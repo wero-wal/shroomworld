@@ -1,0 +1,3 @@
+C:\Users\artyp\Downloads\Student Shared Backup - Summer 2022\Shroomworld_Console\Shroomworld_Console\obj\Debug\Shroomworld_Console.csproj.AssemblyReference.cache
+C:\Users\artyp\Downloads\Student Shared Backup - Summer 2022\Shroomworld_Console\Shroomworld_Console\obj\Debug\Shroomworld_Console.csproj.SuggestedBindingRedirects.cache
+C:\Users\artyp\Downloads\Student Shared Backup - Summer 2022\Shroomworld_Console\Shroomworld_Console\obj\Debug\Shroomworld_Console.csproj.CoreCompileInputs.cache
