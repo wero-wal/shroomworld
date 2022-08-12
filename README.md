@@ -3,5 +3,5 @@
 
 ## Log
 12.08.22
-. Created the repo
-. Pasted in existing code
+* Created the repo
+* Pasted in existing code
