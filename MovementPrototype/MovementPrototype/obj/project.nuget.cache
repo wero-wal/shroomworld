@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "vNBLW5tZB0Kzut/7a0OCo8rCnbfcoE4u68457TRVPuo+bK5fn139GgdP5A54eqECvYEnGLqHJhX7jdolQ3tbew==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\MovementPrototype\\MovementPrototype\\MovementPrototype.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\artyp\\.nuget\\packages\\monogame.content.builder.task\\3.8.1.303\\monogame.content.builder.task.3.8.1.303.nupkg.sha512",
+    "C:\\Users\\artyp\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.1.303\\monogame.framework.desktopgl.3.8.1.303.nupkg.sha512"
+  ],
+  "logs": []
+}
