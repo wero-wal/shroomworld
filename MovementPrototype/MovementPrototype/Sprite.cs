@@ -36,31 +36,19 @@ namespace MovementPrototype
 
         public void MoveLeft()
         {
-            if ((_position.X - _speed) > 0)
-            {
-                _position.X -= _speed;
-            }
+            _position.X = MathF.Max(_position.X - _speed, 0);
         }
         public void MoveRight()
         {
-            if ((_position.X + _speed + _texture.Width) < MyGame.BufferWidth)
-            {
-                _position.X += _speed;
-            }
+            _position.X = MathF.Min(_position.X + _speed, MyGame.BufferWidth - _texture.Width);
         }
         public void MoveUp()
         {
-            if ((_position.Y - _speed) > 0)
-            {
-                _position.Y -= _speed;
-            }
+            _position.Y = MathF.Max(_position.Y - _speed, 0);
         }
         public void MoveDown()
         {
-            if ((_position.Y + _speed + _texture.Height) < MyGame.BufferHeight)
-            {
-                _position.Y += _speed;
-            }
+            _position.Y = MathF.Min(_position.Y + _speed, MyGame.BufferHeight - _texture.Height);
         }
         public void Centre()
         {

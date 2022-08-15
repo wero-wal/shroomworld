@@ -24,3 +24,7 @@ C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype
 C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\obj\Debug\net6.0\MovementPrototype.pdb
 C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\obj\Debug\net6.0\MovementPrototype.genruntimeconfig.cache
 C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\obj\Debug\net6.0\ref\MovementPrototype.dll
+C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\bin\Debug\net6.0\Content\Minecraft_SpriteFont.xnb
+C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\bin\Debug\net6.0\Content\Fonts\MinecraftRegular.xnb
+C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\bin\Debug\net6.0\Content\Fonts\Cambria.xnb
+C:\Users\artyp\source\repos\shroomworld-repo\MovementPrototype\MovementPrototype\bin\Debug\net6.0\Content\Fonts\Font.xnb
