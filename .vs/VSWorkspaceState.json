@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\MovementPrototype",
+    "\\MovementPrototype\\MovementPrototype"
   ],
-  "SelectedNode": "\\ShroomworldConsole",
+  "SelectedNode": "\\MovementPrototype\\MovementPrototype.sln",
   "PreviewInSolutionExplorer": false
 }
