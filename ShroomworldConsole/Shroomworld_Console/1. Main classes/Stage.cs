@@ -12,7 +12,7 @@ namespace Shroomworld_Console
 
         //private Point _origin; // position of the upper left tile. Acts as a reference point for the positions of all the other tiles.
         private Point _camera; // position of the camera. Acts as a reference point to determine which tiles to display and where.
-        private List<Entity> _visibleEntities; // contains all visible NPC and enemy objects (i.e. those within update-range).
+        private List<PhysicalEntity> _visibleEntities; // contains all visible NPC and enemy objects (i.e. those within update-range).
         private Player _player;
 
 

@@ -17,7 +17,7 @@ namespace Shroomworld_Console
         private int
             _width,
             _height;
-        private List<Entity> _entities; // all NPC and enemy objects.
+        private List<PhysicalEntity> _entities; // all NPC and enemy objects.
         private Dictionary<int, BiomeType> _biomes; // key = startpoint of biome, BiomeType = the biome
 
 

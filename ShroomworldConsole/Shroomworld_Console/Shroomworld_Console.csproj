@@ -66,7 +66,7 @@
     <Compile Include="5. Quests\Quest.cs" />
     <Compile Include="5. Quests\QuestItem.cs" />
     <Compile Include="4. Items\ItemType.cs" />
-    <Compile Include="3. Entities\Entity.cs" />
+    <Compile Include="3. Entities\PhysicalEntity.cs" />
     <Compile Include="0. Generic\Texture.cs" />
     <Compile Include="1. Main classes\Stage.cs" />
     <Compile Include="2. World\BiomeType.cs" />
@@ -79,7 +79,8 @@
     <Content Include="tiles.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Prototypes" />
+    <Folder Include="2. Types\" />
+    <Folder Include="Prototypes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

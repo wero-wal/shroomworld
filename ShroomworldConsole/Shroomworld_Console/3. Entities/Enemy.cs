@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld_Console.Entities
 {
-    public class Enemy:Entity
+    public class Enemy:PhysicalEntity
     {
         private int
             _health;

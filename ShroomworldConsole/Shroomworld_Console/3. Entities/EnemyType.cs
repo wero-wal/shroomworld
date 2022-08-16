@@ -24,8 +24,8 @@ namespace Shroomworld_Console
             _max_health,
             _max_speed;
 
-        //- - - - - constructors - - - - -
-        //- - - - - methods - - - - -
+        //- - - - - constructors ----------
+        //- - - - - methods ----------
         // public override string GetKey()
         // {
         //     return $"enemy:{_id}"

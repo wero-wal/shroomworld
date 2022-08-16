@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld_Console
 {
-    public class Player:Entity
+    public class Player:PhysicalEntity
     {
         // Statistics
         private const string

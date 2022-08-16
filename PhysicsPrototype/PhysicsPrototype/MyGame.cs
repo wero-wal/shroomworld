@@ -10,6 +10,9 @@ namespace PhysicsPrototype
     {
         public static float BufferWidth { get => _graphics.PreferredBackBufferWidth; }
         public static float BufferHeight { get => _graphics.PreferredBackBufferHeight; }
+        public static Vector2 TopLeftOfScreen { get => _topLeftOfScreen; }
+        public static Vector2 BottomRightOfScreen { get => _bottomRightOfScreen; }
+        public static Vector2 Gravity = new Vector2(0f, 9.8f);
 
         private enum Functions
         {
@@ -20,17 +23,22 @@ namespace PhysicsPrototype
         }
 
 
+        private static Vector2
+            _topLeftOfScreen = Vector2.Zero,
+            _bottomRightOfScreen;
+
         private static GraphicsDeviceManager _graphics;
+
         private SpriteBatch _spriteBatch;
         private SpriteFont _font;
 
         private Dictionary<Keys, Functions> _functionsDictionary;
         private Player _player;
 
-
         public MyGame()
         {
             _graphics = new GraphicsDeviceManager(this);
+            _bottomRightOfScreen = new Vector2(BufferWidth, BufferHeight);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
@@ -39,6 +47,10 @@ namespace PhysicsPrototype
                 { Keys.Up, Functions.PlayerJump },
                 { Keys.Left, Functions.PlayerMoveLeft },
                 { Keys.Right, Functions.PlayerMoveRight },
+                { Keys.Space, Functions.PlayerJump },
+                { Keys.W, Functions.PlayerJump },
+                { Keys.A, Functions.PlayerMoveLeft },
+                { Keys.D, Functions.PlayerMoveRight },
             };
 
         }
@@ -55,7 +67,8 @@ namespace PhysicsPrototype
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            _player = new Player(new Sprite(Content.Load<Texture2D>("ball"), GetCentreOfScreen(), Color.White));
+            var sprite = new Sprite(Content.Load<Texture2D>("ball"), GetCentreOfScreen(), Color.White);
+            _player = new Player(sprite, 100f, 1f);
             _player.CentreOnOrigin();
 
             _font = Content.Load<SpriteFont>("Font");
@@ -65,7 +78,6 @@ namespace PhysicsPrototype
         {
             Functions action;
             Vector2 direction = Vector2.Zero;
-            bool forceBeingApplied = true;
 
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             { Exit(); }
@@ -81,7 +93,7 @@ namespace PhysicsPrototype
                     switch (action)
                     {
                         case Functions.PlayerJump:
-                            direction.Y--;
+                            direction.Y -= 10; // maybe just code in a Jump()
                             break;
                         case Functions.PlayerMoveLeft:
                             direction.X--;
@@ -93,11 +105,15 @@ namespace PhysicsPrototype
                 }
                 catch (KeyNotFoundException)
                 {
-                    forceBeingApplied = false;
                 }
             }
 
-            _player.Move(direction, 0.2f, forceBeingApplied);
+            //if (direction != Vector2.Zero)
+            //{
+            //    direction.Normalize();
+            //}
+
+            _player.Move(direction, 0.25f, (float)gameTime.ElapsedGameTime.TotalSeconds);
 
             base.Update(gameTime);
         }

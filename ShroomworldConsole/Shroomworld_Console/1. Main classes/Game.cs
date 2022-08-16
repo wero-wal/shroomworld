@@ -8,7 +8,7 @@ namespace Shroomworld_Console
 {
     public class Game
     {
-        //- - - - - enums - - - - -
+        //- - - - - enums ----------
         public enum Input
         {
             // world interaction
@@ -47,13 +47,13 @@ namespace Shroomworld_Console
             ScrollDown,
         }
 
-        //- - - - - public properties - - - - -
+        //- - - - - public properties ----------
         public static Dictionary<int, TileType> TileDictionary { get; private init; }; // ID --> TileType
         public static Dictionary<int, BiomeType> BiomeDictionary { get; private init; }; // ID --> BiomeType
         public static Dictionary<int, ItemType> ItemDictionary { get; private init; }; // ID --> ItemType
         public static Dictionary<int, EnemyType> EnemyDictionary { get; private init; }; // ID --> EnemyType
         
-        // - - - - private properties - - - - - -
+        // - - - - private properties ---------- -
         private const int numOfLayers = 3; // will be determined by biome IRL
         
         private bool
@@ -64,13 +64,13 @@ namespace Shroomworld_Console
         // file management
         // menu management
 
-        //- - - - - constructor - - - - -
+        //- - - - - constructor ----------
         public Game()
         {
             
         }
 
-        //- - - - - methods - - - - -
+        //- - - - - methods ----------
         // Input
         public static Input Get_Input() // TODO
         {

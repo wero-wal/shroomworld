@@ -2,10 +2,13 @@
 **My A-Level Project**
 
 ## Tasks
--[ ] Add text to the basic movement prototype to show the position of the ball.
--[ ] Start work on the advanced movement prototype.
+- [x] _16.08.22_: Add text to the basic movement prototype to show the position of the ball.
+- [x] _16.08.22_: Start work on the advanced movement prototype.
+- [ ] : `PhysicalEntity` class
+- [ ] : Sort out collisions
+- [ ] : Add `CreateFolder()` in `Player` class
 
-## Log
+## Change Log
 
 ### 12.08.22
 1. Created the repository.

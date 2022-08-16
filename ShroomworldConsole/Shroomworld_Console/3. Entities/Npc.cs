@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld_Console
 {
-    public class Npc:Entity
+    public class Npc:PhysicalEntity
     {
         //---Enums---
         //---Constants---
