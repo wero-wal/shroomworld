@@ -15,10 +15,10 @@ namespace Shroomworld
 
 
         // ---------- Properties ----------
-
+        public string Name { get => _name; set => _name = value; }
 
         // ---------- Fields ----------
-        private static MyLibrary.Range _allowedlength;
+        private static Range _allowedlength;
 
         private string _name;
 
@@ -29,19 +29,11 @@ namespace Shroomworld
         }
 
         // ---------- Methods ----------
-        public static void SetMinAndMaxLength(int minLength, int maxLength)
+        public static void SetMinAndMaxLength(byte minLength, byte maxLength)
         {
-            if (minLength == maxLength)
-            {
-                throw new ArgumentException("Minimum and maximum username lengths must be different.");
-            }
-            if (minLength > maxLength)
-            {
-                (minLength, maxLength) = (maxLength, minLength);
-            }
             if (_allowedlength == null) // This is true by default
             {
-                _allowedlength = new MyLibrary.Range(minLength, maxLength, true);
+                _allowedlength = new Range(minLength, maxLength, true);
             }
             else
             {
@@ -49,10 +41,9 @@ namespace Shroomworld
             }
         }
 
-
         public bool Update(string name)
         {
-            if (_allowedlength.CheckIfInRange(name.Length))
+            if (_allowedlength.CheckIfInRange((byte)name.Length))
             {
                 _name = name;
                 return true;

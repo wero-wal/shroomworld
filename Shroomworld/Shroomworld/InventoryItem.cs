@@ -6,16 +6,24 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    public class TileType : XType
+    internal class InventoryItem
     {
         // ---------- Enums ----------
+
+
         // ---------- Properties ----------
+        public int Amount { get => _amount; }
+
         // ---------- Fields ----------
+        private readonly int _id;
+
+        private int _amount;
+
         // ---------- Constructors ----------
+
+
         // ---------- Methods ----------
-        public MoveableSprite GenerateEntity()
-        {
-            return new MoveableSprite();
-        }
+
+
     }
 }

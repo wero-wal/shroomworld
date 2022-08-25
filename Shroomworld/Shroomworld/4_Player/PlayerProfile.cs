@@ -26,7 +26,7 @@ namespace Shroomworld
         private Texture2D[] _skins;
         //private Settings _settings;
         //private PlayerProperties _properties;
-        private Dictionary<string, int>[] _statistics; // [worldId][statName] => or createee StatsDictionary.cs
+        private Dictionary<string, int>[] _statistics; // [worldId][statName]
 
         // ---------- Constructors ----------
 

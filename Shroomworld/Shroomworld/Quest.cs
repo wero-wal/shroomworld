@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    public class WorldPlayer : MoveableEntity // exists within one world. Stores: quests, stats, powerups, incentory
+    internal class Quest
     {
         // ---------- Enums ----------
 
-        
+
         // ---------- Properties ----------
 
 
         // ---------- Fields ----------
-        
+
 
         // ---------- Constructors ----------
 
 
         // ---------- Methods ----------
+
 
     }
 }

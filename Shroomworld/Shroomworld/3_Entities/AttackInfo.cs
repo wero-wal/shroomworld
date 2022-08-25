@@ -6,16 +6,29 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    public class TileType : XType
+    internal class AttackInfo : IAggressive
     {
         // ---------- Enums ----------
+
+
         // ---------- Properties ----------
+
+
         // ---------- Fields ----------
+        private readonly byte _strength;
+        private readonly byte _range;
+        private readonly byte _speed;
+        private readonly byte _cooldown;
+
         // ---------- Constructors ----------
+
+
         // ---------- Methods ----------
-        public MoveableSprite GenerateEntity()
+        public void Attack(out byte strength)
         {
-            return new MoveableSprite();
+            strength = _strength;
+            // do animation or something
+            return;
         }
     }
 }

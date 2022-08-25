@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 {
-    public class TileEntity : StaticEntity
+    public class TileEntity : StaticSprite
     {
         // ---------- Enums ----------
         // ---------- Properties ----------
@@ -17,9 +17,12 @@ namespace Shroomworld
         // ---------- Fields ----------
         private readonly int _id;
 
+        private bool _placedByPlayer; // for statistical purposes
+
         // ---------- Constructors ----------
         public TileEntity(int id, Vector2 position) : base(MyGame.TileDictionary[id].Texture, position)
         {
+            _id = id;
         }
 
         // ---------- Methods ----------

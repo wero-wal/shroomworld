@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,25 +10,21 @@ namespace Shroomworld
         // ---------- Enums ----------
         // ---------- Properties ----------
         public static Dictionary<int, XType> Dictionary { get => _dictionary; }
-        public static string[] FullIds { get => _fullIds; }
 
-
+        public string FullId { get => _fullId; }
         public string Name { get => _name; }
         public string PluralName { get => _pluralName; }
 
         // ---------- Fields ----------
         protected static Dictionary<int, XType> _dictionary;
-        protected static string[] _fullIds;
 
+        protected readonly string _name;
+        protected readonly string _type;
+        protected readonly string _pluralName;
+        protected readonly int _id;
+        protected readonly Texture2D _texture;
 
-        protected readonly string
-            _name,
-            _type,
-            _pluralName;
-        protected readonly int
-            _id;
-        protected readonly Texture2D
-            _texture;
+        protected string _fullId;
 
         // ---------- Constructors ----------
         public XType()
@@ -42,7 +35,7 @@ namespace Shroomworld
         {
             ParseFileText(fileText);
             _dictionary.Add(_id, this);
-            _fullIds.Add(GetFullId());
+            _fullId = GetFullId();
         }
 
         // ---------- Methods ----------
@@ -50,11 +43,7 @@ namespace Shroomworld
         {
             return $"{_type}:{_name}";
         }
-        public Entity GenerateEntity()
-        {
-            return new Entity(); // customise for each type
-        }
-        protected XType ParseFileText(string fileText)
+        protected void ParseFileText(string fileText)
         {
 
         }

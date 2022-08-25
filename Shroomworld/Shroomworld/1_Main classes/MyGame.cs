@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -7,6 +8,9 @@ namespace Shroomworld
 {
     public class MyGame : Game
     {
+        public static Vector2 TopLeftOfScreen;
+        public static Vector2 BottomRightOfScreen;
+
         public static Dictionary<int, XType>
             TileDictionary,
             ItemDictionary,
@@ -55,6 +59,19 @@ namespace Shroomworld
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        public static Vector2 ClampToScreen(float x, float y)
+        {
+            x = Math.Clamp(x, MyGame.TopLeftOfScreen.X, MyGame.BottomRightOfScreen.X);
+            y = Math.Clamp(y, MyGame.TopLeftOfScreen.Y, MyGame.BottomRightOfScreen.Y);
+            return new Vector2(x, y);
+        }
+        public static Vector2 ClampToScreen(Vector2 vector)
+        {
+            var x = Math.Clamp(vector.X, MyGame.TopLeftOfScreen.X, MyGame.BottomRightOfScreen.X);
+            var y = Math.Clamp(vector.Y, MyGame.TopLeftOfScreen.Y, MyGame.BottomRightOfScreen.Y);
+            return new Vector2(x, y);
         }
     }
 }

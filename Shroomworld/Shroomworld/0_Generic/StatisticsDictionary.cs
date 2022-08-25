@@ -19,9 +19,6 @@ namespace Shroomworld
             _items,
             _enemies,
             _npcQuests;
-        private static string
-            _totalEnemies,
-            _totalQuests;
 
         private static List<string> _allKeys; // TODO: change this to list
 
