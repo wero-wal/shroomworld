@@ -4,24 +4,41 @@ namespace Shroomworld
 {
     internal class HealthInfo
     {
-        // ---------- Enums ----------
-
-
         // ---------- Properties ----------
-        public float PercentHealth { get => (float)_health / _maxHealth; }
-        public byte MaxHealth { get => _maxHealth; }
+        public float PercentHealth { get => (float)_health / maxHealth; }
+        public byte MaxHealth { get => maxHealth; }
         public byte Health { get => _health; }
 
         // ----------Fields----------
-        protected readonly byte _maxHealth;
+        protected const char _separator = ' ';
+
+        protected readonly byte maxHealth;
         protected readonly byte _regenAmountPerSecond;
 
         protected byte _health;
 
         // ---------- Constructors ----------
-
+        public HealthInfo(string plainText)
+        {
+            string[] split = plainText.Split(_separator);
+            byte i = 0;
+            _health = Convert.ToByte(split[i++]);
+            _maxHealth = Convert.ToByte(split[i++]);
+            _regenAmountPerSecond = Convert.ToByte(split[i++]);
+        }
+        protected HealthInfo(byte maxHealth, byte regenAmountPerSecond)
+        {
+            _health = maxHealth;
+            _maxHealth = maxHealth;
+            _regenAmountPerSecond = regenAmountPerSecond;
+        }
 
         // ---------- Methods ----------
+        public static virtual HealthInfo CreateNew(byte maxHealth, byte regenAmountPerSecond)
+        {
+            return new HealthInfo(maxHealth, regenAmountPerSecond);
+        }
+
         /// <summary>
         /// Decreases the health by the desired amount.
         /// </summary>
@@ -36,13 +53,23 @@ namespace Shroomworld
         {
             _health = _maxHealth;
         }
-        public virtual void RegenerateHealthNaturally(byte fps)
+        public virtual void RegenerateHealth(byte fps)
         {
             if (_health < _maxHealth)
             {
                 byte healAmount = (byte)(_regenAmountPerSecond / fps);
-                _health = (byte)Math.Clamp(_health + healAmount, _health, _maxHealth);
+                AddHealth(healAmount);
             }
         }
+        public virtual string ToString()
+        {
+            return FileFormatter.FormatAsPlainText(_health, _maxHealth, _regenAmountPerSecond, FileFormatter.SecondarySeparator);
+        }
+
+        protected void AddHealth(byte healthToAdd)
+        {
+            _health += healthToAdd;
+        }
+
     }
 }

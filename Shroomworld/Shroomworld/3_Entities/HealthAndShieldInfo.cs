@@ -4,10 +4,6 @@ namespace Shroomworld
 {
     internal class HealthAndShieldInfo : HealthInfo
     {
-
-        // ---------- Enums ----------
-
-
         // ---------- Properties ----------
         public float PercentShield { get => (float)_shieldHealth / _maxShieldHealth; }
 
@@ -16,9 +12,22 @@ namespace Shroomworld
         private byte _shieldHealth;
 
         // ---------- Constructors ----------
-
+        public HealthAndShieldInfo(string healthPlainText, string shieldPlainText, byte maxShieldHealth) : base(healthPlainText)
+        {
+            _shieldHealth = Convert.ToByte(shieldPlainText);
+            _maxShieldHealth = maxShieldHealth;
+        }
+        private HealthAndShieldInfo(byte maxHealth, byte regenAmountPerSecond) : base(maxHealth, regenAmountPerSecond)
+        {
+            _shieldHealth = 0;
+            _maxShieldHealth = 0;
+        }
 
         // ---------- Methods ----------
+        public static override HealthAndShieldInfo CreateNew()
+        {
+            return new HealthAndShieldInfo();
+        }
         public override void DecreaseHealth(byte amount, out bool dead)
         {
             if (_shieldHealth > 0) // shield is active
@@ -36,36 +45,36 @@ namespace Shroomworld
             }
             dead = _health <= 0; // entity should be dead
         }
-        public override void RegenerateHealthNaturally(byte fps)
+        public override void RegenerateHealth(byte fps)
         {
             byte healAmount = (byte)(_regenAmountPerSecond / fps);
 
             if (_health < _maxHealth) // entity needs healing
             {
-                Heal(healAmount, out byte remainder);
+                AddHealth(healAmount, out byte remainder);
 
                 if (remainder > 0)
                 {
-                    HealShield(remainder); // pass on the remainder to the shield
+                    AddHealthToShield(remainder); // pass on the remainder to the shield
                 }
             }
             else if(_shieldHealth < _maxShieldHealth) // shield needs healing
             {
-                HealShield(healAmount);
+                AddHealthToShield(healAmount);
             }
         }
-        private void Heal(byte healthToAdd, out byte remainder)
+        protected void AddHealth(byte healthToAdd, out byte remainder)
         {
             _health += healthToAdd;
             remainder = (byte)(_maxHealth - _health);
         }
-        private void HealShield(byte healthToAdd)
+        private void AddHealthToShield(byte healthToAdd)
         {
             _shieldHealth = (byte)Math.Clamp(_shieldHealth + healthToAdd, _shieldHealth, _maxShieldHealth);
         }
-        public void EnableShield(byte level, byte multiplier)
+        public void SetMaxShieldHealth(byte maxShieldHealth)
         {
-            _maxShieldHealth = (byte)(level * multiplier);
+            _maxShieldHealth = maxShieldHealth;
 
             // can only activate the shield if the player is at max health
             if (_health == _maxHealth)
@@ -81,6 +90,10 @@ namespace Shroomworld
         {
             _shieldHealth = 0;
             _maxShieldHealth = 0;
+        }
+        public override string ToString()
+        {
+            return FileFormatter.FormatAsPlainText(base.ToString(), _shieldHealth.ToString(), FileFormatter.SecondarySeparator);
         }
     }
 }
