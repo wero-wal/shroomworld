@@ -8,27 +8,31 @@ namespace Shroomworld
         public float PercentShield { get => (float)_shieldHealth / _maxShieldHealth; }
 
         // ---------- Fields ----------
-        private byte _maxShieldHealth;
-        private byte _shieldHealth;
+        private int _maxShieldHealth;
+        private int _shieldHealth;
 
         // ---------- Constructors ----------
-        public HealthAndShieldInfo(string healthPlainText, string shieldPlainText, byte maxShieldHealth) : base(healthPlainText)
+        /// summary: maxShieldHealth should be taken from the powerup
+        public HealthAndShieldInfo(string healthPlainText, string shieldPlainText, int maxShieldHealth) : base(healthPlainText)
         {
-            _shieldHealth = Convert.ToByte(shieldPlainText);
+            _shieldHealth = Convert.ToInt32(shieldPlainText);
             _maxShieldHealth = maxShieldHealth;
         }
-        private HealthAndShieldInfo(byte maxHealth, byte regenAmountPerSecond) : base(maxHealth, regenAmountPerSecond)
+        private HealthAndShieldInfo(int maxHealth, int regenAmountPerSecond) : base(maxHealth, regenAmountPerSecond)
         {
             _shieldHealth = 0;
             _maxShieldHealth = 0;
         }
 
         // ---------- Methods ----------
+        // static
         public static override HealthAndShieldInfo CreateNew()
         {
             return new HealthAndShieldInfo();
         }
-        public override void DecreaseHealth(byte amount, out bool dead)
+        
+        // public
+        public override void DecreaseHealth(int amount, out bool dead)
         {
             if (_shieldHealth > 0) // shield is active
             {
@@ -45,13 +49,13 @@ namespace Shroomworld
             }
             dead = _health <= 0; // entity should be dead
         }
-        public override void RegenerateHealth(byte fps)
+        public override void RegenerateHealth(int fps)
         {
-            byte healAmount = (byte)(_regenAmountPerSecond / fps);
+            int healAmount = _regenAmountPerSecond / fps;
 
             if (_health < _maxHealth) // entity needs healing
             {
-                AddHealth(healAmount, out byte remainder);
+                AddHealth(healAmount, out int remainder);
 
                 if (remainder > 0)
                 {
@@ -63,37 +67,31 @@ namespace Shroomworld
                 AddHealthToShield(healAmount);
             }
         }
-        protected void AddHealth(byte healthToAdd, out byte remainder)
+        public override string ToString()
         {
-            _health += healthToAdd;
-            remainder = (byte)(_maxHealth - _health);
+            return FileFormatter.FormatAsPlainText(base.ToString(), _shieldHealth, levelOfSeparator: FileFormatter.Secondary);
         }
-        private void AddHealthToShield(byte healthToAdd)
+        
+        public void ChangeMaxShieldHealth(int newMaxShieldHealth)
         {
-            _shieldHealth = (byte)Math.Clamp(_shieldHealth + healthToAdd, _shieldHealth, _maxShieldHealth);
-        }
-        public void SetMaxShieldHealth(byte maxShieldHealth)
-        {
-            _maxShieldHealth = maxShieldHealth;
-
-            // can only activate the shield if the player is at max health
-            if (_health == _maxHealth)
-            {
-                _shieldHealth = _maxShieldHealth;
-            }
-            else
-            {
-                _shieldHealth = 0;
-            }
+            _maxShieldHealth = newMaxShieldHealth;
+            // no need to change _shieldHealth, as health will regenerate naturally to the max.
         }
         public void DisableShield()
         {
             _shieldHealth = 0;
             _maxShieldHealth = 0;
         }
-        public override string ToString()
+        
+        // private
+        private void AddHealth(int healthToAdd, out int remainder)
         {
-            return FileFormatter.FormatAsPlainText(base.ToString(), _shieldHealth.ToString(), FileFormatter.SecondarySeparator);
+            _health += healthToAdd;
+            remainder = _maxHealth - _health;
+        }
+        private void AddHealthToShield(int healthToAdd)
+        {
+            _shieldHealth = Math.Clamp(_shieldHealth + healthToAdd, _shieldHealth, _maxShieldHealth);
         }
     }
 }

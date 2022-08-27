@@ -5,28 +5,26 @@ namespace Shroomworld
     internal class HealthInfo
     {
         // ---------- Properties ----------
-        public float PercentHealth { get => (float)_health / maxHealth; }
-        public byte MaxHealth { get => maxHealth; }
-        public byte Health { get => _health; }
+        public float PercentHealth { get => (float)_health / _maxHealth; }
+        public int MaxHealth { get => _maxHealth; }
+        public int Health { get => _health; }
 
         // ----------Fields----------
-        protected const char _separator = ' ';
+        protected readonly int _maxHealth;
+        protected readonly int _regenAmountPerSecond;
 
-        protected readonly byte maxHealth;
-        protected readonly byte _regenAmountPerSecond;
-
-        protected byte _health;
+        protected int _health;
 
         // ---------- Constructors ----------
         public HealthInfo(string plainText)
         {
-            string[] split = plainText.Split(_separator);
-            byte i = 0;
-            _health = Convert.ToByte(split[i++]);
-            _maxHealth = Convert.ToByte(split[i++]);
-            _regenAmountPerSecond = Convert.ToByte(split[i++]);
+            string[] parts = plainText.Split(FileFormatter.Secondary);
+            int i = 0;
+            _health = Convert.ToInt32(parts[i++]);
+            _maxHealth = Convert.ToInt32(parts[i++]);
+            _regenAmountPerSecond = Convert.ToInt32(parts[i++]);
         }
-        protected HealthInfo(byte maxHealth, byte regenAmountPerSecond)
+        protected HealthInfo(int maxHealth, int regenAmountPerSecond)
         {
             _health = maxHealth;
             _maxHealth = maxHealth;
@@ -34,7 +32,7 @@ namespace Shroomworld
         }
 
         // ---------- Methods ----------
-        public static virtual HealthInfo CreateNew(byte maxHealth, byte regenAmountPerSecond)
+        public static virtual HealthInfo CreateNew(int maxHealth, int regenAmountPerSecond)
         {
             return new HealthInfo(maxHealth, regenAmountPerSecond);
         }
@@ -44,7 +42,7 @@ namespace Shroomworld
         /// </summary>
         /// <param name="amount"></param>
         /// <returns>true if health &lt;= 0</returns>
-        public virtual void DecreaseHealth(byte amount, out bool dead)
+        public virtual void DecreaseHealth(int amount, out bool dead)
         {
             _health -= amount;
             dead = _health <= 0;
@@ -53,23 +51,22 @@ namespace Shroomworld
         {
             _health = _maxHealth;
         }
-        public virtual void RegenerateHealth(byte fps)
+        public virtual void RegenerateHealth(int fps)
         {
             if (_health < _maxHealth)
             {
-                byte healAmount = (byte)(_regenAmountPerSecond / fps);
+                int healAmount = _regenAmountPerSecond / fps;
                 AddHealth(healAmount);
             }
         }
         public virtual string ToString()
         {
-            return FileFormatter.FormatAsPlainText(_health, _maxHealth, _regenAmountPerSecond, FileFormatter.SecondarySeparator);
+            return FileFormatter.FormatAsPlainText(_health, _maxHealth, _regenAmountPerSecond, levelOfSeparator: FileFormatter.Secondary);
         }
 
-        protected void AddHealth(byte healthToAdd)
+        protected void AddHealth(int healthToAdd)
         {
             _health += healthToAdd;
         }
-
     }
 }

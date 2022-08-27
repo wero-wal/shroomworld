@@ -15,27 +15,27 @@ namespace Shroomworld
 
 
         // ---------- Fields ----------
+        private Sprite _sprite;
         private HealthInfo _healthInfo;
         private AttackInfo _attackInfo;
-        private List<PowerUp> _powerUps;
+        private PowerUps _powerUps;
         private InventoryItem[,] _inventory;
-        private Dictionary<string, int> _statistics;
         private List<Quest> _quests;
+        private Dictionary<string, int> _statistics;
 
         // ---------- Constructors ----------
-        public Player(string fileText)
+        public Player(string plainText) // might change this to a List<string> lines. or maybe not (cos if it's on one line, it can fit nicely into the world file).
         {
-            string[] splitFileText = fileText.Split(PrimarySeparator_Char);
-            byte i = 0; // index
-            _powerUps = new PowerUps(splitFileText[i++]);
-            _healthInfo = new HealthAndShieldInfo(Convert.ToByte(splitFileText [i++]), _powerUps.Shield);
-            _inventory = ParseInventory(splitFileText[i++]);
-            _statistics = ParseStatistics(splitFileText[i++]);
-            _quests = ParseQuests(splitFileText[i++]);
+            string[] parts = plainText.Split(FileFormatter.Separator_Chars[FileFormatter.Primary]);
+            int i = 0; // index
+            _sprite = new MoveableSprite(LoadTexture(parts[i++]), ParsePosition(parts[i++]));
+            _powerUps = new PowerUps(parts[i++]);
+            _healthInfo = new HealthAndShieldInfo(healthPlainText: parts[i++], shieldPlainText: parts[i++], _powerUps.Shield);
             _attackInfo = new AttackAndBoostInfo(_powerUps.Damage);
-            _sprite = new MoveableSprite(LoadTexture(splitFileText[i++]), ParsePosition(splitFileText[i++]));
+            _inventory = ParseInventory(parts[i++]); // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
+            _quests = ParseQuests(parts[i++]);
+            _statistics = ParseStatistics(parts[i++]);
         }
-        
         private Player()
         {
             _sprite = MoveableSprite.CreateNew(_defaultTexture, MyGame.CentreOfScreen);
@@ -46,24 +46,29 @@ namespace Shroomworld
         }
 
         // ---------- Methods ----------
+        // public ---
+        // . admin stuff
         public static Player CreateNew()
         {
             return Player();
         }
-        public void Attack(out byte attackStrength)
+        public string ToString()
+        {
+            string plainText = FileFormatter.FormatAsPlainText(_sprite, _powerUps, _healthInfo, _attackInfo,
+            InventoryToString(), _quests.ToArray(), _statistics.Values,
+                separatorLevel: FileFormatter.Primary);
+        }
+        
+        // . actions
+        public void Attack(out int attackStrength)
         {
             attackStrength = _attackInfo.Strength;
         }
-        private void ParseStatistics(string plainText)
-        {
-            string[] split = plainText.Split(SecondarySeparator_Char);
-            byte i = 0;
-            foreach (var key in _statistics.Keys)
-            {
-                _statistics[key] = Convert.ToInt(split[i++]);
-            }
-        }
-        private void ParseQuests()
+        
+
+        // private ---
+        // . parsing
+        private void ParsePosition()
         {
 
         }
@@ -71,29 +76,23 @@ namespace Shroomworld
         {
 
         }
-        private void ParsePosition()
+        private void ParseQuests()
         {
 
         }
-
-        public string ToString()
+        private void ParseStatistics(string plainText)
         {
-            string plainText = FileFormatter.FormatAsPlainText(_powerUps.ToString(), _healthInfo.ToString(), _attackInfo.ToString(), GetStatisticsToString(),
-            QuestsToString(), _sprite.ToString(), separator: FileFormatter.PrimarySeparator);
-        }
-        private string StatisticsToString()
-        {
-            string[] array = new string[_statistics.Count];
-            int i = 0;
-            foreach(var item in _statistics)
+            string[] split = plainText.Split(FileFormatter.SecondarySeparator_Char);
+            for (int i = 0; i < _statistics.Count; i++)
             {
-                array[i++] = item.Value.ToString();
+                _statistics.Values[i] = Convert.ToInt32(split[i++]);
             }
-            return FileFormatter.FormatAsPlainText(array, FileFormatter.SecondarySeparator);
         }
-        private string QuestsToString()
+        
+        // . formatting
+        private string InventoryToString()
         {
-            return FileFormatter.FormatAsPlainText(_quests.ToArray(), FileFormatter.SecondarySeparator);
+            // can be 1D
         }
     }
 }

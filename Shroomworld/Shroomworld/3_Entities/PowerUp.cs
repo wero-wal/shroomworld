@@ -5,22 +5,33 @@ namespace Shroomworld
     internal class PowerUp
     {
         // ---------- Properties ----------
-        public byte Value { get => _level * _multiplier; }
+        public int Value { get => _level * _multiplier; }
         
         // ---------- Fields ----------
-        private static byte _minLevel;
-        private static byte _maxLevel;   
-        private static byte _multiplier;
+        // static
+        private static int _minLevel;
+        private static int _maxLevel;   
+        private static int _multiplier;
         
-        private byte _level;
+        // non-static
+        private int _level;
 
         // ---------- Constructors ---------- 
-        public PowerUp(byte level = MinLevel)
+        public PowerUp(int level = MinLevel)
         {
             _level = level;
         }
 
         // ---------- Methods ----------
+        public static void SetMinAndMaxLevel(int min, int max)
+        {
+            if (_minLevel == _maxLevel) // haven't been set yet
+            {
+                _minLevel = min;
+                _maxLevel = max;
+            }
+        }
+        
         public void IncreaseLevel()
         {
             if (_level < MaxLevel)
@@ -28,7 +39,6 @@ namespace Shroomworld
                 _level++;
             }
         }
-
         public string ToString()
         {
             return _level.ToString();
