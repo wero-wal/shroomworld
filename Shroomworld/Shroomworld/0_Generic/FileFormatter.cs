@@ -25,7 +25,7 @@ namespace Shroomworld
 			}
 			return plainText;
 		}
-		public static string FormatAsPlainText<string>(params string[] items, string separator)
+		public static string FormatAsPlainText(params string[] items, string separator)
 		{
 			string plainText = items[0];
 			foreach(string item in items)

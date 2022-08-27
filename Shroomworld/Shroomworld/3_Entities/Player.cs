@@ -58,7 +58,7 @@ namespace Shroomworld
         {
             string[] split = plainText.Split(SecondarySeparator_Char);
             byte i = 0;
-            foreach (Key key in _statistics.KeyValuePairs)
+            foreach (var key in _statistics.Keys)
             {
                 _statistics[key] = Convert.ToInt(split[i++]);
             }
@@ -78,8 +78,8 @@ namespace Shroomworld
 
         public string ToString()
         {
-            string plainText = FileFormatter.FormatAsPlainText(_powerUps.ToString(), _healthInfo.ToString(), _attackInfo.ToString(), GetStatisticsToString()),
-                QuestsToString(), _sprite.ToString(), FileFormatter.PrimarySeparator);
+            string plainText = FileFormatter.FormatAsPlainText(_powerUps.ToString(), _healthInfo.ToString(), _attackInfo.ToString(), GetStatisticsToString(),
+            QuestsToString(), _sprite.ToString(), separator: FileFormatter.PrimarySeparator);
         }
         private string StatisticsToString()
         {
