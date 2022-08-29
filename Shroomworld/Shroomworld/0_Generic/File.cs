@@ -1,8 +1,10 @@
 using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 {
-	internal static class FileFormatter
+	internal static class File
 	{
 		// ---------- Fields ----------
 		public const string[] Separator_Strings = { ",", " ", ";" };
@@ -10,6 +12,15 @@ namespace Shroomworld
 		public const int Primary = 0;
 		public const int Secondary = 1;
 		public const int Tertiary = 2;
+
+		// Directory names
+		public const string TextureDirectory = "textures/";
+		public const string TileDirectory = "tiles/";
+		public const string EnemyDirectory = "enemies/";
+
+
+		// File names
+		public const string TileFile = "tiles.txt";
 
 		// ---------- Methods ----------
 		public static string FormatAsPlainText(params object[] items, string separator)
@@ -50,6 +61,11 @@ namespace Shroomworld
 				plainText += separator + items[i];
 			}
 			return plainText;
+		}
+		
+		public static Texture LoadTexture(string typeDirectory, string textureFileName)
+		{
+			return Content.Load<Texture>(TextureDirectory + type + textureFileName);
 		}
 	}
 }
