@@ -14,7 +14,7 @@ namespace Shroomworld
 		// ---------- Constructors ----------
 		public Drop(string plainText, int separatorLevel)
 		{
-			string[] parts = plainText.Split(File.Separator_Chars[separatorLevel]);
+			string[] parts = plainText.Split(File.Separators[separatorLevel]);
 			int i = 0;
 			_id = Convert.ToInt32(parts[i++]);
 			_min = Convert.ToInt32(parts[i++]);

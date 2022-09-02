@@ -17,7 +17,7 @@ namespace Shroomworld
         // ---------- Constructors ----------
         public TileType(string plainText)
         {
-            string[] parts = plainText.Split(File.Separator_Chars[File.Primary]);
+            string[] parts = plainText.Split(File.Separators[File.Primary]);
             int i = 0;
             _id = Convert.ToInt32(parts[i++]);
             _name = parts[i++];
@@ -28,12 +28,12 @@ namespace Shroomworld
         // ---------- Methods ----------
         public Sprite GetSprite()
         {
-            return new StaticSprite(File.LoadTexture("tiles/" + _name), _isSolid);
+            return new StaticSprite(File.LoadTexture(File.TileDirectory + _id), _isSolid);
         }
 
         private void ParseDrops(string plainText, int separatorLevel)
         {
-            string[] parts = plainText.Split(File.Separator_Chars[separatorLevel]);
+            string[] parts = plainText.Split(File.Separators[separatorLevel]);
             foreach(string part in parts)
             {
                 _drops.Add(new Drop(part, ++separatorLevel));

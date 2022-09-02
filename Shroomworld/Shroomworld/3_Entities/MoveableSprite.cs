@@ -19,6 +19,8 @@ namespace Shroomworld
         public Vector2 Velocity { get => _velocity; }
 
         // ---------- Fields ----------
+        private const int _jumpMultiplier = 10;
+
         private readonly float _movementForce;
         private readonly float _jumpForce;
         private readonly float _constantOfRestitution;
@@ -27,22 +29,27 @@ namespace Shroomworld
         private Vector2 _velocity;
 
         // ---------- Constructors ----------
-        public MoveableSprite(Texture2D texture, float movementForce, float jumpForce, float constantOfRestitution) : base(texture)
+        public MoveableSprite(Texture2D texture, float movementForce, float constantOfRestitution) : base(texture)
         {
             _movementForce = movementForce;
-            _jumpForce = jumpForce;
+            _jumpForce = movementForce * _jumpMultiplier;
             _constantOfRestitution = constantOfRestitution;
             _velocity = Vector2.Zero;
         }
-        public MoveableSprite(Texture2D texture, Vector2 position, float movementForce, float jumpForce, float constantOfRestitution) : base(texture, position)
+        private MoveableSprite(Texture2D texture, Vector2 position, float movementForce, float constantOfRestitution) : base(texture, position)
         {
             _movementForce = movementForce;
-            _jumpForce = jumpForce;
+            _jumpForce = movementForce * _jumpMultiplier;
             _constantOfRestitution = constantOfRestitution;
             _velocity = Vector2.Zero;
         }
 
         // ---------- Methods ----------
+        public static MoveableSprite CreateNew(Texture2D texture, Vector2 position, float movementForce, float constantOfRestitution)
+        {
+            return new MoveableSprite(texture, position, movementForce, constantOfRestitution);
+        }
+
         public override void SetPosition(float x, float y)
         {
             if (_clampToEdgeOfScreen)

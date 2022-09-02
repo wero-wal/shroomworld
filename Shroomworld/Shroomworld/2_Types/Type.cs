@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 {
-    public abstract class Type : IType
+    public abstract class Type
     {
         // ---------- Properties ----------
         public static Dictionary<int, Type> Dictionary { get => _dictionary; }
@@ -25,18 +25,16 @@ namespace Shroomworld
 
 
         // ---------- Constructors ----------
-        public abstract Type(string plainText); // must add to dictionary here
-
         // ---------- Methods ----------
         public abstract Sprite GetSprite();
 
-        protected sealed void ParseNamesAndId(ref int index, string[] parts)
+        protected void ParseNamesAndId(ref int index, string[] parts)
         {
             _id = Convert.ToInt32(parts[index++]);
             _name = parts[index++];
             _pluralName = parts[index++];
         }
-        protected sealed void AddToDictionary()
+        protected void AddToDictionary()
         {
             _dictionary.Add(_id, this);
         }
