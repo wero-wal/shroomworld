@@ -4,9 +4,11 @@
 ## Tasks
 - [x] _16.08.22_: Add text to the basic movement prototype to show the position of the ball.
 - [x] _16.08.22_: Start work on the advanced movement prototype.
-- [ ] : `PhysicalEntity` class
-- [ ] : Sort out collisions
-- [ ] : Add `CreateFolder()` in `Player` class
+- [x] `PhysicalEntity` class
+- [ ] Sort out collisions
+- [ ] Add `CreateFolder()` in `Player` class
+- [ ] Finish physical prototype
+- [ ] Quest prototype
 
 ## Change Log
 
@@ -15,5 +17,5 @@
 2. Pasted in existing code.
 3. Reformatted identifiers to fit C# guidelines.
 
-### 15.08.22
+### 15.08.22+
 - See commits

@@ -38,7 +38,7 @@ namespace Shroomworld
             _position = Vector2.Zero;
             _size = new Vector2(_texture.Width, _texture.Height);
         }
-        public Sprite(Texture2D texture, Vector2 position)
+        protected Sprite(Texture2D texture, Vector2 position)
         {
             _texture = texture;
             _position = position;
@@ -46,6 +46,11 @@ namespace Shroomworld
         }
 
         // ---------- Methods ----------
+        public static Sprite CreateNew(Texture2D texture, Vector2 position)
+        {
+            return new Sprite(texture, position);
+        }
+
         public Vector2[] GetVertices()
         {
             return new Vector2[]

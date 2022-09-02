@@ -22,10 +22,6 @@ namespace Shroomworld
         {
             _solid = solid;
         }
-        public StaticSprite(Texture2D texture, Vector2 position, bool solid) : base(texture, position)
-        {
-            _solid = solid;
-        }
 
         // ---------- Methods ----------
     }
