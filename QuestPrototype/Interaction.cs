@@ -7,12 +7,22 @@ namespace QuestPrototype
         // ----- Fields -----
         private string _message;
         private string[] _responses;
-        private Quest _quest;
+
+        // ----- Constructors -----
+        internal Interaction(string message, params string[] responses)
+        {
+            _message = message;
+            _responses = responses;
+        }
 
         // ----- Methods -----
-        public void Update()
+        internal void Update()
         {
 
+        }
+        internal void Display()
+        {
+            
         }
     }
 }

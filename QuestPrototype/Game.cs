@@ -27,19 +27,20 @@ namespace QuestPrototype
         // ----- Fields -----
         private Dictionary<ConsoleKey, UserInput> _keyBinds;
         private Player _player;
+        private List<Npc> _npcs;
 
         // ----- Constructors -----
         internal Game()
         {
-            SetKeyBinds();
         }
 
         // ----- Methods -----
 		internal static void Play()
 		{
+            SetKeyBinds();
             Console.CursorVisible = false;
-			UserInput userInput;
             _player = new Player(GetString("Name: "));
+			UserInput userInput;
 			do
 			{
                 userInput = GetUserInput();
@@ -47,7 +48,8 @@ namespace QuestPrototype
 			} while (true);
 		}
 
-		private static UserInput SetKeyBinds(ConsoleKey key)
+        // Setup
+		private void SetKeyBinds()
 		{
             _keyBinds = new Dictionary<ConsoleKey, UserInput>
             {
@@ -78,6 +80,16 @@ namespace QuestPrototype
                 { ConsoleKey.Enter, UserInput.Enter },
             };
 		}
+        private void CreateNpcs(int amount)
+        {
+            List<Point> usedPoints;
+            for(int i = 0; i < amount; i++)
+            {
+                
+            }
+        }
+
+        // Inputs
         private UserInput GetUserInput()
         {
             try

@@ -26,7 +26,7 @@ namespace QuestPrototype
         {
             _quests = quests;
             _location = location;
-            _dimensions = new Point(32, quests.Count * 2);
+            _dimensions = new Point(32, 0);
             _show = false;
         }
 
