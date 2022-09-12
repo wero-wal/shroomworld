@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuestPrototype
 {
     internal class Quest
     {
-        // ---------- Properties ----------
-        public string Name => _name;
-        public bool Complete => _complete;
+        // ----- Properties -----
+        internal string Name => _name; // rename to title
+        internal bool Complete => _complete;
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private readonly string _name;
         private bool _complete;
         private List<IRequirement> _requirements;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         internal Quest(string name, params IRequirement[] requirements)
         {
             _name = name;
@@ -25,22 +22,19 @@ namespace QuestPrototype
             _complete = false;
         }
 
-        // ---------- Methods ----------
-        public void Update(Player player)
+        // ----- Methods -----
+        internal void Update(Player player)
         {
-            if (!_complete) // no need to update if we know it's complete
+            _complete = true;
+            foreach (IRequirement requirement in _requirements)
             {
-                _complete = true;
-                foreach (IRequirement requirement in _requirements)
+                if (!requirement.Completed) // no need to update if we know it's complete
                 {
-                    if (!requirement.Completed) // no need to update if we know it's complete
-                    {
-                        requirement.Update(player);
-                    }
-                    if (!requirement.Completed)
-                    {
-                        _complete = false;
-                    }
+                    requirement.Update(player);
+                }
+                if (!requirement.Completed)
+                {
+                    _complete = false;
                 }
             }
         }

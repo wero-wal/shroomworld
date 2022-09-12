@@ -8,11 +8,11 @@ namespace QuestPrototype
 {
     internal interface IRequirement
     {
-        // ---------- Properties ----------
+        // ----- Properties -----
         public string Description { get; }
         public bool Completed { get; }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public void Update(Player player);
     }
 }
