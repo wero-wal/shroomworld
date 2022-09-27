@@ -3,15 +3,25 @@ using System.Collections.Generic;
 
 namespace QuestPrototype
 {
-    internal class Quest
+    internal readonly class Quest
     {
+        private Enum Status
+        {
+            Uninitiated,
+            Active,
+            Completed,
+            Count,
+        }
+
         // ----- Properties -----
         internal string Name => _name; // rename to title
         internal bool Complete => _complete;
+        internal Status CurrentStatus => _status;
 
         // ----- Fields -----
         private readonly string _name;
         private bool _complete;
+        private Status _status;
         private List<IRequirement> _requirements;
 
         // ----- Constructors -----
@@ -20,6 +30,7 @@ namespace QuestPrototype
             _name = name;
             _requirements = new List<IRequirement>(requirements);
             _complete = false;
+            _status = Status.Uninitiated;
         }
 
         // ----- Methods -----

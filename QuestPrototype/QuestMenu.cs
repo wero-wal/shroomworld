@@ -17,7 +17,7 @@ namespace QuestPrototype
 
         private bool _show;
         private Point _location;
-        private Point _dimensions;
+        private Point _size;
         private ConsoleColour _backgroundColour;
         private ConsoleColor _textColour;
 
@@ -26,18 +26,14 @@ namespace QuestPrototype
         {
             _quests = quests;
             _location = location;
-            _dimensions = new Point(32, 0);
+            _size = new Point(32, 0);
             _show = false;
         }
 
         // ----- Methods -----
-        internal void Update(bool toggleVisibility)
+        internal void Update()
         {
-            if(toggleVisibility)
-            {
-                ToggleVisibility();
-            }
-            dimensions.Y = _quests.Count;
+            _size.Y = _quests.Count;
         }
 
         // Display
@@ -79,7 +75,7 @@ namespace QuestPrototype
         }
         private void WrapAndWrite(string text, bool requirement)
         {
-            int maxLength = dimensions.X - _standardIndent - (requirement) ? _requirementIndent : _standardIndent;
+            int maxLength = _size.X - _standardIndent - (requirement) ? _requirementIndent : _standardIndent;
 
             if(text.Length > maxLength) // must be wrapped
             {
@@ -106,7 +102,7 @@ namespace QuestPrototype
         }
 
         //
-        private void ToggleVisibility()
+        private void OnToggleVisibilityKeyPressed(object source, EventArgs eventArgs)
         {
             _show = !_show;
         }

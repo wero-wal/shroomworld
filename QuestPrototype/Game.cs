@@ -6,7 +6,7 @@ namespace QuestPrototype
     internal class Game
     {
         // ----- Enums -----
-		internal enum Input
+		internal enum Key
 		{
 			MoveUp,
 			MoveDown,
@@ -20,14 +20,14 @@ namespace QuestPrototype
 			Previous,
 			Next,
 			Enter,
-
-            DoNothing,
 		}
 
         // ----- Fields -----
         private Dictionary<ConsoleKey, Input> _keyBinds;
         private Player _player;
         private List<Npc> _npcs;
+
+        private event EventHandler[] _keyPressed;
 
         // ----- Constructors -----
         internal Game()
@@ -39,12 +39,12 @@ namespace QuestPrototype
 		{
             SetKeyBinds();
             Console.CursorVisible = false;
-            _player = new Player(GetString("Name: "));
-			Input Input;
+            _player = new Player(GetString("Name: "), Settings.CentreOfScreen);
+			Input input;
 			do
 			{
-                Input = GetInput();
-				player.Update(Input);
+                input = GetInput();
+                _keyPressed[(int)input]?.Invoke(this, EventArgs.Empty);
 			} while (true);
 		}
 
@@ -79,6 +79,19 @@ namespace QuestPrototype
                 { ConsoleKey.N, Input.Next },
                 { ConsoleKey.Enter, Input.Enter },
             };
+
+            _keyPressed[Input.MoveUp] += player.OnMoveUpKeyPressed;
+			_keyPressed[Input.MoveDown] += player.OnMoveDownKeyPressed;
+			_keyPressed[Input.MoveLeft] += player.OnMoveLeftKeyPressed;
+			_keyPressed[Input.MoveRight] += player.OnMoveRightKeyPressed;
+
+			//_keyPressed[Input.Interact] += ...;
+
+			_keyPressed[Input.ToggleQuestMenu] += player.QuestMenu.OnToggleVisibilityKeyPressed;
+
+			//_keyPressed[Input.Previous,
+			//_keyPressed[Input.Next,
+			//_keyPressed[Input.Enter,]
 		}
         private void CreateNpcs(int amount)
         {

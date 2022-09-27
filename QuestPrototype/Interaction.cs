@@ -2,24 +2,20 @@ using System;
 
 namespace QuestPrototype
 {
-    internal class Interaction
+    internal readonly class Interaction
     {
         // ----- Fields -----
         private string _message;
-        private string[] _responses;
+        private Button[] _responses;
 
         // ----- Constructors -----
-        internal Interaction(string message, params string[] responses)
+        internal Interaction(string message, params Button[] responses)
         {
             _message = message;
             _responses = responses;
         }
 
         // ----- Methods -----
-        internal void Update()
-        {
-
-        }
         internal void Display()
         {
             
