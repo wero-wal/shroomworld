@@ -24,17 +24,17 @@ namespace QuestPrototype
         }
 
         // ----- Methods -----
-        public void Update(Game.UserInput input)
+        public void Update(Game.Input input)
         {
             switch (input)
             {
-                case Game.UserInput.MoveUp:
+                case Game.Input.MoveUp:
                     break;
-                case Game.UserInput.MoveDown:
+                case Game.Input.MoveDown:
                     break;
-                case Game.UserInput.MoveLeft:
+                case Game.Input.MoveLeft:
                     break;
-                case Game.UserInput.MoveRight:
+                case Game.Input.MoveRight:
                     break;
 
                 default:
@@ -49,7 +49,7 @@ namespace QuestPrototype
                 }
             }
 
-            _questMenu.Update(input == Game.UserInput.ToggleQuestMenu);
+            _questMenu.Update(input == Game.Input.ToggleQuestMenu);
         }
     }
 }

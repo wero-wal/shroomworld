@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\MovementPrototype",
-    "\\MovementPrototype\\MovementPrototype"
+    "\\InputProcessingPrototype"
   ],
-  "SelectedNode": "\\MovementPrototype\\MovementPrototype.sln",
+  "SelectedNode": "\\InputProcessingPrototype\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

@@ -6,7 +6,7 @@ namespace QuestPrototype
     internal class Game
     {
         // ----- Enums -----
-		internal enum UserInput
+		internal enum Input
 		{
 			MoveUp,
 			MoveDown,
@@ -25,7 +25,7 @@ namespace QuestPrototype
 		}
 
         // ----- Fields -----
-        private Dictionary<ConsoleKey, UserInput> _keyBinds;
+        private Dictionary<ConsoleKey, Input> _keyBinds;
         private Player _player;
         private List<Npc> _npcs;
 
@@ -40,44 +40,44 @@ namespace QuestPrototype
             SetKeyBinds();
             Console.CursorVisible = false;
             _player = new Player(GetString("Name: "));
-			UserInput userInput;
+			Input Input;
 			do
 			{
-                userInput = GetUserInput();
-				player.Update(userInput);
+                Input = GetInput();
+				player.Update(Input);
 			} while (true);
 		}
 
         // Setup
 		private void SetKeyBinds()
 		{
-            _keyBinds = new Dictionary<ConsoleKey, UserInput>
+            _keyBinds = new Dictionary<ConsoleKey, Input>
             {
 				// Movement
-                { ConsoleKey.W, UserInput.MoveUp },
-                { ConsoleKey.UpArrow, UserInput.MoveUp },
-                { ConsoleKey.Spacebar, UserInput.MoveUp },
+                { ConsoleKey.W, Input.MoveUp },
+                { ConsoleKey.UpArrow, Input.MoveUp },
+                { ConsoleKey.Spacebar, Input.MoveUp },
 
-                { ConsoleKey.S, UserInput.MoveDown },
-                { ConsoleKey.DownArrow, UserInput.MoveDown },
+                { ConsoleKey.S, Input.MoveDown },
+                { ConsoleKey.DownArrow, Input.MoveDown },
 
-                { ConsoleKey.A, UserInput.MoveLeft },
-                { ConsoleKey.LeftArrow, UserInput.MoveLeft },
+                { ConsoleKey.A, Input.MoveLeft },
+                { ConsoleKey.LeftArrow, Input.MoveLeft },
 
-                { ConsoleKey.D, UserInput.MoveRight },
-                { ConsoleKey.RightArrow, UserInput.MoveRight },
+                { ConsoleKey.D, Input.MoveRight },
+                { ConsoleKey.RightArrow, Input.MoveRight },
 
                 // Interaction
-                { ConsoleKey.C, UserInput.Interact },
+                { ConsoleKey.C, Input.Interact },
 
                 // Accessing menus
-                { ConsoleKey.E, UserInput.ToggleQuestMenu },
-                { ConsoleKey.Tab, UserInput.ToggleQuestMenu },
+                { ConsoleKey.E, Input.ToggleQuestMenu },
+                { ConsoleKey.Tab, Input.ToggleQuestMenu },
 
                 // Navigating menus
-                { ConsoleKey.B, UserInput.Previous },
-                { ConsoleKey.N, UserInput.Next },
-                { ConsoleKey.Enter, UserInput.Enter },
+                { ConsoleKey.B, Input.Previous },
+                { ConsoleKey.N, Input.Next },
+                { ConsoleKey.Enter, Input.Enter },
             };
 		}
         private void CreateNpcs(int amount)
@@ -90,7 +90,7 @@ namespace QuestPrototype
         }
 
         // Inputs
-        private UserInput GetUserInput()
+        private Input GetInput()
         {
             try
             {
@@ -98,7 +98,7 @@ namespace QuestPrototype
             }
             catch(KeyNotFoundException)
             {
-                return UserInput.DoNothing;
+                return Input.DoNothing;
             }
         }
         private string GetString(string prompt)
