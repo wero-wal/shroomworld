@@ -1,0 +1,14 @@
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.exe
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.deps.json
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.runtimeconfig.json
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.runtimeconfig.dev.json
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.dll
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\bin\Debug\netcoreapp3.1\EventHandlerPrototype.pdb
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.csproj.AssemblyReference.cache
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.AssemblyInfoInputs.cache
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.AssemblyInfo.cs
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.csproj.CoreCompileInputs.cache
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.dll
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.pdb
+C:\Users\artyp\source\repos\EventHandlerPrototype\EventHandlerPrototype\obj\Debug\netcoreapp3.1\EventHandlerPrototype.genruntimeconfig.cache
