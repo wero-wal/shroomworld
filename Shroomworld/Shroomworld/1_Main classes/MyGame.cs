@@ -11,12 +11,9 @@ namespace Shroomworld
         public static Vector2 TopLeftOfScreen;
         public static Vector2 BottomRightOfScreen;
 
-        public static Dictionary<int, XType>
-            TileDictionary,
-            ItemDictionary,
-            BiomeDictionary,
-            EnemyDictionary,
-            NpcDictionary;
+        public static User CurrentUser;
+        public static int CurrentWorldID;
+
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -38,6 +35,7 @@ namespace Shroomworld
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            Content.RootDirectory = "Content";
 
             // TODO: use this.Content to load your game content here
         }

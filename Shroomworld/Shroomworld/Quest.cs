@@ -8,19 +8,19 @@ namespace Shroomworld
 {
     internal class Quest
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
 
 
-        // ---------- Fields ----------
+        // ----- Fields -----
 
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
 
 
-        // ---------- Methods ----------
+        // ----- Methods -----
 
 
     }

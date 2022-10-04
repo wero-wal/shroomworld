@@ -2,12 +2,12 @@ namespace Shroomworld
 {
 	internal class PowerUps
     {
-		// ---------- Properties ----------
+		// ----- Properties -----
         public int Shield { get => _powerUps[_shield].Value; }
         public int Damage { get => _powerUps[_damage].Value; }
         public int Speed { get => _powerUps[_speed].Value; }
         
-		// ---------- Fields ----------
+		// ----- Fields -----
 		// constants
 		private const int _shield = 0;
 		private const int _damage = 1;
@@ -17,7 +17,7 @@ namespace Shroomworld
 		// variables
         private PowerUp[] _powerUps;
 
-		// ---------- Constructors ----------
+		// ----- Constructors -----
 		public PowerUps(string plainText)
 		{
             string[] parts = plainText.Split(' ');
@@ -41,7 +41,7 @@ namespace Shroomworld
 			}
 		}
 
-		// ---------- Methods ----------
+		// ----- Methods -----
 		public static PowerUps CreateNew()
 		{
 			return new PowerUps();

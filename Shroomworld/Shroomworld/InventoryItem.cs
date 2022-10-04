@@ -8,21 +8,21 @@ namespace Shroomworld
 {
     internal class InventoryItem
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
         public int Amount { get => _amount; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private readonly int _id;
 
         private int _amount;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
 
 
-        // ---------- Methods ----------
+        // ----- Methods -----
 
 
     }

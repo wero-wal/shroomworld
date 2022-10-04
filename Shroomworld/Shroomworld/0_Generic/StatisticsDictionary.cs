@@ -8,12 +8,12 @@ namespace Shroomworld
 {
     public class StatisticsDictionary
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private static string[]
             _tiles,
             _items,
@@ -24,12 +24,12 @@ namespace Shroomworld
 
         private Dictionary<string, int> _statistics;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public StatisticsDictionary()
         {
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static void GetKeys()
         {
             int dictionary = 0;

@@ -7,7 +7,7 @@ namespace Shroomworld
 {
     public abstract class Type
     {
-        // ---------- Properties ----------
+        // ----- Properties -----
         public static Dictionary<int, Type> Dictionary { get => _dictionary; }
 
         public int Id { get => _id; }
@@ -15,7 +15,7 @@ namespace Shroomworld
         public string Name { get => _name; }
         public string PluralName { get => _pluralName; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         protected static Dictionary<int, Type> _dictionary;
 
         protected readonly int _id;
@@ -24,8 +24,8 @@ namespace Shroomworld
         protected readonly string _pluralName;
 
 
-        // ---------- Constructors ----------
-        // ---------- Methods ----------
+        // ----- Constructors -----
+        // ----- Methods -----
         public abstract Sprite GetSprite();
 
         protected void ParseNamesAndId(ref int index, string[] parts)

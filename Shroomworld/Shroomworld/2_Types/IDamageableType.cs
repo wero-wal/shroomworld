@@ -4,11 +4,11 @@ namespace Shroomworld
 {
 	internal interface IDamageableType
 	{
-		// ---------- Enums ----------
-		// ---------- Properties ----------
-		// ---------- Fields ----------
-		// ---------- Constructors ----------
-		// ---------- Methods ----------
+		// ----- Enums -----
+		// ----- Properties -----
+		// ----- Fields -----
+		// ----- Constructors -----
+		// ----- Methods -----
 		public HealthInfo GetHealthInfo();
 	}
 }

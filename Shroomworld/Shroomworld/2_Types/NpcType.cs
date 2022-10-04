@@ -9,13 +9,13 @@ namespace Shroomworld
 {
     internal class NpcType : EntityType
     {
-        // ---------- Enums ----------
-        // ---------- Properties ----------
-        // ---------- Fields ----------
+        // ----- Enums -----
+        // ----- Properties -----
+        // ----- Fields -----
         private Quest _quest;
 
-        // ---------- Constructors ----------
-        // ---------- Methods ----------
+        // ----- Constructors -----
+        // ----- Methods -----
         public override Sprite GetSprite()
         {
             return new MoveableSprite(File.LoadTexture(File.NpcDirectory, _id), _movementSpeed, _constantOfRestitution);

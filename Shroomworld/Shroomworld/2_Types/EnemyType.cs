@@ -5,18 +5,18 @@ namespace Shroomworld
 {
 	internal abstract class EnemyType : EntityType, IDamageableType
 	{
-		// ---------- Enums ----------
-		// ---------- Properties ----------
-		// ---------- Fields ----------
+		// ----- Enums -----
+		// ----- Properties -----
+		// ----- Fields -----
 		private readonly int _attackStrength;
 		private readonly int _attackRange;
 		private readonly int _attackSpeed;
 		private readonly int _attackCooldown;
 
-		// ---------- Constructors ----------
+		// ----- Constructors -----
 		public EnemyType(string plainText)
 		{
-			string[] parts = plainText.Split(File.Separators[File.Primary]);
+			string[] parts = plainText.Split(File.Separators[File.Level.i]);
 			int i = 0;
 			ParseNamesAndId(ref i, parts);
 
@@ -34,10 +34,10 @@ namespace Shroomworld
 			AddToDictionary();
 		}
 
-		// ---------- Methods ----------
-		public AttackInfo GetAttackInfo()
+		// ----- Methods -----
+		public AttackData GetAttackInfo()
 		{
-			return AttackInfo.CreateNew(_attackStrength, _attackRange, _attackSpeed, _attackCooldown);
+			return AttackData.CreateNew(_attackStrength, _attackRange, _attackSpeed, _attackCooldown);
 		}
 	}
 }

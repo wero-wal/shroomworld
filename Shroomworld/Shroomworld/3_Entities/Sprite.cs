@@ -10,7 +10,7 @@ namespace Shroomworld
 {
     public class Sprite
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
         public enum Vertices
         {
             TopLeft = 0,
@@ -19,19 +19,19 @@ namespace Shroomworld
             BottomRight = 3,
         }
 
-        // ---------- Properties ----------
+        // ----- Properties -----
         public Texture2D Texture { get => _texture; }
         public Color Colour { get => _colour; }
         public Vector2 Position { get => _position; }
         public Vector2 Size { get => _size; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         protected Texture2D _texture;
         protected Color _colour;
         protected Vector2 _position;
         protected Vector2 _size;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public Sprite(Texture2D texture)
         {
             _texture = texture;
@@ -45,7 +45,7 @@ namespace Shroomworld
             _size = new Vector2(_texture.Width, _texture.Height);
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static Sprite CreateNew(Texture2D texture, Vector2 position)
         {
             return new Sprite(texture, position);

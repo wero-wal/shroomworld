@@ -1,59 +1,55 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 {
 	internal static class File
 	{
-		// ---------- Fields ----------
-		// Directory names
-		public const string TextureDirectory = "textures/";
-		public const string TileDirectory = "tiles/";
-		public const string EnemyDirectory = "enemies/";
-		public const string NpcDirectory = "npcs/";
+		// ----- Fields -----
+		public static char[] Separators = { ',', ';', ':' };
 
-
-		// File names
-		public const string TileFile = "tiles.txt";
-
-		// Separators
-		public static char[] Separators = { ',', ' ', ';' };
-
-		// an enum would make the statement way too long ( e.g. File.Level.Primary ).
-		public const int Primary = 0;
-		public const int Secondary = 1;
-		public const int Tertiary = 2;
-
-
-		private static string[] Separator_Strings = { ",", " ", ";" };
-
-		// ---------- Methods ----------
-		public static string FormatAsPlainText(params object[] items, int separatorLevel)
+		public static class Level
 		{
-			string separator = Separator_Strings[separatorLevel];
+			public const int i = 0;
+			public const int ii = 1;
+			public const int iii = 2;
+		}
 
-			string plainText = items[0];
+		// ----- Methods -----
+		public static string FormatAsCsv(int level, params object[] items)
+		{
+			string separator = Separators[level].ToString();
+
+			string plainText = items[0].ToString();
 			for(int i = 1; i < items.Length; i++)
 			{
 				plainText += separator + items[i].ToString();
 			}
 			return plainText;
 		}
-		public static string FormatAsPlainText(params string[] items, int separatorLevel) // duplicate method for string becaue the ToString method is not needed
+		public static List<string[]> LoadCsvFile(string path)
 		{
-			string separator = Separator_Strings[separator];
-			string plainText = items[0];
-			for (int i = 1; i < items.Length; i++)
+			List<string> lines = new List<string> { };
+			List<string[]> linesSplitIntoParts = new List<string[]> { };
+			using (StreamReader sr = new StreamReader(path))
 			{
-				plainText += separator + items[i];
+				while (!sr.EndOfStream)
+				{
+					lines.Add(sr.ReadLine());
+					linesSplitIntoParts.Add(lines[^1].Split(Separators[Level.i]));
+				}
+				sr.Close();
 			}
-			return plainText;
+			return linesSplitIntoParts;
 		}
-		
-		public static Texture LoadTexture(string typeDirectory, string textureFileName)
+
+		public static Texture2D LoadTexture(string directory, string name)
 		{
-			return Content.Load<Texture>(TextureDirectory + type + textureFileName);
+			return Content.Load<Texture2D>(directory + name);
 		}
 	}
 }

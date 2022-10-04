@@ -8,16 +8,16 @@ namespace Shroomworld
 {
     internal class TileType : Type
     {
-        // ---------- Enums ----------
-        // ---------- Properties ----------
-        // ---------- Fields ----------
+        // ----- Enums -----
+        // ----- Properties -----
+        // ----- Fields -----
         private bool _isSolid; // if is solid, entities can't pass through
         private List<Drop> _drops;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public TileType(string plainText)
         {
-            string[] parts = plainText.Split(File.Separators[File.Primary]);
+            string[] parts = plainText.Split(File.Separators[File.Level.i]);
             int i = 0;
             _id = Convert.ToInt32(parts[i++]);
             _name = parts[i++];
@@ -25,7 +25,7 @@ namespace Shroomworld
             ParseDrops(parts[i++], ++File.Primary);
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public Sprite GetSprite()
         {
             return new StaticSprite(File.LoadTexture(File.TileDirectory + _id), _isSolid);
