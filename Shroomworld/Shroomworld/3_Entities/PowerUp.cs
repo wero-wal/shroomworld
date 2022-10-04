@@ -4,10 +4,10 @@ namespace Shroomworld
 {
     internal class PowerUp
     {
-        // ---------- Properties ----------
+        // ----- Properties -----
         public int Value { get => _level * _multiplier; }
         
-        // ---------- Fields ----------
+        // ----- Fields -----
         // static
         private static int _minLevel;
         private static int _maxLevel;   
@@ -16,13 +16,13 @@ namespace Shroomworld
         // non-static
         private int _level;
 
-        // ---------- Constructors ---------- 
+        // ----- Constructors ----- 
         public PowerUp(int level = MinLevel)
         {
             _level = level;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static void SetMinAndMaxLevel(int min, int max)
         {
             if (_minLevel == _maxLevel) // haven't been set yet

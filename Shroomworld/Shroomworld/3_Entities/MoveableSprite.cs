@@ -10,15 +10,15 @@ namespace Shroomworld
 {
     public class MoveableSprite : Sprite
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
-        // ---------- Properties ----------
+        // ----- Properties -----
         public float MovementForce { get => _movementForce; }
         public float JumpForce { get => _jumpForce; }
         public float ConstantOfRestitution { get => _constantOfRestitution; }
         public Vector2 Velocity { get => _velocity; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private const int _jumpMultiplier = 10;
 
         private readonly float _movementForce;
@@ -28,7 +28,7 @@ namespace Shroomworld
 
         private Vector2 _velocity;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public MoveableSprite(Texture2D texture, float movementForce, float constantOfRestitution) : base(texture)
         {
             _movementForce = movementForce;
@@ -44,7 +44,7 @@ namespace Shroomworld
             _velocity = Vector2.Zero;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static MoveableSprite CreateNew(Texture2D texture, Vector2 position, float movementForce, float constantOfRestitution)
         {
             return new MoveableSprite(texture, position, movementForce, constantOfRestitution);

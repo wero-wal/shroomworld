@@ -9,20 +9,20 @@ namespace Shroomworld
 {
     internal abstract class LivingBeing : IMoveable, IDamageable
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
 
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         protected HealthInfo _healthInfo;
         protected Sprite _sprite;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
 
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public void Move(Vector2 direction)
         {
 

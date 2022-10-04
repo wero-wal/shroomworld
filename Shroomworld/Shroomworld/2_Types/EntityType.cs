@@ -8,17 +8,17 @@ namespace Shroomworld
 {
     internal abstract class EntityType : Type
     {
-        // ---------- Enums ----------
-        // ---------- Properties ----------
-        // ---------- Fields ----------
+        // ----- Enums -----
+        // ----- Properties -----
+        // ----- Fields -----
         protected int _movementSpeed;
         protected float _constantOfRestitution;
 
         protected int _maxHealth;
         protected int _regenAmountPerSecond;
 
-        // ---------- Constructors ----------
-        // ---------- Methods ----------
+        // ----- Constructors -----
+        // ----- Methods -----
         public HealthInfo GetHealthInfo()
         {
             return HealthInfo.CreateNew(_maxHealth, _regenAmountPerSecond);

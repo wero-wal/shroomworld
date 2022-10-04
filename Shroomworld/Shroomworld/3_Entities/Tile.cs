@@ -10,20 +10,20 @@ namespace Shroomworld
 {
     public class Tile
     {
-        // ---------- Enums ----------
-        // ---------- Properties ----------
+        // ----- Enums -----
+        // ----- Properties -----
         public Sprite Sprite { get => _sprite; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private readonly int _tileType;
 
         private Sprite _sprite;
         private bool _placedByPlayer; // for statistical purposes. If not placed by player, the resources it drops will count towards stats when broken. otherwise, no.
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public Tile(string plainText)
         {
-            string[] parts = plainText.Split(File.Separators[File.Secondary]);
+            string[] parts = plainText.Split(File.Separators[File.Level.ii]);
             int i = 0;
             _tileType = TileType.Dictionary[Convert.ToInt32(parts[i++])];
             _sprite = _tileType.GenerateSprite();
@@ -36,7 +36,7 @@ namespace Shroomworld
             _placedByPlayer = false;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static Tile CreateNew(int id)
         {
             return new Tile(id);
@@ -44,7 +44,7 @@ namespace Shroomworld
 
         public string ToString()
         {
-            return File.FormatAsPlainText(_tileType.Id, Convert.ToInt32(_placedByPlayer), separator: File.Secondary);
+            return File.FormatAsPlainText(_tileType.Id, Convert.ToInt32(_placedByPlayer), separator: File.Level.ii);
         }
     }
 }

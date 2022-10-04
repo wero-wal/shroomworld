@@ -10,19 +10,19 @@ namespace Shroomworld
 {
     public class StaticSprite : Sprite // Uses: backgrounds, tiles, menu boxes
     {
-        // ---------- Enums ----------
-        // ---------- Properties ----------
+        // ----- Enums -----
+        // ----- Properties -----
         public bool Solid { get => _solid; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private readonly bool _solid;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public StaticSprite(Texture2D texture, bool solid) : base(texture)
         {
             _solid = solid;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
     }
 }

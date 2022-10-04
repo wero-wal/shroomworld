@@ -8,24 +8,24 @@ namespace Shroomworld
 {
     internal class Range
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
 
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private byte _min;
         private byte _max;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         internal Range(byte min, byte max, bool includeMax)
         {
             _min = min;
             _max = (byte)((includeMax) ? max + 1 : max);
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public byte ClampToRange(byte value)
         {
             return (byte)Math.Clamp(value, _min, _max - 1);

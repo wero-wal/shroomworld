@@ -4,14 +4,14 @@ namespace Shroomworld
 {
     internal class HealthAndShieldInfo : HealthInfo
     {
-        // ---------- Properties ----------
+        // ----- Properties -----
         public float PercentShield { get => (float)_shieldHealth / _maxShieldHealth; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private int _maxShieldHealth;
         private int _shieldHealth;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         /// summary: maxShieldHealth should be taken from the powerup
         public HealthAndShieldInfo(string healthPlainText, string shieldPlainText, int maxShieldHealth) : base(healthPlainText)
         {
@@ -24,7 +24,7 @@ namespace Shroomworld
             _maxShieldHealth = 0;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         // static
         public static override HealthAndShieldInfo CreateNew()
         {

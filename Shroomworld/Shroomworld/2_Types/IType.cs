@@ -1,6 +1,6 @@
 internal interface IType
 {
-	// ---------- Properties ----------
+	// ----- Properties -----
 	public static Dictionary<string, IType> Dictionary { get; }
 
 	public int Id { get; }
@@ -8,10 +8,10 @@ internal interface IType
 	public string Name { get; }
 	public string PluralName { get; }
 
-	// ---------- Constructors ----------
+	// ----- Constructors -----
 	public Type(string plainText); // ***
 
-	// ---------- Methods ----------
+	// ----- Methods -----
 	public Sprite GetSprite(); // ***
 
 

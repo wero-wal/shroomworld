@@ -4,18 +4,18 @@ namespace Shroomworld
 {
     internal class HealthInfo
     {
-        // ---------- Properties ----------
+        // ----- Properties -----
         public float PercentHealth { get => (float)_health / _maxHealth; }
         public int MaxHealth { get => _maxHealth; }
         public int Health { get => _health; }
 
-        // ----------Fields----------
+        // -----Fields-----
         protected readonly int _maxHealth;
         protected readonly int _regenAmountPerSecond;
 
         protected int _health;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public HealthInfo(string plainText)
         {
             string[] parts = plainText.Split(FileFormatter.Secondary);
@@ -31,7 +31,7 @@ namespace Shroomworld
             _regenAmountPerSecond = regenAmountPerSecond;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static virtual HealthInfo CreateNew(int maxHealth, int regenAmountPerSecond)
         {
             return new HealthInfo(maxHealth, regenAmountPerSecond);

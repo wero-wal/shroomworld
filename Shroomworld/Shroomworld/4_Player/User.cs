@@ -7,31 +7,27 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 { 
-    public class PlayerProfile // exists outside of the world.
-                               // Stores: custom player settings
-                               // username, password
-                               // note: store most recent user id in gamelog.txt
+    public class User
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
 
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private readonly int _id;
-        private readonly string _userName;
+        private readonly string _username;
 
-        private string _password;
         private Texture2D[] _skins;
         //private Settings _settings;
         //private PlayerProperties _properties;
         private Dictionary<string, int>[] _statistics; // [worldId][statName]
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
 
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         private void CreateFolder()
         {
             System.IO.Directory.CreateDirectory($"Content/user{_id}/");

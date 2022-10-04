@@ -11,24 +11,24 @@ namespace Shroomworld
 {
     public struct Username
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
 
 
-        // ---------- Properties ----------
+        // ----- Properties -----
         public string Name { get => _name; set => _name = value; }
 
-        // ---------- Fields ----------
+        // ----- Fields -----
         private static Range _allowedlength;
 
         private string _name;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public Username()
         {
             _name = string.Empty;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public static void SetMinAndMaxLength(byte minLength, byte maxLength)
         {
             if (_allowedlength == null) // This is true by default

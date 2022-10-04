@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal interface IAggressive
+    internal class AttackEventArgs : EventArgs
     {
-        void Attack(out byte attackStrength);
+        public int AttackStrength;
     }
 }

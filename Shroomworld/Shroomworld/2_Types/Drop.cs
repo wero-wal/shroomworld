@@ -4,14 +4,14 @@ namespace Shroomworld
 {
 	internal class Drop
 	{
-		// ---------- Enums ----------
-		// ---------- Properties ----------
-		// ---------- Fields ----------
+		// ----- Enums -----
+		// ----- Properties -----
+		// ----- Fields -----
 		private readonly int _id;
 		private readonly int _min;
 		private readonly int _max;
 
-		// ---------- Constructors ----------
+		// ----- Constructors -----
 		public Drop(string plainText, int separatorLevel)
 		{
 			string[] parts = plainText.Split(File.Separators[separatorLevel]);
@@ -21,6 +21,6 @@ namespace Shroomworld
 			_max = Convert.ToInt32(parts[i++]);
 		}
 
-		// ---------- Methods ----------
+		// ----- Methods -----
 	}
 }

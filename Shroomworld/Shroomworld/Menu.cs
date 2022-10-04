@@ -9,7 +9,7 @@ namespace Shroomworld
 {
     internal class Menu<TPoint, TColour, TKey>
     {
-        // ---------- Enums ----------
+        // ----- Enums -----
         public enum IndexingOptions
         {
             Numbered,
@@ -27,8 +27,8 @@ namespace Shroomworld
             Count,
         }
 
-        // ---------- Properties ----------
-        // ---------- Fields ----------
+        // ----- Properties -----
+        // ----- Fields -----
         private readonly string[] _items;
 
         private readonly TColour _backgroundColour;
@@ -57,7 +57,7 @@ namespace Shroomworld
         private TPoint _dimensionsOfOneBox;
         private int _indexOfSelectedItem = 0;
 
-        // ---------- Constructors ----------
+        // ----- Constructors -----
         public Menu(string[] items,
             TColour backgroundColour, TColour textColour, TColour? selectedBackgroundColour, TColour? selectedTextColour,
             TPoint topLeftOfMenu, TPoint? bottomRightOfMenu,
@@ -87,7 +87,7 @@ namespace Shroomworld
             _downIsPositive = downIsPositive;
         }
 
-        // ---------- Methods ----------
+        // ----- Methods -----
         public void DisplayMenu(IndexingOptions indexingOption, char? characterToPutAfterIndex = '.', char? bullet = null)
         {
             if (((indexingOption == IndexingOptions.LowerCaseLettered) || (indexingOption == IndexingOptions.UpperCaseLettered)) && (_items.Length > 26))
