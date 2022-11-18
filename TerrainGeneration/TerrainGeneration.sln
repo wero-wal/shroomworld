@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerrainGeneration", "\sgs-svr-fs01\studenthome$\SixthForm\2021Intake\st2021149\My Documents\Visual Studio 2017\source\repos\shroomworld-repo\TerrainGeneration\TerrainGeneration\TerrainGeneration.csproj", "{D81F353D-7720-4B54-847A-84A78C790D3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerrainGeneration", "\sgs-svr-fs01\studenthome$\SixthForm\2021Intake\ST2021149\My Documents\Visual Studio 2017\source\repos\shroomworld-repo\TerrainGeneration\TerrainGeneration\TerrainGeneration.csproj", "{5ABF34C0-3452-417B-8BBD-7B9D9E7D05E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D81F353D-7720-4B54-847A-84A78C790D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D81F353D-7720-4B54-847A-84A78C790D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D81F353D-7720-4B54-847A-84A78C790D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D81F353D-7720-4B54-847A-84A78C790D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ABF34C0-3452-417B-8BBD-7B9D9E7D05E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ABF34C0-3452-417B-8BBD-7B9D9E7D05E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ABF34C0-3452-417B-8BBD-7B9D9E7D05E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ABF34C0-3452-417B-8BBD-7B9D9E7D05E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2DE6CDC9-1025-444D-9FBC-1B981EBED9AC}
+		SolutionGuid = {748B1859-218B-4C46-9ACB-461FC010D515}
 	EndGlobalSection
 EndGlobal

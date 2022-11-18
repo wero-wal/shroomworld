@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\st2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj": {}
+    "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\ST2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj": {}
   },
   "projects": {
-    "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\st2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj": {
+    "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\ST2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\st2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj",
+        "projectUniqueName": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\ST2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj",
         "projectName": "TerrainGeneration",
-        "projectPath": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\st2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj",
-        "packagesPath": "C:\\Users\\st2021149\\.nuget\\packages\\",
-        "outputPath": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\st2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\obj\\",
+        "projectPath": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\ST2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\TerrainGeneration.csproj",
+        "packagesPath": "C:\\Users\\ST2021149\\.nuget\\packages\\",
+        "outputPath": "\\\\sgs-svr-fs01\\studenthome$\\SixthForm\\2021Intake\\ST2021149\\My Documents\\Visual Studio 2017\\source\\repos\\shroomworld-repo\\TerrainGeneration\\TerrainGeneration\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\st2021149\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ST2021149\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

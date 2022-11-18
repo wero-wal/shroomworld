@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TerrainGeneration
 {
-    internal class Map
+    public class Map
     {
         public bool[,] Tiles => _tiles;
 
@@ -17,103 +17,92 @@ namespace TerrainGeneration
         private int[] _surfaceHeight; // stores top of terrain at each x
         
         private float _seed;
+        private float _smoothness; // how smooth or 'janky' the terrain looks
+        private const int _smoothAmount = 2;
 
         private const int _airAtTop = 2; // (min) number of empty tiles at the top of the map
-        private const int _tileAtBottom = 1; // (min) number of solid tiles at the bottom of the map
+        private const int _tilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
         private const float _sizeOfSurface = 0.33f; // percentage of the map (vertically) that makes up the surface
 
-        public Map(bool[,] tiles, int width, int height, float? chosenSeed = null)
+        private const ConsoleColor _groundColour = ConsoleColor.Green;
+        private const ConsoleColor _backgroundColour = ConsoleColor.Black;
+
+        private const bool _Ground = true;
+        private const bool _Air = false;
+
+        public Map(bool[,] tiles, int width, int height, float smoothness, float? chosenSeed = null)
         {
             _tiles = tiles;
             _width = width;
             _height = height;
             _seed = chosenSeed ?? (float)new Random().NextDouble();
+            _smoothness = smoothness;
+            _surfaceHeight = new int[_width];
         }
-        public Map(int width, int height, float? chosenSeed = null)
+        public Map(int width, int height, float smoothness, float? chosenSeed = null)
         {
             _tiles = GetEmptyMap(width, height);
             _width = width;
             _height = height;
             _seed = chosenSeed ?? (float)new Random().NextDouble();
+            _smoothness = smoothness;
+            _surfaceHeight = new int[_width];
         }
 
-        // Coordinate stuff
-        public int GetX(int index)
-        {
-            return (index % _width);
-        }
-        public int GetY(int index)
-        {
-            return (index / _width);
-        }
-        public int GetIndex(int x, int y)
-        {
-            return (y * _width + x);
-        }
-
-        // Map stuff
+        // Generate surface
         public void GenerateSurfaceTerrain()
         {
-            float smoothness = 0.3f; // how smooth or “janky” the terrain looks
             int height = (int)Math.Round(_height * _sizeOfSurface); // the Perlin wave will be <= this height
 
             Perlin perlin = new Perlin();
             int y;
             for (int x = 0; x < _width; x++)
             {
-                y = _airAtTop + (int)Math.Round(perlin.OctavePerlin(x / smoothness, _seed, 0, 6, smoothness) * height);
+                y = _airAtTop + (int)Math.Round(perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * height);
                 _surfaceHeight[x] = y;
                 _tiles[x, y] = true;
             }
         }
 
-        int randomFillPercent = 45, // what % of the underground will be caves
-            max_neighbours; // Moore’s Neighbourhood: max = 8. Von Neumann’s: max = 4.
 
-        // generate terrain
-        // 
-
-        public void GenerateCaves()
+        // Generate caves
+        public void GenerateCaves(int smoothAmount = -1)
         {
-            int perlin_height;
-            int height = _height - _airAtTop - _tileAtBottom;
-            float smoothness = 0.3f;
-            Perlin perlin = new();
+            int randomFillPercent = 55; // what % of the underground will be ground
             Random random = new Random(_seed.GetHashCode());
             for (int x = 0; x < _width; x++)
             {
-                perlin_height = (int)Math.Round(perlin.OctavePerlin(x / smoothness, _seed, 0, 4, smoothness) * height);
-                for (int y = _airAtTop; y < (_airAtTop + perlin_height); y++)
+                for (int y = _surfaceHeight[x]; y < (_height - _tilesAtBottom); y++)
                 {
-                    // the && bit at the end is to ensure that any air tiles above the surface don't get converted to solid tiles
-                    _tiles[x, y] = (random.Next(1, 100) < randomFillPercent) && (!_tiles[x, y]);
+                    _tiles[x, y] = random.Next(1, 100) < randomFillPercent;
                 }
             }
-            Smooth_Map(smoothness * 10);
+            Smooth_Map();
         }
-        private void Smooth_Map(int smoothAmount) // smooth_amount = how many times to smooth the caves. Smaller amount = bigger caves + vice versa.
+        private void Smooth_Map() // smooth_amount = how many times to smooth the caves. Smaller amount = bigger caves + vice versa.
         {
             int surroundingGroundCount;
-            for (int s = 0; s < Math.Abs(smoothAmount); s++)
+            int max_neighbours = 4; // Moore’s Neighbourhood: max = 8. Von Neumann’s: max = 4.
+            for (int s = 0; s < Math.Abs(_smoothAmount); s++)
             {
                 for (int x = 0; x < _width; x++)
                 {
-                    for (int y = 0; y < _surfaceHeight[x]; y++)
+                    for (int y = _surfaceHeight[x]; y < _height; y++)
                     {
-                        if (x == 0 || y == 0 || x == _width - 1 || y == _surfaceHeight[x] - 1) // if on the edge, create a border.
+                        if ((x == 0) || (x == (_width - 1)) || (y == _surfaceHeight[x]) || (y >= (_height - _tilesAtBottom))) // if on the edge, create a border (place solid tile).
                         {
-                            _tiles[x, y] = true;
+                            _tiles[x, y] = _Ground;
                         }
                         else
                         {
                             surroundingGroundCount = GetSurroundingGroundCount(x, y);
-                            if (surroundingGroundCount > (max_neighbours / 2)) // if surrounded by > 4 ground tiles, become a ground tile.
+                            if (surroundingGroundCount > (max_neighbours / 2)) // if surrounded by > 2 ground tiles, become a ground tile.
                             {
-                                _tiles[x, y] = true;
+                                _tiles[x, y] = _Ground;
                             }
-                            else if (surroundingGroundCount < (max_neighbours / 2)) // if surrounded by < 4 ground tiles, become an air tile.
+                            else if (surroundingGroundCount < (max_neighbours / 2)) // if surrounded by < 2 ground tiles, become an air tile.
                             {
-                                _tiles[x, y] = false;
+                                _tiles[x, y] = _Air;
                             }
                             else
                             {
@@ -126,43 +115,40 @@ namespace TerrainGeneration
         }
         private int GetSurroundingGroundCount(int x, int y)
         {
+            /* using the Von Neumann Neighbourhood:
+             * 
+             * . n .
+             * n t n
+             * . n .
+             * 
+             * (n = neighbour    t = current tile    . = other tile)
+             */
+
             int groundCount = 0;
-            for (int nebx = x - 1; nebx <= x + 1; nebx++) // nebx = x-index of neighbour
+            for (int nebx = (x - 1); nebx <= (x + 1); nebx += 2) // nebx = x-index of neighbour
             {
-                for (int neby = y - 1; neby <= y + 1; neby++) // neby = y-index of neighbour
-                {
-                    if (nebx >= 0 && nebx < _width && neby >= 0 && neby < _height) // within bounds
-                    {
-                        groundCount += (_tiles[nebx, neby] ? 1 : 0); // if neighbour contains a tile, add 1
-                    }
-                }
+                AddToGroundCount(nebx, y);
+            }
+            for (int neby = (y - 1); neby <= (y + 1); neby += 2) // neby = y-index of neighbour
+            {
+                AddToGroundCount(x, neby);
             }
             return groundCount;
+
+            // local functions
+            void AddToGroundCount(int neighbourX, int neighbourY)
+            {
+                if ((neighbourX >= 0) && (neighbourX < _width) && (neighbourY >= 0) && (neighbourY < _height)) // check if within bounds
+                {
+                    groundCount += (_tiles[neighbourX, neighbourY] ? 1 : 0); // if neighbour contains a tile, add 1
+                }
+            }
         }
 
-
+        // Clearing map
         public void Clear()
         {
             _tiles = GetEmptyMap(_width, _height);
-        }
-        public void Display()
-        {
-            for (int y = 0; y < _height; y++)
-            {
-                for (int x = 0; x < _width; x++)
-                {
-                    if (_tiles[x, y])
-                    {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.Cyan;
-                    }
-                    Console.Write(" ");
-                }
-                Console.WriteLine();
-            }
         }
         private bool[,] GetEmptyMap(int width, int height)
         {
@@ -175,6 +161,20 @@ namespace TerrainGeneration
                 }
             }
             return map;
+        }
+        
+        // Other
+        public void Display()
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                for (int x = 0; x < _width; x++)
+                {
+                    Console.BackgroundColor = _tiles[x, y] ? _groundColour : _backgroundColour;
+                    Console.Write(" ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
