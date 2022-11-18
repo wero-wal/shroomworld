@@ -1,0 +1,4 @@
+0,dragon,dragons,2,4,4,1,3,0
+1,ghost,ghosts,0,1,0,0,4,0
+2,fungasaur,fungasaurs,4,1,3,3,0,1
+3,bear,bears,2,2,2,2,2,1
