@@ -12,7 +12,7 @@ namespace Shroomworld._1_Main_classes
         public static Dictionary<int, TileType> Tiles;
         public static Dictionary<int, ItemType> Items;
         public static Dictionary<int, BiomeType> Biomes;
-        public static Dictionary<int, EnemyType> Enemies;
+        public static Dictionary<int, NpcType> Enemies;
         public static Dictionary<int, NpcType> Npcs;
     }
 }

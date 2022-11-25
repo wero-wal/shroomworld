@@ -18,7 +18,7 @@ namespace Shroomworld
         // ----- Methods -----
         public override Sprite GetSprite()
         {
-            return new MoveableSprite(File.LoadTexture(File.NpcDirectory, _id), _movementSpeed, _constantOfRestitution);
+            return new MoveableSprite(FileManager.LoadTexture(FileManager.NpcDirectory, _id), _movementSpeed, _constantOfRestitution);
         }
     }
 }

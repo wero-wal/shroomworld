@@ -39,7 +39,7 @@ namespace Shroomworld
             _allKeys = new List<string>(2
                 + TileType.Dictionary.Count
                 + ItemType.Dictionary.Count,
-                + EnemyType.Dictionary.Count,
+                + NpcType.Dictionary.Count,
                 + NpcType.Dictionary.Count);
 
             while (!done)
@@ -55,7 +55,7 @@ namespace Shroomworld
                             _allKeys.Add(ItemType.FullIds[i]);
                             break;
                         case 3:
-                            _allKeys.Add(EnemyType.FullIds[i]);
+                            _allKeys.Add(NpcType.FullIds[i]);
                             break;
                         case 4:
                             _allKeys.Add(_totalEnemies);
