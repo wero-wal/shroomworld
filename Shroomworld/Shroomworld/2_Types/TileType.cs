@@ -6,38 +6,44 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class TileType : Type
+    internal class TileType : IType
     {
         // ----- Enums -----
         // ----- Properties -----
         // ----- Fields -----
+        private int _id;
+        private string _name;
+        private string _pluralName;
+        private List<Drop> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
         private bool _isSolid; // if is solid, entities can't pass through
-        private List<Drop> _drops;
+        private int[] _breakableBy; // IDs of the tools which can break this tile
+        private float _friction;
 
         // ----- Constructors -----
-        public TileType(string plainText)
+        public TileType(int id, string name, string pluralName, List<Drop> drops, bool isSolid, int[] breakableBy, float friction)
         {
-            string[] parts = plainText.Split(File.Separators[File.Level.i]);
-            int i = 0;
-            _id = Convert.ToInt32(parts[i++]);
-            _name = parts[i++];
-            _pluralName = parts[i++];
-            ParseDrops(parts[i++], ++File.Primary);
+            _id = id;
+            _name = name;
+            _pluralName = pluralName;
+            _drops = drops;
+            _isSolid = isSolid;
+            _breakableBy = breakableBy;
+            _friction = friction;
         }
 
         // ----- Methods -----
         public Sprite GetSprite()
         {
-            return new StaticSprite(File.LoadTexture(File.TileDirectory + _id), _isSolid);
+            return new StaticSprite(FileManager.LoadTexture(Directories.Textures.Tiles, _id.ToString()), _isSolid);
         }
-
-        private void ParseDrops(string plainText, int separatorLevel)
+        public InventoryItem[] GetDrops()
         {
-            string[] parts = plainText.Split(File.Separators[separatorLevel]);
-            foreach(string part in parts)
+            InventoryItem[] itemsDropped = new InventoryItem[_drops.Count];
+            for(int i = 0; i < _drops.Count; i++)
             {
-                _drops.Add(new Drop(part, ++separatorLevel));
+                itemsDropped[i] = new InventoryItem(_drops[i].Id, _drops[i].GetAmount());
             }
+            return itemsDropped;
         }
     }
 }

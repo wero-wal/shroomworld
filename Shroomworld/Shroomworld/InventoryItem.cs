@@ -12,6 +12,7 @@ namespace Shroomworld
 
 
         // ----- Properties -----
+        public int Id => _id;
         public int Amount { get => _amount; }
 
         // ----- Fields -----
@@ -20,10 +21,13 @@ namespace Shroomworld
         private int _amount;
 
         // ----- Constructors -----
-
+        public InventoryItem(int id, int amount)
+        {
+            _id = id;
+            _amount = amount;
+        }
 
         // ----- Methods -----
-
 
     }
 }

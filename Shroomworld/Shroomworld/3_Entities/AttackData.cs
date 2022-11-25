@@ -10,13 +10,13 @@ namespace Shroomworld
     {
         public int _strength;
         public int _range;
-        public int _speed;
+        public int _cooldown;
 
         public AttackData(int strength, int range, int speed)
         {
             _strength = strength;
             _range = range;
-            _speed = speed;
+            _cooldown = speed;
         }
     }
 }

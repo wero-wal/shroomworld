@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shroomworld._0_Generic
+namespace Shroomworld
 {
     internal static class FilePaths
     {

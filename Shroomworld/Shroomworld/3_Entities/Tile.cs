@@ -23,7 +23,7 @@ namespace Shroomworld
         // ----- Constructors -----
         public Tile(string plainText)
         {
-            string[] parts = plainText.Split(File.Separators[File.Level.ii]);
+            string[] parts = plainText.Split(FileManager.Separators[FileManager.Level.ii]);
             int i = 0;
             _tileType = TileType.Dictionary[Convert.ToInt32(parts[i++])];
             _sprite = _tileType.GenerateSprite();
@@ -44,7 +44,7 @@ namespace Shroomworld
 
         public string ToString()
         {
-            return File.FormatAsPlainText(_tileType.Id, Convert.ToInt32(_placedByPlayer), separator: File.Level.ii);
+            return FileManager.FormatAsPlainText(_tileType.Id, Convert.ToInt32(_placedByPlayer), separator: FileManager.Level.ii);
         }
     }
 }
