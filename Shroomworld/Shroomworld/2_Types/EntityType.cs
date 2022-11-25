@@ -19,9 +19,9 @@ namespace Shroomworld
 
         // ----- Constructors -----
         // ----- Methods -----
-        public HealthInfo GetHealthInfo()
+        public HealthData GetHealthInfo()
         {
-            return HealthInfo.CreateNew(_maxHealth, _regenAmountPerSecond);
+            return HealthData.CreateNew(_maxHealth, _regenAmountPerSecond);
         }
 
         protected void ParsePhysics(int index, string[] parts)

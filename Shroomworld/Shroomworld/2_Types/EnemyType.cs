@@ -35,9 +35,9 @@ namespace Shroomworld
 		}
 
 		// ----- Methods -----
-		public AttackData GetAttackInfo()
+		public ReadonlyAttackData GetAttackInfo()
 		{
-			return AttackData.CreateNew(_attackStrength, _attackRange, _attackSpeed, _attackCooldown);
+			return ReadonlyAttackData.CreateNew(_attackStrength, _attackRange, _attackSpeed, _attackCooldown);
 		}
 	}
 }

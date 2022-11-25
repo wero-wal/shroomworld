@@ -17,6 +17,8 @@ namespace Shroomworld
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private event Func<bool> _doEnemyAttacks;
+
 
         public MyGame()
         {
@@ -71,5 +73,13 @@ namespace Shroomworld
             var y = Math.Clamp(vector.Y, MyGame.TopLeftOfScreen.Y, MyGame.BottomRightOfScreen.Y);
             return new Vector2(x, y);
         }
+
+
+        private Npc CreateNewEnemy()
+		{
+            Npc npc = new Npc();
+            _doEnemyAttacks += npc.InitiateAttack(); // todo: sort this out
+            return npc;
+		}
     }
 }

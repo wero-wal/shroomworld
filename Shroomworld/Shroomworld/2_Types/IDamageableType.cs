@@ -9,6 +9,6 @@ namespace Shroomworld
 		// ----- Fields -----
 		// ----- Constructors -----
 		// ----- Methods -----
-		public HealthInfo GetHealthInfo();
+		public HealthData GetHealthInfo();
 	}
 }

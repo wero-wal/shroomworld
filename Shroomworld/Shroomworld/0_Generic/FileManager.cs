@@ -22,11 +22,16 @@ namespace Shroomworld
 		// ----- Fields -----
 		public static char[] Separators => _separators;
 
-
 		private static char[] _separators = { ',', ';', ':' };
 
 		// ----- Methods -----
-		private static string FormatAsCsv(int level, params object[] items)
+		/// <summary>
+		/// converts an array of <paramref name="items"/> into one line of a csv file.
+		/// </summary>
+		/// <param name="level">Default: comma. Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
+		/// <param name="items"></param>
+		/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
+		private static string FormatAsCsv(int level = Level.i, params object[] items)
 		{
 			string separator = Separators[level].ToString();
 
@@ -43,18 +48,16 @@ namespace Shroomworld
 		}
 		public static List<string[]> LoadCsvFile(string path)
 		{
-			List<string> lines = new List<string> { };
-			List<string[]> linesSplitIntoParts = new List<string[]> { };
+			List<string[]> lines = new List<string[]> { };
 			using (StreamReader sr = new StreamReader(path))
 			{
 				while (!sr.EndOfStream)
 				{
-					lines.Add(sr.ReadLine());
-					linesSplitIntoParts.Add(lines[^1].Split(Separators[Level.i]));
+					lines.Add(sr.ReadLine().Split(Separators[Level.i])); // add a line (split by commas into an array)
 				}
 				sr.Close();
 			}
-			return linesSplitIntoParts;
+			return lines;
 		}
 
 		public static Texture2D LoadTexture(string directory, string name)
@@ -98,21 +101,22 @@ namespace Shroomworld
 			}
 			return itemTypes;
 		}
-		public static List<ItemType> LoadEnemyTypes()
+		public static List<NpcType> LoadEnemyTypes()
 		{
 			List<string[]> file = LoadCsvFile(FilePaths.ItemData);
-			List<ItemType> itemTypes = new List<ItemType>(file.Count);
+			List<ItemType> itemTypes = new List<NpcType>(file.Count);
 
 			int i;
 			foreach (string[] line in file)
 			{
 				i = 0;
-				itemTypes.Add(new ItemType(
+				itemTypes.Add(new NpcType(
 					id: Convert.ToInt32(line[i++]),
 					name: line[i++],
 					pluralName: line[i++],
 					canBePlaced: Convert.ToBoolean(line[i++]),
-					stackable: Convert.ToBoolean(line[i++])));
+					stackable: Convert.ToBoolean(line[i++]),
+					));
 			}
 			return itemTypes;
 		}
