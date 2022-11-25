@@ -51,5 +51,16 @@ namespace Shroomworld
 		{
 			return Content.Load<Texture2D>(directory + name);
 		}
+		public static List<TileType> LoadTileTypes()
+		{
+			List<string[]> file = LoadCsvFile(FilePaths.TileData);
+			List<TileType> tiles = new List<TileType>(file.Count);
+			int i;
+			foreach(string[] line in file) // each line represents a tile
+			{
+				i = 0;
+				tiles.Add(new TileType(Convert.ToInt32(line[i++])));
+			}
+		}
 	}
 }
