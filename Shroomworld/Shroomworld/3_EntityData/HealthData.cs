@@ -5,12 +5,13 @@ namespace Shroomworld
     internal class HealthData
     {
         public int Health { get => _health; }
+        public int PercentageHealth => (int)(100 * _health / _readonlyData.MaxHealth);
 
-// todo: percentage health
-        protected int _health;
+
+        private int _health;
         private ReadonlyHealthData _readonlyData;
 
-        private DateTime _healed;
+        private DateTime _lastHealed;
 
 
         public HealthData(int? health, ref ReadonlyHealthData readonlyHealthData)

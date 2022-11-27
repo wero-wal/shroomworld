@@ -18,9 +18,22 @@ namespace Shroomworld
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private event Func<bool> _doEnemyAttacks;
+        private Action<GameTime> _updateCurrentState; // The update method to call in the Update method. I have opted for this
+                                                      // instead of a GameState enum and an if statement in the Update function
+                                                      // because it uses less processing time.
+        private Stack<Menu> _activeMenus;
+        private Menu _currentMenu => _activeMenus.Peek();
+        // todo: menu class
 
+		private class Menus
+		{
+            public Menu MainMenu;
+            public Menu PauseMenu;
+            public Menu StatisticsMenu;
+            // todo: add the rest
+		}
 
-        public MyGame()
+		public MyGame()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -30,7 +43,8 @@ namespace Shroomworld
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            _updateCurrentState = UpdateMenu;
+            _activeMenus = new Stack<Menu> { Menus.MainMenu };
             base.Initialize();
         }
 
@@ -44,13 +58,85 @@ namespace Shroomworld
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            _updateCurrentState(gameTime);
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            //    Exit();
 
             // TODO: Add your update logic here
 
             base.Update(gameTime);
         }
+        private void SetStateToStage()
+		{
+            _updateCurrentState = UpdateStage;
+		}
+        private void SetStateToMenu(Menu menu)
+		{
+            OpenMenu(menu);
+            _updateCurrentState = UpdateMenu;
+		}
+        private void UpdateStage(GameTime gameTime)
+		{
+
+		}
+        private void UpdateMenu(GameTime gameTime)
+		{
+
+		}
+        /// <summary>
+        /// Adds <paramref name="menu"/> to the stack (<see cref="_activeMenus"/>).
+        /// </summary>
+        /// <param name="menu">The menu you would like to open (add to the <see cref="_activeMenus"/> stack).</param>
+        private void OpenMenu(Menu menu)
+		{
+            _activeMenus.Push(menu);
+		}
+        /// <summary>
+        /// Closes a menu, so the user will either return to the previous one, or will return to the stage (if this was the only menu in <see cref="_activeMenus"/>).
+        /// </summary>
+        /// <returns>TRUE if a menu was closed successfully, FALSE if there were no menus to close.</returns>
+        private bool CloseCurrentMenu()
+		{
+			if (_activeMenus.Count == 0) // There's no menu to close
+			{
+                return false; // no menus were closed
+			}
+
+            _activeMenus.Pop(); // Closes current menu
+            
+            // If there are no more open menus, go back to playing the game
+			if (_activeMenus.Count == 0)
+			{
+                SetStateToStage();
+			}
+            // (else: go back to previous menu)
+
+            return true; // the current menu was closed successfully
+		}
+        private void LoadFiles()
+		{
+            /* TODO: Things to load:
+             * - Types
+             * - World names / ids
+             * - User settings
+             * - Game settings
+             * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
+             */
+		}
+        /// <summary>
+        /// idk
+        /// </summary>
+        private void SaveSettings()
+		{
+            // Save user settings
+		}
+        /// <summary>
+        /// save a world
+        /// </summary>
+        private void SaveWorld()
+		{
+            // Save world
+		}
 
         protected override void Draw(GameTime gameTime)
         {

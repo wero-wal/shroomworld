@@ -1,8 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\InputProcessingPrototype"
+    "\\Shroomworld",
+    "\\Shroomworld\\Shroomworld",
+    "\\Shroomworld\\Shroomworld\\0_Generic",
+    "\\Shroomworld\\Shroomworld\\1_Main classes",
+    "\\Shroomworld\\Shroomworld\\2_Types"
   ],
-  "SelectedNode": "\\InputProcessingPrototype\\Program.cs",
+  "SelectedNode": "\\Shroomworld\\Shroomworld\\2_Types\\IDamageableType.cs",
   "PreviewInSolutionExplorer": false
 }
