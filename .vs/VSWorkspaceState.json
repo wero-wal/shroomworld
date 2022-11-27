@@ -5,8 +5,9 @@
     "\\Shroomworld\\Shroomworld",
     "\\Shroomworld\\Shroomworld\\0_Generic",
     "\\Shroomworld\\Shroomworld\\1_Main classes",
-    "\\Shroomworld\\Shroomworld\\2_Types"
+    "\\Shroomworld\\Shroomworld\\2_Types",
+    "\\Shroomworld\\Shroomworld\\3_EntityData"
   ],
-  "SelectedNode": "\\Shroomworld\\Shroomworld\\2_Types\\IDamageableType.cs",
+  "SelectedNode": "\\Shroomworld\\Shroomworld\\2_Types\\NpcType.cs",
   "PreviewInSolutionExplorer": false
 }

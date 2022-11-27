@@ -5,8 +5,8 @@
         public const string GameData = "gamedata/";
         public const string UserData = "userdata/";
 
-        public static string User => UserData + $"user{MyGame.CurrentUser.ID}/";
-        public static string World => User + $"world{MyGame.CurrentWorldID}/";
+        public static string User => UserData + $"user{Shroomworld.CurrentUser.ID}/";
+        public static string World => User + $"world{Shroomworld.CurrentWorldID}/";
 
         public static class Textures
         {

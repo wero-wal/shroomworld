@@ -41,7 +41,7 @@ namespace Shroomworld
         }
         private Player()
         {
-            _sprite = MoveableSprite.CreateNew(_defaultTexture, MyGame.CentreOfScreen);
+            _sprite = MoveableSprite.CreateNew(_defaultTexture, Shroomworld.CentreOfScreen);
             _healthInfo = HealthAndShieldInfo.CreateNew(_maxHealth, 0);
             _attack = AttackAndBoostInfo.CreateNew();
             _powerUps = PowerUps.CreateNew();
