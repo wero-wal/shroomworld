@@ -120,6 +120,7 @@ namespace Shroomworld
 		{
 			throw new NotImplementedException();
 		}
+		// TODO: finish writing these methods
 		public bool Remove(string key)
 		{
 
