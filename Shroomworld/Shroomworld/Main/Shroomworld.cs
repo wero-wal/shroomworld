@@ -8,12 +8,13 @@ namespace Shroomworld
 {
     public class Shroomworld : Game
     {
+        // ----- Properties -----
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
         public static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
         
-        
+        // ----- Fields -----
         public static Vector2 TopLeftOfScreen;
         public static Vector2 BottomRightOfScreen;
 
@@ -49,6 +50,7 @@ namespace Shroomworld
             // todo: add the rest
 		}
 
+        // ----- Constructors -----
 		public Shroomworld()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -56,6 +58,7 @@ namespace Shroomworld
             IsMouseVisible = true;
         }
 
+        // ----- Methods -----
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here

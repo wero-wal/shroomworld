@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class Npc
+    internal class Npc : IEntity
     {
 		// Properties
 		public ReadonlyAttackData AttackData => _type.AttackData;

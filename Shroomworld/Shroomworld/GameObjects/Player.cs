@@ -8,19 +8,20 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class Player : LivingBeing, IAttackable
+    internal class Player : IEntity
     {
         // ----- Enums -----
-
-
         // ----- Properties -----
+        public IType Type => _type;
+        public HealthData HealthData => _healthData;
+        public static MovementData MovementData => _movementData;
 
         // ----- Fields -----
-        public static ReadonlyAttackData DefaultAttackData;
 
+        private PlayerTemplate _type;
         private Sprite _sprite;
-        private HealthData _healthInfo;
-        private ReadonlyAttackData _attack;
+        private HealthData _healthData;
+        private MovementData _movementData;
         private PowerUps _powerUps;
         private InventoryItem[,] _inventory;
         private List<Quest> _quests;
