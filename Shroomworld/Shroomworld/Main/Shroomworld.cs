@@ -29,13 +29,15 @@ namespace Shroomworld
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private event Func<bool> _doEnemyAttacks;
+        private event Action<> _checkForAttacks; // subscribe enemy Npcs to this
+
         private Action<GameTime> _updateCurrentState; // The update method to call in the Update method. I have opted for this
                                                       // instead of a GameState enum and an if statement in the Update function
                                                       // because it uses less processing time.
         private Stack<Menu> _activeMenus;
         private Menu _currentMenu => _activeMenus.Peek();
-
+        private List<Npc> _npcs;
+        private List<Entity> _friendlyEntities; // contains references to all friendly entities in current world
 
 		// todo: menu class
 
@@ -61,7 +63,6 @@ namespace Shroomworld
             _activeMenus = new Stack<Menu> { Menus.MainMenu };
             base.Initialize();
         }
-
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -69,7 +70,6 @@ namespace Shroomworld
 
             // TODO: use this.Content to load your game content here
         }
-
         protected override void Update(GameTime gameTime)
         {
             _updateCurrentState(gameTime);
@@ -91,8 +91,24 @@ namespace Shroomworld
 		}
         private void UpdateStage(GameTime gameTime)
 		{
-
+            _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
 		}
+        /// <summary>
+        /// This will be called whenever an enemy is able and attempts to initiate an attack.
+        /// It will check whether any of its opponents are in range. If so, an attack will be initiated.
+        /// </summary>
+        /// <returns></returns>
+        private void TryApplyAttack(Npc source, ReadonlyAttackData attackData)
+        {
+            // (from npc in _npcs where npc.Type.IsFriendly select npc)
+            foreach (Entity opponent in _friendlyEntities) // loop through opponents
+            {
+                if (source.IsInRange(opponent)) // check if in range
+                {
+                    source.InitiateAttack();
+                }
+            }
+        }
         private void UpdateMenu(GameTime gameTime)
 		{
 
@@ -178,7 +194,8 @@ namespace Shroomworld
         private Npc CreateNewEnemy()
 		{
             Npc npc = new Npc();
-            _doEnemyAttacks += npc.InitiateAttack(); // todo: sort this out
+            _checkForEnemyAttacks += npc.TryToInitiateAttack(); // todo: sort this out
+            npc.AttackAttemptInitiated += TryApplyAttack;
             return npc;
 		}
     }
