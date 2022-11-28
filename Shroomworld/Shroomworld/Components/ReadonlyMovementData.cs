@@ -8,7 +8,7 @@ namespace Shroomworld
 {
 	internal class ReadonlyMovementData
 	{
-		public int MovementForce => _movementForce;
+		public float MovementForce => _movementForce;
 		public int Mass => _mass;
 
 

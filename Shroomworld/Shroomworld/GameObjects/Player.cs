@@ -30,15 +30,7 @@ namespace Shroomworld
         // ----- Constructors -----
         public Player(string plainText) // might change this to a List<string> lines. or maybe not (cos if it's on one line, it can fit nicely into the world file).
         {
-            string[] parts = plainText.Split(FileFormatter.Separator_Chars[FileFormatter.Primary]);
-            int i = 0; // index
-            _sprite = new MoveableSprite(LoadTexture(parts[i++]), ParsePosition(parts[i++]));
-            _powerUps = new PowerUps(parts[i++]);
-            _healthInfo = new HealthAndShieldInfo(healthPlainText: parts[i++], shieldPlainText: parts[i++], _powerUps.Shield);
-            _attack = new AttackAndBoostInfo(_powerUps.Damage);
-            _inventory = ParseInventory(parts[i++]); // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
-            _quests = ParseQuests(parts[i++]);
-            _statistics = ParseStatistics(parts[i++]);
+            
         }
         private Player()
         {

@@ -9,16 +9,12 @@ namespace Shroomworld
 {
     internal class MovementData
     {
-        private readonly float _movementForce;
-        private readonly float _mass;
-        private Vector2 _velocity;
-        private Vector2 _position;
+        private readonly Vector2 _velocity;
+        private readonly Vector2 _position; // position of the entity WITHIN THE WORLD (i.e. using the world's coordinate system; NOT MonoGame's)
 
-        public MovementData(float movementForce, float mass, Vector2 velocity, Vector2 position)
+        public MovementData(Vector2 position)
         {
-            _movementForce = movementForce;
-            _mass = mass;
-            _velocity = velocity;
+            _velocity = Vector2.Zero;
             _position = position;
         }
     }

@@ -8,6 +8,8 @@ namespace Shroomworld
 {
     internal static class FilePaths
     {
+        // todo: move Directories into here?
+        // todo: make a Create() class here
         public const string PlayerData = Directories.GameData + _player + _txt;
         public const string TileData = Directories.GameData + "tiles" + _txt;
         public const string BiomeData = Directories.GameData + "biomes" + _txt;

@@ -120,7 +120,25 @@ namespace Shroomworld
 			}
 			return itemTypes;
 		}
-
+		public static Player LoadPlayer(string name) // or use int id
+		{
+			// todo: sort this out
+			string[] parts = LoadCsvFile(FilePaths.AllUsers); // load player file
+            int i = 0; // index to keep track of which part we're on
+            _sprite = new MoveableSprite(LoadTexture(parts[i++]), ParsePosition(parts[i++]));
+            _powerUps = new PowerUps(parts[i++]);
+            _healthInfo = new HealthAndShieldInfo(healthPlainText: parts[i++], shieldPlainText: parts[i++], _powerUps.Shield);
+            _attack = new AttackAndBoostInfo(_powerUps.Damage);
+            _inventory = ParseInventory(parts[i++]); // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
+            _quests = ParseQuests(parts[i++]);
+            _statistics = ParseStatistics(parts[i++]);
+		}
+		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
+		{
+			int[] parts = StringToIntArray(SplitAtLevel(plaintext, containingLevel + 1));
+			int i = 0;
+			return new MovementData(new Vector2(parts[i++], parts[i++]));
+		}
 		private static List<Drop> ParseDrops(string plaintext)
 		{
 			List<Drop> drops;
