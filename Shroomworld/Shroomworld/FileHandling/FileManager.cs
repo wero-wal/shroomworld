@@ -12,7 +12,7 @@ namespace Shroomworld
 	internal static class FileManager
 	{
 		//-----Enums-----
-		public static class Level
+		public static class Level // todo: make plural
 		{
 			public const int i = 0;
 			public const int ii = 1;
@@ -26,15 +26,16 @@ namespace Shroomworld
 
 		// ----- Methods -----
 		/// <summary>
-		/// converts an array of <paramref name="items"/> into one line of a csv file.
+		/// Converts an array of <paramref name="items"/> into one line of a csv file.
 		/// </summary>
-		/// <param name="level">Default: comma. Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
-		/// <param name="items"></param>
+		/// <param name="level">Default: Level 1 (comma). Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
+		/// <param name="items">The array you want to convert into strings</param>
 		/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
 		private static string FormatAsCsv(int level = Level.i, params object[] items)
 		{
 			string separator = Separators[level].ToString();
 
+			//Array.ConvertAll(items, item => item.ToString());
 			string plainText = items[0].ToString();
 			for(int i = 1; i < items.Length; i++)
 			{
@@ -78,7 +79,7 @@ namespace Shroomworld
 					pluralName: line[i++],
 					drops: ParseDrops(line[i++]),
 					isSolid: Convert.ToBoolean(line[i++]),
-					breakableBy: StringToIntArray(SplitAtLevel(line[i++], Level.ii)),
+					breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Level.ii)),
 					friction: (float)Convert.ToDecimal(line[i++])));
 			}
 			return tiles;
@@ -122,22 +123,25 @@ namespace Shroomworld
 		}
 		public static Player LoadPlayer(string name) // or use int id
 		{
-			// todo: sort this out
+			// todo: sort loadplayer out
 			string[] parts = LoadCsvFile(FilePaths.AllUsers); // load player file
-            int i = 0; // index to keep track of which part we're on
-            _sprite = new MoveableSprite(LoadTexture(parts[i++]), ParsePosition(parts[i++]));
-            _powerUps = new PowerUps(parts[i++]);
-            _healthInfo = new HealthAndShieldInfo(healthPlainText: parts[i++], shieldPlainText: parts[i++], _powerUps.Shield);
-            _attack = new AttackAndBoostInfo(_powerUps.Damage);
-            _inventory = ParseInventory(parts[i++]); // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
-            _quests = ParseQuests(parts[i++]);
-            _statistics = ParseStatistics(parts[i++]);
+            int p = 0; // index to keep track of which part we're on
+			return new Player(
+				type: ,
+				sprite: new Sprite(LoadTexture(parts[p++])),
+            	powerUps: new PowerUp(ParsePowerUps(parts[p++])),
+            	healthData: new HealthData(ParseHealthData(parts[p++]), type.ReadonlyHealthData),
+				shieldData: new HealthData(ParseHealthData(parts[p++])),
+            	attack: new AttackAndBoostInfo(_powerUps.Damage),
+            	inventory: ParseInventory(parts[p++]), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
+            	quests: ParseQuests(parts[p++]),
+            	statistics: ParseStatistics(parts[p++]));
 		}
 		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
 		{
-			int[] parts = StringToIntArray(SplitAtLevel(plaintext, containingLevel + 1));
-			int i = 0;
-			return new MovementData(new Vector2(parts[i++], parts[i++]));
+			int[] parts = ConvertStringArrayToInt(SplitAtLevel(plaintext, containingLevel + 1));
+			int p = 0;
+			return new MovementData(new Vector2(parts[p++], parts[p++]));
 		}
 		private static List<Drop> ParseDrops(string plaintext)
 		{
@@ -147,18 +151,26 @@ namespace Shroomworld
 
 			foreach (string drop in allDrops)
 			{
-				drops.Add(new Drop(StringToIntArray(SplitAtLevel(drop, Level.iii))));
+				drops.Add(new Drop(ConvertStringArrayToInt(SplitAtLevel(drop, Level.iii))));
 			}
 			return drops;
 		}
-        private static int[] StringToIntArray(string[] strArray)
+        private static HealthData ParseHealthData(string plaintext, ReadonlyHealthData readonlyHealthData)
 		{
-			int[] intArray = new int[strArray.Length];
-			for (int i = 0; i < strArray.Length; i++)
-			{
-				intArray[i] = Convert.ToInt32(strArray[i]);
-			}
-			return intArray;
+			int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : Convert.ToInt32(plaintext);
+			return new HealthData(currentHealth, readonlyHealthData);
+		}
+		private static PowerUp[] ParsePowerUps(string plaintext) // TODO: parse powerups
+		{
+			// split into parts
+			// ConvertAll to powerup
+
+			// local function to use as converter
+		}
+
+		private static int[] ConvertStringArrayToInt(string[] strArray)
+		{
+			return Array.ConvertAll(strArray, item => Convert.ToInt32(item));
 		}
 	}
 }

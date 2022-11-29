@@ -11,8 +11,10 @@ namespace Shroomworld
         // ----- Properties -----
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
-        public static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
+        internal static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
+        internal static Dictionary<int, PlayerTemplate> PlayerTypes => _playerTypes;
+
         
         // ----- Fields -----
         public static Vector2 TopLeftOfScreen;
@@ -26,6 +28,7 @@ namespace Shroomworld
         private static Dictionary<int, ItemType> _itemTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
         private static Dictionary<int, NpcType> _npcTypes;
+        private static Dictionary<int, PlayerTemplate> _playerTypes;
 
 
         private GraphicsDeviceManager _graphics;
