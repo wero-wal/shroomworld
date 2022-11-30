@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using System.Microsoft.Xna.Framework;
 
 namespace Shroomworld
 {
@@ -18,6 +19,9 @@ namespace Shroomworld
 
 
         // ----- Fields -----
+        public event Action<> PlacedOrRemovedTile;
+        public event Action<> Moved;
+
         private readonly PlayerTemplate _type;
         private readonly HealthData _healthData;
         private readonly MovementData _movementData;

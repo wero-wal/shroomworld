@@ -76,6 +76,7 @@ namespace Shroomworld
 
             // TODO: use this.Content to load your game content here
         }
+        
         protected override void Update(GameTime gameTime)
         {
             _updateCurrentState(gameTime);
@@ -95,6 +96,7 @@ namespace Shroomworld
             OpenMenu(menu);
             _updateCurrentState = UpdateMenu;
 		}
+        
         private void UpdateStage(GameTime gameTime)
 		{
             _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
@@ -115,6 +117,13 @@ namespace Shroomworld
                 }
             }
         }
+        private void CalculateNpcPaths()
+        {
+            // this will be called upon edits to the world or changes in the player's position
+            // Perhaps check if the interacted-with tile lies between them.
+            // recalculate paths for npcs
+        }
+
         private void UpdateMenu(GameTime gameTime)
 		{
 
@@ -197,6 +206,12 @@ namespace Shroomworld
         }
 
 
+        private Player CreatePlayer()
+        {
+            Player player = new Player();
+            player.Moved += CalculateNpcPaths;
+            player.PlacedOrRemovedTile += CalculateNpcPaths;
+        }
         private Npc CreateNewEnemy()
 		{
             Npc npc = new Npc();
