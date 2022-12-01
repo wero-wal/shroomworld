@@ -1,38 +1,113 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shroomworld
+namespace Shroomworld.FileHandling
 {
     internal static class FilePaths
     {
-        // todo: move Directories into here?
-        // todo: make a Create() class here
-        public const string PlayerData = Directories.GameData + _player + _txt;
-        public const string TileData = Directories.GameData + "tiles" + _txt;
-        public const string BiomeData = Directories.GameData + "biomes" + _txt;
-        public const string ItemData = Directories.GameData + "items" + _txt;
-        public const string EnemyData = Directories.GameData + _enemies + _txt;
-        public const string NpcData = Directories.GameData + _npcs + _txt;
-        public const string QuestData = Directories.GameData + "quests" + _txt;
-        public const string WorldData = Directories.GameData + "world" + _txt;
+        // Style note: In this class, Dir = Directory
+        // todo: make a Create() method here
+        // ----- Enums -----
+        public enum WorldFiles
+        {
+            Map,
+            Enemies,
+            Friendlies,
+            Player,
+        }
 
-        public const string AllUsers = "users" + _txt;
-        public const string GeneralSettings = _settings + _txt;
+        // ----- Properties -----
+        // todo: add properties to the fields below
 
-        public static string UserSettings => Directories.User + _settings + _txt;
-        public static string SavedMap => Directories.World + "map" + _txt;
-        public static string SavedPlayer => Directories.World + _player + _txt;
-        public static string SavedEnemies => Directories.World + _enemies + _txt;
-        public static string SavedNpcs => Directories.World + _npcs + _txt;
+        // ----- Fields -----
+        // UI and settings
+        private static string _users; // contains names, ids, and settings of users
+        private static string _generalSettings; // contains 
+        private static string _menuText; // contains text for all menu buttons and headings for all menus
+
+        // Types and templates
+        private static string _itemTypes;
+        private static string _tileTypes;
+        private static string _biomeTypes;
+        private static string _mapTemplate;
+        private static string _enemyTypes;
+        private static string _friendlyTypes;
+        private static string _playerTemplate;
+
+        // World saves
+        private static string _worldSavesDir;
+        private static string _savedMapFileName;
+        private static string _savedEnemiesFileName;
+        private static string _savedFriendliesFileName;
+        private static string _savedPlayerFileName;
+
+        // Textures
+        private static string _itemTextureDir;
+        private static string _tileTextureDir;
+        private static string _biomeTextureDir;
+        private static string _enemyTextureDir;
+        private static string _friendlyTextureDir;
+        private static string _playerTextureDir;
+        private static string _menuTextureDir;
+        private static string _guiTextureDir;
 
 
-        private const string _txt = ".txt";
-        private const string _enemies = "enemies";
-        private const string _npcs = "npcs";
-        private const string _player = "player";
-        private const string _settings = "settings";
+        // ----- Methods -----
+        public static bool SetFilePaths(params string[] paths)
+        {
+            int p = 0;
+            try
+            {
+                _generalSettings = paths[p++];
+                _menuText = paths[p++];
+
+                _itemTypes = paths[p++];
+                _tileTypes = paths[p++];
+                _biomeTypes = paths[p++];
+                _mapTemplate = paths[p++];
+                _enemyTypes = paths[p++];
+                _friendlyTypes = paths[p++];
+                _playerTemplate = paths[p++];
+
+                _worldSavesDir = paths[p++];
+                _savedMapFileName = paths[p++];
+                _savedEnemiesFileName = paths[p++];
+                _savedFriendliesFileName = paths[p++];
+                _savedPlayerFileName = paths[p++];
+
+                _itemTextureDir = paths[p++];
+                _tileTextureDir = paths[p++];
+                _biomeTextureDir = paths[p++];
+                _enemyTextureDir = paths[p++];
+                _friendlyTextureDir = paths[p++];
+                _playerTextureDir = paths[p++];
+                _menuTextureDir = paths[p++];
+                _guiTextureDir = paths[p++];
+            }
+            catch (System.IndexOutOfRangeException)
+            {
+                throw new ArgumentException("Not enough paths specified.");
+            }
+        }
+        public static string GetPathForWorldFile(int worldId, WorldFiles worldFile)
+        {
+            string prefix = $"{_worldSavesDir}{worldId}\\";
+            switch (worldFile)
+            {
+                case WorldFiles.Map:
+                    return prefix + _savedMapFileName;
+                case WorldFiles.Enemies:
+                    return prefix + _savedEnemiesFileName;
+                case WorldFiles.Friendlies:
+                    return prefix + _savedFriendliesFileName;
+                case WorldFiles.Player:
+                    return prefix + _savedPlayerFileName;
+                default:
+                    return String.Empty;
+            }
+        }
     }
 }
