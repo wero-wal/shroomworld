@@ -74,6 +74,11 @@ namespace Shroomworld
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Content.RootDirectory = "Content";
 
+            // FILE FORMAT for biomes: name,rarity,top-layer-tile,2nd-layer,3rd-layer,tree-texture,flower1;flower2;flower3;...,amount-of-trees,amount-of-chests,amount-of-NPCs,amount-of-enemies
+            // 	context	| 0		 | 1		| 2				| 3
+            // 	amount	| none	 | a few	| a fair amount	| a lot
+            //	rarity	| common | uncommon	| cool			| rare
+
             // TODO: use this.Content to load your game content here
         }
         
