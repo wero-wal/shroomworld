@@ -117,28 +117,15 @@ namespace Shroomworld.FileHandling
                     _textureDirs.Add(_textureElements[i], paths[p++]);
                 }
             }
-            catch (System.IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 return false;
             }
             return true;
         }
-        public static string GetPathForWorldFile(int worldId, WorldFiles worldFile)
+        public static string GetPathForWorldFile(int worldId, Elements file)
         {
-            string prefix = $"{_worldSavesDir}{worldId}\\";
-            switch (worldFile)
-            {
-                case WorldFiles.Map:
-                    return prefix + _savedMapFileName;
-                case WorldFiles.Enemies:
-                    return prefix + _savedEnemiesFileName;
-                case WorldFiles.Friendlies:
-                    return prefix + _savedFriendliesFileName;
-                case WorldFiles.Player:
-                    return prefix + _savedPlayerFileName;
-                default:
-                    return String.Empty;
-            }
+            return $"{_worldSavesDir}{worldId}\\{_worldSaveFiles[file]}";
         }
     }
 }
