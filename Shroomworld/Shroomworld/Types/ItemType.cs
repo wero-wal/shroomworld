@@ -8,19 +8,13 @@ namespace Shroomworld
 {
     internal class ItemType
     {
-        private readonly int _id;
-        private readonly string _name;
-        private readonly string _pluralName;
-        private readonly bool _canBePlaced;
-        private readonly bool _stackable;
+        private readonly IdentifyingData _idData;
+        private readonly string[] _tags; // includes properties such as placeable, stackable
 
-        public ItemType(int id, string name, string pluralName, bool canBePlaced, bool stackable)
+        public ItemType(IdentifyingData identifiers, params string[] tags)
         {
-            _id = id;
-            _name = name;
-            _pluralName = pluralName;
-            _canBePlaced = canBePlaced;
-            _stackable = stackable;
+            _idData = identifiers;
+            _tags = tags;
         }
     }
 }

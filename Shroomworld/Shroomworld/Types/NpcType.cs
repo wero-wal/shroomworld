@@ -8,9 +8,9 @@ namespace Shroomworld
 {
     internal class NpcType
     {
-		public int Id => _id;
-		public string Name => _name;
-		public string PluralName => _pluralName;
+		public int Id => _idData.Id;
+		public string Name => _idData.Name;
+		public string PluralName => _idData.PluralName;
 		public ReadonlyHealthData HealthData => _healthData;
 		public ReadonlyAttackData AttackData => _attackData;
 		internal ReadonlyMovementData MovementData => _movementData;
@@ -19,9 +19,7 @@ namespace Shroomworld
 		public bool Friendly => _friendly;
 
 
-		private readonly int _id;
-		private readonly string _name;
-		private readonly string _pluralName;
+		private readonly IdentifyingData _idData;
 		private readonly ReadonlyHealthData _healthData;
 		private readonly ReadonlyAttackData _attackData;
 		private readonly ReadonlyMovementData _movementData;
@@ -30,11 +28,9 @@ namespace Shroomworld
 		private readonly bool _friendly;
 
 
-		public NpcType(int id, string name, string pluralName, ReadonlyAttackData attackData, ReadonlyMovementData movementData, Quest quest)
+		public NpcType(IdentifyingData idData, ReadonlyAttackData attackData, ReadonlyMovementData movementData, Quest quest)
 		{
-			_id = id;
-			_name = name;
-			_pluralName = pluralName;
+			_idData = idData;
 			_attackData = attackData;
 			_movementData = movementData;
 			_quest = quest;

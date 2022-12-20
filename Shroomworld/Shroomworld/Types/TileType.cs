@@ -11,20 +11,16 @@ namespace Shroomworld
         // ----- Enums -----
         // ----- Properties -----
         // ----- Fields -----
-        private int _id;
-        private string _name;
-        private string _pluralName;
+        private int _idData;
         private List<Drop> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
         private bool _isSolid; // if is solid, entities can't pass through
         private int[] _breakableBy; // IDs of the tools which can break this tile
         private float _friction;
 
         // ----- Constructors -----
-        public TileType(int id, string name, string pluralName, List<Drop> drops, bool isSolid, int[] breakableBy, float friction)
+        public TileType(IdentifyingData idData, List<Drop> drops, bool isSolid, int[] breakableBy, float friction)
         {
-            _id = id;
-            _name = name;
-            _pluralName = pluralName;
+            _idData = idData;
             _drops = drops;
             _isSolid = isSolid;
             _breakableBy = breakableBy;
