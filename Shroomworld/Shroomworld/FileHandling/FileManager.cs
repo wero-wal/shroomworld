@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
+using Shroomworld.FileHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,8 @@ namespace Shroomworld
 	internal static class FileManager
 	{
 		//-----Enums-----
-		public static class Level // todo: make plural
+		// used as an enum to keep track of which level of list (or separation) we are in within a file
+		public static struct Levels
 		{
 			public const int i = 0;
 			public const int ii = 1;
@@ -31,7 +33,7 @@ namespace Shroomworld
 		/// <param name="level">Default: Level 1 (comma). Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
 		/// <param name="items">The array you want to convert into strings</param>
 		/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
-		private static string FormatAsCsv(int level = Level.i, params object[] items)
+		private static string FormatAsCsv(int level = Levels.i, params object[] items)
 		{
 			string separator = Separators[level].ToString();
 
@@ -54,13 +56,14 @@ namespace Shroomworld
 			{
 				while (!sr.EndOfStream)
 				{
-					lines.Add(sr.ReadLine().Split(Separators[Level.i])); // add a line (split by commas into an array)
+					lines.Add(sr.ReadLine().Split(Separators[Levels.i])); // add a line (split by commas into an array)
 				}
 				sr.Close();
 			}
 			return lines;
 		}
 
+		// Load specifics
 		public static Texture2D LoadTexture(string directory, string name)
 		{
 			return Content.Load<Texture2D>(directory + name);
@@ -79,7 +82,7 @@ namespace Shroomworld
 					pluralName: line[i++],
 					drops: ParseDrops(line[i++]),
 					isSolid: Convert.ToBoolean(line[i++]),
-					breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Level.ii)),
+					breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Levels.ii)),
 					friction: (float)Convert.ToDecimal(line[i++])));
 			}
 			return tiles;
@@ -116,18 +119,19 @@ namespace Shroomworld
 					name: line[i++],
 					pluralName: line[i++],
 					canBePlaced: Convert.ToBoolean(line[i++]),
-					stackable: Convert.ToBoolean(line[i++]),
+					stackable: Convert.ToBoolean(line[i++])
 					));
 			}
 			return itemTypes;
 		}
-		public static Player LoadPlayer(string name) // or use int id
+		public static Player LoadPlayer(int id)
 		{
 			// todo: sort loadplayer out
 			string[] parts = LoadCsvFile(FilePaths.AllUsers); // load player file
             int p = 0; // index to keep track of which part we're on
+			PlayerTemplate type = Shroomworld.PlayerTypes[Convert.ToInt32(parts[p++])];
 			return new Player(
-				type: ,
+				type: type,
 				sprite: new Sprite(LoadTexture(parts[p++])),
             	powerUps: new PowerUp(ParsePowerUps(parts[p++])),
             	healthData: new HealthData(ParseHealthData(parts[p++]), type.ReadonlyHealthData),
@@ -137,6 +141,8 @@ namespace Shroomworld
             	quests: ParseQuests(parts[p++]),
             	statistics: ParseStatistics(parts[p++]));
 		}
+		
+		// Parsing
 		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
 		{
 			int[] parts = ConvertStringArrayToInt(SplitAtLevel(plaintext, containingLevel + 1));
@@ -146,12 +152,12 @@ namespace Shroomworld
 		private static List<Drop> ParseDrops(string plaintext)
 		{
 			List<Drop> drops;
-			string[] allDrops = SplitAtLevel(plaintext, Level.ii);
+			string[] allDrops = SplitAtLevel(plaintext, Levels.ii);
 			drops = new List<Drop>(allDrops.Length);
 
 			foreach (string drop in allDrops)
 			{
-				drops.Add(new Drop(ConvertStringArrayToInt(SplitAtLevel(drop, Level.iii))));
+				drops.Add(new Drop(ConvertStringArrayToInt(SplitAtLevel(drop, Levels.iii))));
 			}
 			return drops;
 		}
@@ -168,6 +174,15 @@ namespace Shroomworld
 			// local function to use as converter
 		}
 
+		// Saving
+		public static void SavePlayer(Player player)
+		{
+
+		}
+		public static void SaveWorld(List<Npc> npcs, int[,] tileMap, int width, int height, int difficulty)
+		{
+			
+		}
 		private static int[] ConvertStringArrayToInt(string[] strArray)
 		{
 			return Array.ConvertAll(strArray, item => Convert.ToInt32(item));

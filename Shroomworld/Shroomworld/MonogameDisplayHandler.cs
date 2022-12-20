@@ -1,8 +1,10 @@
+using MyLibrary.Menu;
+using MyLibrary.Display;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-namespace MyLibrary
+namespace Shroomworld
 {
-	class MonogameDisplayHandler : IDisplayHandler<Color, Vector2, float>
+	internal class MonogameDisplayHandler : IDisplayHandler<Color, Vector2, float>
 	{
 		// ---------- Properties ---------- 
 		// ---------- Fields ---------- 
