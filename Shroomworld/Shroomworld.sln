@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shroomworld", "Shroomworld\Shroomworld.csproj", "{3B80AF69-4439-4C65-BC6E-042DE6030C83}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyLibrary", "..\MyLibrary\MyLibrary\MyLibrary.csproj", "{CBE52B1A-D480-428B-ADC6-A925BE79160E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
