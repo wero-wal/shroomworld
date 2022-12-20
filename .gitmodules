@@ -1,0 +1,3 @@
+[submodule "MyLibrary"]
+	path = MyLibrary
+	url = https://github.com/wero-wal/MyLibrary
