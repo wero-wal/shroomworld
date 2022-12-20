@@ -11,8 +11,10 @@ namespace Shroomworld
         // ----- Properties -----
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
-        public static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
+        internal static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
+        internal static Dictionary<int, PlayerTemplate> PlayerTypes => _playerTypes;
+
         
         // ----- Fields -----
         public static Vector2 TopLeftOfScreen;
@@ -26,6 +28,7 @@ namespace Shroomworld
         private static Dictionary<int, ItemType> _itemTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
         private static Dictionary<int, NpcType> _npcTypes;
+        private static Dictionary<int, PlayerTemplate> _playerTypes;
 
 
         private GraphicsDeviceManager _graphics;
@@ -71,8 +74,14 @@ namespace Shroomworld
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Content.RootDirectory = "Content";
 
+            // FILE FORMAT for biomes: name,rarity,top-layer-tile,2nd-layer,3rd-layer,tree-texture,flower1;flower2;flower3;...,amount-of-trees,amount-of-chests,amount-of-NPCs,amount-of-enemies
+            // 	context	| 0		 | 1		| 2				| 3
+            // 	amount	| none	 | a few	| a fair amount	| a lot
+            //	rarity	| common | uncommon	| cool			| rare
+
             // TODO: use this.Content to load your game content here
         }
+        
         protected override void Update(GameTime gameTime)
         {
             _updateCurrentState(gameTime);
@@ -92,6 +101,7 @@ namespace Shroomworld
             OpenMenu(menu);
             _updateCurrentState = UpdateMenu;
 		}
+        
         private void UpdateStage(GameTime gameTime)
 		{
             _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
@@ -112,6 +122,13 @@ namespace Shroomworld
                 }
             }
         }
+        private void CalculateNpcPaths()
+        {
+            // this will be called upon edits to the world or changes in the player's position
+            // Perhaps check if the interacted-with tile lies between them.
+            // recalculate paths for npcs
+        }
+
         private void UpdateMenu(GameTime gameTime)
 		{
 
@@ -194,6 +211,12 @@ namespace Shroomworld
         }
 
 
+        private Player CreatePlayer()
+        {
+            Player player = new Player();
+            player.Moved += CalculateNpcPaths;
+            player.PlacedOrRemovedTile += CalculateNpcPaths;
+        }
         private Npc CreateNewEnemy()
 		{
             Npc npc = new Npc();

@@ -1,24 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj": {}
+    "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj": {}
   },
   "projects": {
-    "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj": {
+    "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj",
+        "projectUniqueName": "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj",
         "projectName": "Shroomworld",
-        "projectPath": "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj",
-        "packagesPath": "C:\\Users\\artyp\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\obj\\",
+        "projectPath": "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\Shroomworld.csproj",
+        "packagesPath": "C:\\Users\\SGS CompSci 004\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\Shroomworld\\Shroomworld\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+<<<<<<< HEAD
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
           "C:\\Users\\artyp\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+=======
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\SGS CompSci 004\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 4fe0ce841deb5a8f11c6c63d8431467645a35201
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -32,8 +39,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\MyLibrary\\MyLibrary\\MyLibrary.csproj": {
-                "projectPath": "C:\\Users\\artyp\\source\\repos\\shroomworld-repo\\MyLibrary\\MyLibrary\\MyLibrary.csproj"
+              "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\MyLibrary\\MyLibrary\\MyLibrary.csproj": {
+                "projectPath": "C:\\Users\\SGS CompSci 004\\Source\\Repos\\shroomworld-repo\\MyLibrary\\MyLibrary\\MyLibrary.csproj"
               }
             }
           }
@@ -73,7 +80,11 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+>>>>>>> 4fe0ce841deb5a8f11c6c63d8431467645a35201
         }
       }
     }
