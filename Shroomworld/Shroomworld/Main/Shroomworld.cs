@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,9 @@ namespace Shroomworld
         public static int CurrentWorldID;
 
         
+        private const int _WIDTH = 0;
+        private const int _HEIGHT = 1;
+
         private static Dictionary<int, TileType> _tileTypes;
         private static Dictionary<int, ItemType> _itemTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
@@ -43,8 +47,6 @@ namespace Shroomworld
         private List<Npc> _npcs;
         private List<Entity> _friendlyEntities; // contains references to all friendly entities in current world
 
-		// todo: menu class
-
 		private class Menus
 		{
             public Menu MainMenu;
@@ -62,6 +64,7 @@ namespace Shroomworld
         }
 
         // ----- Methods -----
+        // Prepare
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -81,7 +84,18 @@ namespace Shroomworld
 
             // TODO: use this.Content to load your game content here
         }
+        private void LoadFiles()
+		{
+            /* TODO: Things to load:
+             * - Types
+             * - World names / ids
+             * - User settings
+             * - Game settings
+             * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
+             */
+		}
         
+        // Update cycle
         protected override void Update(GameTime gameTime)
         {
             _updateCurrentState(gameTime);
@@ -101,7 +115,6 @@ namespace Shroomworld
             OpenMenu(menu);
             _updateCurrentState = UpdateMenu;
 		}
-        
         private void UpdateStage(GameTime gameTime)
 		{
             _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
@@ -129,6 +142,7 @@ namespace Shroomworld
             // recalculate paths for npcs
         }
 
+        // Menu
         private void UpdateMenu(GameTime gameTime)
 		{
 
@@ -163,16 +177,8 @@ namespace Shroomworld
 
             return true; // the current menu was closed successfully
 		}
-        private void LoadFiles()
-		{
-            /* TODO: Things to load:
-             * - Types
-             * - World names / ids
-             * - User settings
-             * - Game settings
-             * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
-             */
-		}
+        
+        // Saving
         /// <summary>
         /// idk
         /// </summary>
@@ -188,6 +194,7 @@ namespace Shroomworld
             // Save world
 		}
 
+        // Drawing
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -210,7 +217,7 @@ namespace Shroomworld
             return new Vector2(x, y);
         }
 
-
+        // Initialisation details
         private Player CreatePlayer()
         {
             Player player = new Player();
@@ -224,5 +231,6 @@ namespace Shroomworld
             npc.AttackAttemptInitiated += TryApplyAttack;
             return npc;
 		}
+
     }
 }
