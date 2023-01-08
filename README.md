@@ -24,7 +24,3 @@
 - [ ] Physics prototype
 1. Use WAS keys to move a player around the screen. Simplistic rigid body physics apply.
 2. Player should not be able to pass through solid objects.
-
-
-- [ ] Shroomworld
-The final project.
