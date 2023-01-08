@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 namespace Shroomworld
 {
-	internal class BiomeDictionary : IEnumerable
+	internal class BiomeDictionary : IEnumerable // todo: complete BiomeDictionary class
 	{
 		public class CapacityReachedException : Exception
 		{
