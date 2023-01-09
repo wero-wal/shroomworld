@@ -9,6 +9,13 @@ namespace Shroomworld
 {
     public class Shroomworld : Game
     {
+        // ----- Enums -----
+        private enum SpecialChestTypes
+        {
+            Death, // created upon death to store the user's items
+            User // when a user places a chest
+        }
+
         // ----- Properties -----
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
@@ -34,6 +41,7 @@ namespace Shroomworld
         private static Dictionary<int, NpcType> _npcTypes;
         private static Dictionary<int, PlayerTemplate> _playerTypes;
 
+        private static int _universalTileTypeCount; // number of default tile types
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -46,6 +54,8 @@ namespace Shroomworld
         private Menu _currentMenu => _activeMenus.Peek();
         private List<Npc> _npcs;
         private List<Entity> _friendlyEntities; // contains references to all friendly entities in current world
+        
+
 
 		private class Menus
 		{
@@ -119,6 +129,8 @@ namespace Shroomworld
 		{
             _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
 		}
+        
+        // Gameplay
         /// <summary>
         /// This will be called whenever an enemy is able and attempts to initiate an attack.
         /// It will check whether any of its opponents are in range. If so, an attack will be initiated.
@@ -140,6 +152,14 @@ namespace Shroomworld
             // this will be called upon edits to the world or changes in the player's position
             // Perhaps check if the interacted-with tile lies between them.
             // recalculate paths for npcs
+        }
+        private void CreateChest(SpecialChestTypes chestType, List<Item> items)
+        {
+            const string CHEST = "chest";
+            string name = chestType.ToString().ToLower() + CHEST;
+            List<Drop> drops = items.ForEach(item => new Drop(item.Id, item.Amount));
+            _tileTypes.Add(_tileTypes.Count, new TileType(new IdentifyingData(_tileTypes.Count, name, name + "s"), drops, false, ));
+            // todo: use the chest item type to do this
         }
 
         // Menu
