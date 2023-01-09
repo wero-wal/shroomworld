@@ -1,33 +1,32 @@
 using System;
-
 namespace Shroomworld
 {
 	internal class Drop
 	{
 		// ----- Enums -----
 		// ----- Properties -----
-		public int Id => _id;
+		public int Id => _itemId;
 
 		// ----- Fields -----
-		private readonly int _id;
+		private readonly int _itemId;
 		private readonly int _min;
 		private readonly int _max;
 
 		// ----- Constructors -----
-		public Drop(int id, int minInclusive, int maxExclusive)
+		public Drop(int itemId, int minInclusive, int? maxExclusive = null)
 		{
-			_id = id;
+			_itemId = itemId;
 			_min = minInclusive;
-			_max = maxExclusive;
+			_max = maxExclusive ?? minInclusive + 1;
 		}
 		internal Drop(params int[] properties)
 		{
-			_id = properties[0];
+			_itemId = properties[0];
 			_min = properties[1];
 			_max = properties[2];
 		}
 
         // ----- Methods -----
-        public int GetAmount() => (int)Math.Floor((decimal)new Random().Next(_min, _max));
+		public Item DropItem() => new Item(_itemId, new Random().Next(_min, _max));
     }
 }
