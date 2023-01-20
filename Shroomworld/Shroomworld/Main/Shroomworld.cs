@@ -247,6 +247,12 @@ namespace Shroomworld
             npc.AttackAttemptInitiated += TryApplyAttack;
             return npc;
 		}
-
+		
+		// Display / Input
+		public Vector2 GetMousePosition()
+		{
+			return new Vector2(); // todo: write code to get mouse position
+		}
+		public Keys[] GetNewlyPressedKeys => _currentKeyboardState.KeysPressed.Where(item => (!_previousKeyboardState.KeysPressed.Contains(item)));
     }
 }

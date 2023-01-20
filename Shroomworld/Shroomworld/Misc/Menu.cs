@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class Menu<TPoint, TColour, TKey>
+    internal class Menu
     {
         // ----- Enums -----
         public enum IndexingOptions
@@ -31,17 +31,15 @@ namespace Shroomworld
         // ----- Fields -----
         private readonly string[] _items;
 
-        private readonly TColour _backgroundColour;
-        private readonly TColour _textColour;
-        private readonly TColour _selectedBackgroundColour;
-        private readonly TColour _selectedTextColour;
+        private readonly Color _backgroundColour;
+        private readonly Color _textColour;
+        private readonly Color _selectedBackgroundColour;
+        private readonly Color _selectedTextColour;
 
-        private readonly TPoint _topLeftOfMenu;
-        private readonly TPoint _bottomRightOfMenu;
-        private readonly bool _rightIsPositive;
-        private readonly bool _downIsPositive;
+        private readonly Vector2 _topLeftOfMenu;
+        private readonly Vector2 _bottomRightOfMenu;
 
-        private readonly TKey _confirmSelection;
+        private readonly Key _confirmSelection;
 
         //---
         private SelectBy _selectBy;
@@ -50,20 +48,19 @@ namespace Shroomworld
         private string _characterToPutAfterIndexers;
         private int _lengthOfLongestIndex;
 
-        private Action<string, TColour, TColour, TPoint, TPoint> _displayBox; // msg, bgCol, txtCol, startPoint, dimensions
-        private Func<TPoint> _getCursorLocation;
-        private Func<TKey> _getInput;
+        private Action<string, Color, Color, Vector2, Vector2> _displayBox; // msg, bgCol, txtCol, startVector2, dimensions
+        private Func<Vector2> Shroomworld.GetMousePosition;
+        private Func<Key> _getInput;
 
-        private TPoint _dimensionsOfOneBox;
+        private Vector2 _dimensionsOfOneBox;
         private int _indexOfSelectedItem = 0;
 
         // ----- Constructors -----
         public Menu(string[] items,
-            TColour backgroundColour, TColour textColour, TColour? selectedBackgroundColour, TColour? selectedTextColour,
-            TPoint topLeftOfMenu, TPoint? bottomRightOfMenu,
-            TKey confirmSelection,
-            Action<string, TColour, TColour, TPoint, TPoint> displayBox, Func<TPoint> getCursorLocation, Func<TKey> getInput,
-            bool rightIsPositive = true, bool downIsPositive = true,
+            Color backgroundColour, Color textColour, Color? selectedBackgroundColour, Color? selectedTextColour,
+            Vector2 topLeftOfMenu, Vector2? bottomRightOfMenu,
+            Key confirmSelection,
+            Action<string, Color, Color, Vector2, Vector2> displayBox,
             SelectBy selectBy = SelectBy.MouseOrCursor, IndexingOptions indexingOption = IndexingOptions.None)
         {
             _items = items;
@@ -80,11 +77,6 @@ namespace Shroomworld
             _confirmSelection = confirmSelection;
 
             _displayBox = displayBox;
-            _getCursorLocation = getCursorLocation;
-            _getInput = getInput;
-
-            _rightIsPositive = rightIsPositive;
-            _downIsPositive = downIsPositive;
         }
 
         // ----- Methods -----
@@ -206,5 +198,7 @@ namespace Shroomworld
             }
             return romanResult;
         }
+		
+		// Interface
     }
 }
