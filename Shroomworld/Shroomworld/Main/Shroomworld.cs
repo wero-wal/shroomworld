@@ -31,10 +31,6 @@ namespace Shroomworld
         public static User CurrentUser;
         public static int CurrentWorldID;
 
-        
-        private const int _WIDTH = 0;
-        private const int _HEIGHT = 1;
-
         private static Dictionary<int, TileType> _tileTypes;
         private static Dictionary<int, ItemType> _itemTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
