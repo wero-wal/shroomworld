@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+// using Display;
+// using Menu;
 
 namespace Shroomworld
 {
@@ -31,10 +33,7 @@ namespace Shroomworld
         public static User CurrentUser;
         public static int CurrentWorldID;
 
-        
-        private const int _WIDTH = 0;
-        private const int _HEIGHT = 1;
-
+        // ---
         private static Dictionary<int, TileType> _tileTypes;
         private static Dictionary<int, ItemType> _itemTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
@@ -42,7 +41,7 @@ namespace Shroomworld
         private static Dictionary<int, PlayerTemplate> _playerTypes;
 
         private static int _universalTileTypeCount; // number of default tile types
-
+        // ---
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private event Action<> _checkForAttacks; // subscribe enemy Npcs to this
@@ -65,6 +64,7 @@ namespace Shroomworld
             // todo: add the rest
 		}
 
+
         // ----- Constructors -----
 		public Shroomworld()
         {
@@ -72,6 +72,7 @@ namespace Shroomworld
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
+
 
         // ----- Methods -----
         // Prepare
@@ -104,6 +105,10 @@ namespace Shroomworld
              * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
              */
 		}
+        private void CreateMenus()
+        {
+            Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
+        }
         
         // Update cycle
         protected override void Update(GameTime gameTime)
