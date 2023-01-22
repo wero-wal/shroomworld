@@ -71,5 +71,15 @@ namespace Shroomworld
         {
             Shroomworld.SpriteBatch.Draw(_texture, position, _colour);
         }
+        public bool SetPosition(Vector2 position)
+        {
+            if ((position.X >= Shroomworld.TopLeftOfScreen.X) && (position.Y >= Shroomworld.TopLeftOfScreen.Y)
+            && ((position.X + _size.X) <= Shroomworld.BottomRightOfScreen.X) && ((position.Y + _size.Y) <= Shroomworld.BottomRightOfScreen.Y))
+            {
+                _position = position;
+                return true;
+            }
+            return false;
+        }
     }
 }
