@@ -17,11 +17,16 @@ namespace Shroomworld
         }
 
         // ----- Properties -----
+
+        // Dictionaries
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
         internal static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
         internal static Dictionary<int, PlayerTemplate> PlayerTypes => _playerTypes;
+
+        //
+        public SpriteBatch SpriteBatch => _spriteBatch;
 
         
         // ----- Fields -----
@@ -154,7 +159,7 @@ namespace Shroomworld
             const string CHEST = "chest";
             string name = chestType.ToString().ToLower() + CHEST;
             List<Drop> drops = items.ForEach(item => new Drop(item.Id, item.Amount));
-            _tileTypes.Add(_tileTypes.Count, new TileType(new IdentifyingData(_tileTypes.Count, name, name + "s"), drops, false, ));
+            _tileTypes.Add(_tileTypes.Count, new TileType(new IdentifyingData(_tileTypes.Count, name, name + "s"), drops, false));
             // todo: use the chest item type to do this
         }
 

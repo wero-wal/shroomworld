@@ -23,12 +23,14 @@ namespace Shroomworld
         // ----- Properties -----
         public Texture2D Texture { get => _texture; }
         public Color Colour { get => _colour; }
+        public Vector2 Position => _position;
         public Vector2 Size { get => _size; }
 
 
         // ----- Fields -----
         protected Texture2D _texture;
         protected Color _colour;
+        protected Vector2 _position;
         protected Vector2 _size;
 
 
@@ -41,7 +43,17 @@ namespace Shroomworld
 
 
         // ----- Methods -----
-        public Vector2[] GetVertices(Vector2 position)
+        public Vector2[] GetVertices()
+        {
+            return new Vector2[]
+            {
+                _position, // Top Left
+                _position + _size * Vector2.UnitX, // Top Right
+                _position + _size * Vector2.UnitY, // Bottom Left
+                _position + _size, // Bottom Right
+            };
+        }
+        public Vector2[] GetVerticesAt(Vector2 position)
         {
             return new Vector2[]
             {
@@ -50,6 +62,14 @@ namespace Shroomworld
                 position + _size * Vector2.UnitY, // Bottom Left
                 position + _size, // Bottom Right
             };
+        }
+        public void Draw()
+        {
+            Shroomworld.SpriteBatch.Draw(_texture, _position, _colour);
+        }
+        public void DrawAt(Vector2 position)
+        {
+            Shroomworld.SpriteBatch.Draw(_texture, position, _colour);
         }
     }
 }
