@@ -11,6 +11,8 @@ namespace Shroomworld
     internal class Menu
     {
         // ----- Fields -----
+        private const float _distanceBetweenEachMenuItem = 10;
+
         private readonly Button[] _items;
 
         private readonly Color _buttonColour;
@@ -18,7 +20,7 @@ namespace Shroomworld
         private readonly Color _highlightedButtonColour;
         private readonly Color _highlightedTextColour;
 
-        private readonly Vector2 _topLeftOfMenu;
+        private readonly Vector2 _startPosition; // top left
         private readonly Vector2 _buttonSize;
 
         private Action<string, Color, Color, Vector2, Vector2> _displayBox; // msg, bgCol, txtCol, startVector2, dimensions
@@ -36,15 +38,16 @@ namespace Shroomworld
             _highlightedButtonColour = highlightedButtonColour ?? textColour;
             _highlightedTextColour = highlightedTextColour  ?? buttonColour;
 
-            _topLeftOfMenu = topLeftOfMenu;
-            _buttonSize = buttonSize ?? topLeftOfMenu;
+            _startPosition = topLeftOfMenu;
+            _buttonSize = buttonSize;
+            
+            SetButtonPositions();
         }
 
 
         // ----- Methods -----
         public void DisplayMenu()
         {
-
         }
         public int UserSelectsButton()
         {
@@ -58,6 +61,14 @@ namespace Shroomworld
                     // todo: divide mouse position in order to determine which button it's on
                     // todo: highlight if mouse is not down, select (return index of button) if it is
                 }
+            }
+        }
+
+        private void SetButtonPositions()
+        {
+            for (int i = 0; i < _items.Length; i++)
+            {
+                _items[i].Sprite.SetPosition(_startPosition + (_buttonSize * i) + (Vector2.UnitY * i * _distanceBetweenEachMenuItem));
             }
         }
     }
