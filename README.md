@@ -2,7 +2,7 @@
 **My A-Level Project**
 
 # Design
-## General design principles
+## General Design Principles
 1. I have tried to separate data from interfaces as much as possible.
 2. In general, each game object contains information about itself relating to its context (i.e. the world it resides in), as well as a reference to its type, which contains all the data that remains the same for all objects of that type in all worlds.
 3. I have tried as much as possible to store all data in files. The only exception to this is file paths.
