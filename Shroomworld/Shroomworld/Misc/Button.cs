@@ -10,6 +10,12 @@ namespace Shroomworld
 		private readonly string _text;
 		private readonly Sprite _sprite;
 
+
+		public void Draw(Color buttonColour, Color textColour)
+		{
+			_sprite.Draw(buttonColour);
+			Shroomworld.SpriteFont.Draw(textColour); // check: is this correct
+		}
 		// public bool CheckIfPressed(MouseState mouseState)
 		// {
 		// 	// todo: write code to check if mouse is pressed and is on the button

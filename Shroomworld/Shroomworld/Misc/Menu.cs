@@ -48,19 +48,55 @@ namespace Shroomworld
         // ----- Methods -----
         public void DisplayMenu()
         {
+            for(int i = 0; i < _items.Length; i++)
+            {
+                _items[i].Draw(_buttonColour, _textColour);
+            }
         }
         public int UserSelectsButton()
         {
-            // get input
-            // check if cursor is in box
-            // select that box
+            Vector2 currentMousePosition;
+            bool mouseDown;
+            bool prevMouseDown;
+            bool mouseHasBeenReleased;
+            bool mouseIsOnAButton;
+            int indexOfPreviouslyHighlightedButton;
+            int indexOfHighlightedButton;
+            
             while(true)
             {
-                if(Shroomworld.GetCurrentMousePosition())
+                indexOfPreviouslyHighlightedButton = indexOfHighlightedButton;
+
+                // todo: get mouse state
+
+                mouseHasBeenReleased = (!mouseDown) && prevMouseDown;
+                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(Shroomworld.GetCurrentMousePosition());
+                mouseIsOnAButton = indexOfHighlightedButton != -1;
+
+                if (!mouseIsOnAButton)
                 {
-                    // todo: divide mouse position in order to determine which button it's on
-                    // todo: highlight if mouse is not down, select (return index of button) if it is
+                    continue;
                 }
+                if(mouseHasBeenReleased)
+                {
+                    return indexOfHighlightedButton;
+                }
+                if (indexOfHighlightedButton != indexOfPreviouslyHighlightedButton)
+                {
+                    _items[indexOfHighlightedButton].Draw(_highlightedButtonColour, _highlightedTextColour);
+                    _items[indexOfPreviouslyHighlightedButton].Draw(_buttonColour, _textColour);
+                }
+            }
+
+            // local functions
+            int GetIndexOfButtonContainingMouse(Vector2 mousePosition) // returns -1 if no box
+            {
+                int index;
+                // todo: get index of button containing mouse
+                // check if out of bounds of the menu
+                // divide
+                // check if in the space between two boxes
+                return -1;
             }
         }
 

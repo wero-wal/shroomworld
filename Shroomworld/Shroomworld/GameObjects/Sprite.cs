@@ -67,9 +67,13 @@ namespace Shroomworld
         {
             Shroomworld.SpriteBatch.Draw(_texture, _position, _colour);
         }
-        public void DrawAt(Vector2 position)
+        public void Draw(Vector2 position)
         {
             Shroomworld.SpriteBatch.Draw(_texture, position, _colour);
+        }
+        public void Draw(Color colour)
+        {
+            Shroomworld.SpriteBatch.Draw(_texture, _position, colour);
         }
         public bool SetPosition(Vector2 position)
         {
