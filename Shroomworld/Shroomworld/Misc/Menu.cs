@@ -102,9 +102,12 @@ namespace Shroomworld
 
         private void SetButtonPositions()
         {
+            Vector2 position = new Vector2();
             for (int i = 0; i < _items.Length; i++)
             {
-                _items[i].Sprite.SetPosition(_startPosition + (_buttonSize * i) + (Vector2.UnitY * i * _distanceBetweenEachMenuItem));
+                position.X = _startPosition.X;
+                position.Y = _startPosition.Y + (_buttonSize.Y * i) + (_distanceBetweenEachMenuItem * i);
+                _items[i].Sprite.SetPosition(position);
             }
         }
     }
