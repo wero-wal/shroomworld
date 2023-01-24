@@ -1,6 +1,4 @@
 # Shroomworld
-**My A-Level Project**
-
 # Design
 ## General Design Principles
 1. I have tried to separate data from interfaces as much as possible.
