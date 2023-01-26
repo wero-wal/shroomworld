@@ -10,8 +10,10 @@ namespace Shroomworld
     {
         // ----- Enums -----
         // ----- Properties -----
+        public IdentifyingData IdData => _idData;
+
         // ----- Fields -----
-        private int _idData;
+        private IdentifyingData _idData;
         private List<Drop> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
         private bool _isSolid; // if is solid, entities can't pass through
         private int[] _breakableBy; // IDs of the tools which can break this tile
@@ -34,12 +36,10 @@ namespace Shroomworld
         }
         public InventoryItem[] GetDrops()
         {
-            InventoryItem[] itemsDropped = new InventoryItem[_drops.Count];
             for(int i = 0; i < _drops.Count; i++)
             {
-                itemsDropped[i] = new InventoryItem(_drops[i].Id, _drops[i].GetAmount());
+                yield return _drops[i].DropItem();
             }
-            return itemsDropped;
         }
     }
 }
