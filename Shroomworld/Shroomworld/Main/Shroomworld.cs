@@ -19,11 +19,16 @@ namespace Shroomworld
         }
 
         // ----- Properties -----
+
+        // Dictionaries
         internal static Dictionary<int, TileType> TileTypes => _tileTypes;
         internal static Dictionary<int, ItemType> ItemTypes => _itemTypes;
         internal static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
         internal static Dictionary<int, PlayerTemplate> PlayerTypes => _playerTypes;
+
+        //
+        public SpriteBatch SpriteBatch => _spriteBatch;
 
         
         // ----- Fields -----
@@ -41,6 +46,7 @@ namespace Shroomworld
         private static Dictionary<int, PlayerTemplate> _playerTypes;
 
         private static int _universalTileTypeCount; // number of default tile types
+        
         // ---
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -256,6 +262,12 @@ namespace Shroomworld
             npc.AttackAttemptInitiated += TryApplyAttack;
             return npc;
 		}
-
+		
+		// Display / Input
+		public Vector2 GetMousePosition()
+		{
+			return new Vector2(); // todo: write code to get mouse position
+		}
+		public Keys[] GetNewlyPressedKeys => _currentKeyboardState.KeysPressed.Where(item => (!_previousKeyboardState.KeysPressed.Contains(item)));
     }
 }

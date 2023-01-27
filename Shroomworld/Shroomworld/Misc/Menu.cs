@@ -4,207 +4,149 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace Shroomworld
 {
-    internal class Menu<TPoint, TColour, TKey>
+    internal class Menu
     {
-        // ----- Enums -----
-        public enum IndexingOptions
-        {
-            Numbered,
-            LowerCaseLettered,
-            UpperCaseLettered,
-            LowerCaseRomanNumeraled,
-            UpperCaseRomanNumeraled,
-            None,
-            Count,
-        }
-        public enum SelectBy
-        {
-            Index,
-            MouseOrCursor,
-            Count,
-        }
-
-        // ----- Properties -----
         // ----- Fields -----
-        private readonly string[] _items;
+        private static readonly float _distanceBetweenEachButton = 10;
+        private static readonly Sprite _background;
 
-        private readonly TColour _backgroundColour;
-        private readonly TColour _textColour;
-        private readonly TColour _selectedBackgroundColour;
-        private readonly TColour _selectedTextColour;
+        private readonly Button[] _items;
 
-        private readonly TPoint _topLeftOfMenu;
-        private readonly TPoint _bottomRightOfMenu;
-        private readonly bool _rightIsPositive;
-        private readonly bool _downIsPositive;
+        private readonly Color _buttonColour;
+        private readonly Color _textColour;
+        private readonly Color _highlightedButtonColour;
+        private readonly Color _highlightedTextColour;
 
-        private readonly TKey _confirmSelection;
+        private readonly Vector2 _startPosition; // top left
+        private readonly Vector2 _buttonSize;
 
-        //---
-        private SelectBy _selectBy;
-        private IndexingOptions _indexingOption;
-        private string _bullet;
-        private string _characterToPutAfterIndexers;
-        private int _lengthOfLongestIndex;
+        private Action<string, Color, Color, Vector2, Vector2> _displayBox; // msg, bgCol, txtCol, startVector2, dimensions
 
-        private Action<string, TColour, TColour, TPoint, TPoint> _displayBox; // msg, bgCol, txtCol, startPoint, dimensions
-        private Func<TPoint> _getCursorLocation;
-        private Func<TKey> _getInput;
-
-        private TPoint _dimensionsOfOneBox;
-        private int _indexOfSelectedItem = 0;
 
         // ----- Constructors -----
-        public Menu(string[] items,
-            TColour backgroundColour, TColour textColour, TColour? selectedBackgroundColour, TColour? selectedTextColour,
-            TPoint topLeftOfMenu, TPoint? bottomRightOfMenu,
-            TKey confirmSelection,
-            Action<string, TColour, TColour, TPoint, TPoint> displayBox, Func<TPoint> getCursorLocation, Func<TKey> getInput,
-            bool rightIsPositive = true, bool downIsPositive = true,
-            SelectBy selectBy = SelectBy.MouseOrCursor, IndexingOptions indexingOption = IndexingOptions.None)
+        /// <summary>
+        /// Create new instance of <see cref="Menu"/> and calculate button positions.
+        /// </summary>
+        /// <param name="items">all the clickable buttons you want in the menu</param>
+        /// <param name="buttonColour">background colour of each button</param>
+        /// <param name="textColour">foreground colour of each button</param>
+        /// <param name="highlightedButtonColour">background colour of each button when the mouse is hovering over it. if null, set to <paramref name="textColour"/></param>
+        /// <param name="highlightedTextColour">foreground colour of each button when the mouse is hovering over it. if null, set to <paramref name="buttonColour"/></param>
+        /// <param name="topLeftOfMenu">position of the top left corner of the first button in the menu</param>
+        /// <param name="buttonSize">size of each button (x = width, y = height)</param>
+        public Menu(Button[] items,
+            Color buttonColour, Color textColour, Color? highlightedButtonColour, Color? highlightedTextColour,
+            Vector2 topLeftOfMenu, Vector2 buttonSize)
         {
             _items = items;
-            _lengthOfLongestIndex = items.Length.ToString().Length;
 
-            _backgroundColour = backgroundColour;
+            _buttonColour = buttonColour;
             _textColour = textColour;
-            _selectedBackgroundColour = selectedBackgroundColour ?? textColour;
-            _selectedTextColour = selectedTextColour  ?? backgroundColour;
+            _highlightedButtonColour = highlightedButtonColour ?? textColour;
+            _highlightedTextColour = highlightedTextColour  ?? buttonColour;
 
-            _topLeftOfMenu = topLeftOfMenu;
-            _bottomRightOfMenu = bottomRightOfMenu ?? topLeftOfMenu;
-
-            _confirmSelection = confirmSelection;
-
-            _displayBox = displayBox;
-            _getCursorLocation = getCursorLocation;
-            _getInput = getInput;
-
-            _rightIsPositive = rightIsPositive;
-            _downIsPositive = downIsPositive;
+            _startPosition = topLeftOfMenu;
+            _buttonSize = buttonSize;
+            
+            SetButtonPositions();
         }
+
 
         // ----- Methods -----
-        public void DisplayMenu(IndexingOptions indexingOption, char? characterToPutAfterIndex = '.', char? bullet = null)
+        /// <summary>
+        /// Display all the buttons in the menu. They cannot be interacted with yet.
+        /// </summary>
+        public void DisplayMenu()
         {
-            if (((indexingOption == IndexingOptions.LowerCaseLettered) || (indexingOption == IndexingOptions.UpperCaseLettered)) && (_items.Length > 26))
+            _background.Draw();
+            for(int i = 0; i < _items.Length; i++)
             {
-                throw new ArgumentException("Can't use lettered indexing because the number of items is greater than the number of letters in the alphabet.");
-            }
-
-            _characterToPutAfterIndexers = ((characterToPutAfterIndex is null) ? "" : characterToPutAfterIndex.ToString()) + " ";
-            _bullet = (bullet is null) ? null : (bullet.ToString() + " ");
-
-            if (bullet is not null)
-            {
-                ApplyBullet();
-            }
-            if (indexingOption != IndexingOptions.None)
-            {
-                ApplyIndexingOption();
+                _items[i].Draw(_buttonColour, _textColour);
             }
         }
-        public int SelectBox(SelectBy selectBy, out string selectedItem)
+        /// <summary>
+        /// Allow the user to select a button by clicking on it using the left mouse button.
+        /// Highlight the button that the mouse is hovering over.
+        /// </summary>
+        /// <returns>the index of the selected button</returns>
+        public int UserSelectsButton()
         {
-            // get input
-            // check if cursor is in box
-            // select that box
+            const int DefaultIndexValue = -1;
+            
+            Vector2 currentMousePosition;
+            bool mouseDown;
+            bool prevMouseDown;
+            bool mouseHasBeenReleased;
+            bool mouseIsOnAButton;
+            int indexOfPreviouslyHighlightedButton;
+            int indexOfHighlightedButton;
+            
+            while(true)
+            {
+                // Update user inputs
+                indexOfPreviouslyHighlightedButton = indexOfHighlightedButton;
 
-            selectedItem = _items[_indexOfSelectedItem];
-            return _indexOfSelectedItem;
-        }
+                // todo: get mouse state
 
-        private void DetermineDimensionsOfOneBox()
-        {
-            // get longest string in items
-            // check ( against the topLeft and bottomRight of menu ) if it needs to be wrapped
-            // determine the height and width from that
-            // also check menuHeight / wrappedBoxHeight to see if it fits
+                mouseHasBeenReleased = (!mouseDown) && prevMouseDown;
+                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(mousePosition: Shroomworld.GetCurrentMousePosition());
+                mouseIsOnAButton = indexOfHighlightedButton != DefaultIndexValue;
+
+                // Display
+                if (!mouseIsOnAButton)
+                {
+                    continue;
+                }
+                if(mouseHasBeenReleased)
+                {
+                    return indexOfHighlightedButton;
+                }
+                if (indexOfHighlightedButton != indexOfPreviouslyHighlightedButton)
+                {
+                    _items[indexOfHighlightedButton].Draw(buttonColour: _highlightedButtonColour, textColour: _highlightedTextColour);
+                    _items[indexOfPreviouslyHighlightedButton].Draw(buttonColour: _buttonColour, textColour: _textColour);
+                }
+            }
+
+            // Local Functions
+            int GetIndexOfButtonContainingMouse(Vector2 mousePosition) // returns -1 if no box
+            {
+                // Check if out of bounds of the menu
+                if ((mousePosition.Y < _startPosition.Y) || (mousePosition.X < _startPosition.X)
+                || (mousePosition.Y > (_startPosition.Y + (_buttonSize.Y + _distanceBetweenEachButton) * _items.Length))
+                || (mousePosition.X > (_startPosition.X + _buttonSize.X)))
+                {
+                    return DefaultIndexValue;
+                }
+
+                // Calculate index
+                int index = (int)(mousePosition.Y / (_buttonSize.Y + _distanceBetweenEachButton));
+
+                // Check if in between two buttons
+                float bottomOfButtonAtIndex = _startPosition.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
+                if (mousePosition.Y > bottomOfButtonAtIndex)
+                {
+                    return DefaultIndexValue;
+                }
+                return index;
+            }
         }
-        private void ApplyBullet()
+        /// <summary>
+        /// Calculate and save the position of each button based on <see cref="_startPosition"/>, <see cref="_buttonSize"/>, and <see cref="_distanceBetweenEachButton"/>.
+        /// </summary>
+        private void SetButtonPositions()
         {
+            Vector2 position = new Vector2();
             for (int i = 0; i < _items.Length; i++)
             {
-                _items[i] = _bullet + _items[i];
+                position.X = _startPosition.X;
+                position.Y = _startPosition.Y + (_buttonSize.Y * i) + (_distanceBetweenEachButton * i);
+                _items[i].Sprite.SetPosition(position);
             }
-        }
-        private void ApplyIndexingOption()
-        {
-            switch (_indexingOption)
-            {
-                case IndexingOptions.Numbered:
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        InsertIndexer(i, (i + 1).ToString().PadLeft(_lengthOfLongestIndex));
-                    }
-                    break;
-
-                case IndexingOptions.LowerCaseLettered:
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        InsertIndexer(i, Convert.ToChar('a' + i).ToString());
-                    }
-                    break;
-
-                case IndexingOptions.UpperCaseLettered:
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        InsertIndexer(i, Convert.ToChar('A' + i).ToString());
-                    }
-                    break;
-
-                case IndexingOptions.LowerCaseRomanNumeraled:
-                    int longestNumeral = 0;
-                    int current;
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        current = IntToRoman(i).ToString().Length;
-                        if (current > longestNumeral)
-                        {
-                            longestNumeral = current;
-                        }
-                    }
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        InsertIndexer(i, IntToRoman(i).ToLower().PadLeft(longestNumeral));
-                    }
-                    break;
-
-                case IndexingOptions.UpperCaseRomanNumeraled:
-                    for (int i = 0; i < _items.Length; i++)
-                    {
-                        InsertIndexer(i, IntToRoman(i));
-                    }
-                    break;
-            }
-        }
-        private void InsertIndexer(int itemIndex, string indexer)
-        {
-            _items[itemIndex] = _items[itemIndex].Insert(_bullet.Length, indexer + _characterToPutAfterIndexers);
-        }
-        private string IntToRoman(int number) // code from: https://www.c-sharpcorner.com/article/convert-numbers-to-roman-characters-in-c-sharp/
-        {
-            string romanResult = string.Empty;
-            string[] romanLetters = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
-            int[] romanNumbers = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
-
-            int i = 0;
-            while (number != 0)
-            {
-                if (number >= romanNumbers[i])
-                {
-                    number -= romanNumbers[i];
-                    romanResult += romanLetters[i];
-                }
-                else
-                {
-                    i++;
-                }
-            }
-            return romanResult;
         }
     }
 }
