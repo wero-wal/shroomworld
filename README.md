@@ -22,3 +22,6 @@
 I try to stick to [these guidelines]().
 
 Unfortunately, as this is my first project using GitHub, my earlier commits are not great, however, my newer commits should be much better as I am constantly learning and improving.
+
+## Additional Links and References
+[Prototypes](https://github.com/wero-wal/shroomworld-prototypes)
