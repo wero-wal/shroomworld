@@ -27,6 +27,16 @@ namespace Shroomworld
 
 
         // ----- Constructors -----
+        /// <summary>
+        /// Create new instance of <see cref="Menu"/> and calculate button positions.
+        /// </summary>
+        /// <param name="items">all the clickable buttons you want in the menu</param>
+        /// <param name="buttonColour">background colour of each button</param>
+        /// <param name="textColour">foreground colour of each button</param>
+        /// <param name="highlightedButtonColour">background colour of each button when the mouse is hovering over it. if null, set to <paramref name="textColour"/></param>
+        /// <param name="highlightedTextColour">foreground colour of each button when the mouse is hovering over it. if null, set to <paramref name="buttonColour"/></param>
+        /// <param name="topLeftOfMenu">position of the top left corner of the first button in the menu</param>
+        /// <param name="buttonSize">size of each button (x = width, y = height)</param>
         public Menu(Button[] items,
             Color buttonColour, Color textColour, Color? highlightedButtonColour, Color? highlightedTextColour,
             Vector2 topLeftOfMenu, Vector2 buttonSize)
@@ -46,6 +56,9 @@ namespace Shroomworld
 
 
         // ----- Methods -----
+        /// <summary>
+        /// Display all the buttons in the menu. They cannot be interacted with yet.
+        /// </summary>
         public void DisplayMenu()
         {
             for(int i = 0; i < _items.Length; i++)
@@ -53,6 +66,11 @@ namespace Shroomworld
                 _items[i].Draw(_buttonColour, _textColour);
             }
         }
+        /// <summary>
+        /// Allow the user to select a button by clicking on it using the left mouse button.
+        /// Highlight the button that the mouse is hovering over.
+        /// </summary>
+        /// <returns>the index of the selected button</returns>
         public int UserSelectsButton()
         {
             Vector2 currentMousePosition;
