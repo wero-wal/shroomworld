@@ -11,7 +11,8 @@ namespace Shroomworld
     internal class Menu
     {
         // ----- Fields -----
-        private const float _distanceBetweenEachButton = 10;
+        private static readonly float _distanceBetweenEachButton = 10;
+        private static readonly Sprite _background;
 
         private readonly Button[] _items;
 
@@ -61,6 +62,7 @@ namespace Shroomworld
         /// </summary>
         public void DisplayMenu()
         {
+            _background.Draw();
             for(int i = 0; i < _items.Length; i++)
             {
                 _items[i].Draw(_buttonColour, _textColour);
@@ -73,6 +75,8 @@ namespace Shroomworld
         /// <returns>the index of the selected button</returns>
         public int UserSelectsButton()
         {
+            const int DefaultIndexValue = -1;
+            
             Vector2 currentMousePosition;
             bool mouseDown;
             bool prevMouseDown;
@@ -90,7 +94,7 @@ namespace Shroomworld
 
                 mouseHasBeenReleased = (!mouseDown) && prevMouseDown;
                 indexOfHighlightedButton = GetIndexOfButtonContainingMouse(mousePosition: Shroomworld.GetCurrentMousePosition());
-                mouseIsOnAButton = indexOfHighlightedButton != -1;
+                mouseIsOnAButton = indexOfHighlightedButton != DefaultIndexValue;
 
                 // Display
                 if (!mouseIsOnAButton)
@@ -111,14 +115,12 @@ namespace Shroomworld
             // Local Functions
             int GetIndexOfButtonContainingMouse(Vector2 mousePosition) // returns -1 if no box
             {
-                const int DefaultReturnValue = -1;
-                
                 // Check if out of bounds of the menu
                 if ((mousePosition.Y < _startPosition.Y) || (mousePosition.X < _startPosition.X)
                 || (mousePosition.Y > (_startPosition.Y + (_buttonSize.Y + _distanceBetweenEachButton) * _items.Length))
                 || (mousePosition.X > (_startPosition.X + _buttonSize.X)))
                 {
-                    return DefaultReturnValue;
+                    return DefaultIndexValue;
                 }
 
                 // Calculate index
@@ -128,12 +130,14 @@ namespace Shroomworld
                 float bottomOfButtonAtIndex = _startPosition.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
                 if (mousePosition.Y > bottomOfButtonAtIndex)
                 {
-                    return DefaultReturnValue;
+                    return DefaultIndexValue;
                 }
                 return index;
             }
         }
-
+        /// <summary>
+        /// Calculate and save the position of each button based on <see cref="_startPosition"/>, <see cref="_buttonSize"/>, and <see cref="_distanceBetweenEachButton"/>.
+        /// </summary>
         private void SetButtonPositions()
         {
             Vector2 position = new Vector2();
