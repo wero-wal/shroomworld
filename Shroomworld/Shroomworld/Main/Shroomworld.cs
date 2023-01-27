@@ -39,8 +39,8 @@ namespace Shroomworld
         public static int CurrentWorldID;
 
         // ---
-        private static Dictionary<int, TileType> _tileTypes;
         private static Dictionary<int, ItemType> _itemTypes;
+        private static Dictionary<int, TileType> _tileTypes;
         private static Dictionary<int, BiomeType> _biomeTypes;
         private static Dictionary<int, NpcType> _npcTypes;
         private static Dictionary<int, PlayerTemplate> _playerTypes;
@@ -89,6 +89,8 @@ namespace Shroomworld
             _activeMenus = new Stack<Menu> { Menus.MainMenu };
             base.Initialize();
         }
+        
+        // Loading
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -103,14 +105,28 @@ namespace Shroomworld
         }
         private void LoadFiles()
 		{
+            // Load Types
+            InjectIntoDictionary(FileManager.LoadItemTypes(), ref _itemTypes);
+            InjectIntoDictionary(FileManager.LoadTileTypes(), ref _tileTypes);
+            InjectIntoDictionary(FileManager.LoadBiomeTypes(), ref _biomeTypes);
+            InjectIntoDictionary(FileManager.LoadEnemyTypes(), ref _enemyTypes);
+            InjectIntoDictionary(FileManager.LoadPlayerTypes(), ref _playerTypes);
+
             /* TODO: Things to load:
-             * - Types
              * - World names / ids
              * - User settings
              * - Game settings
              * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
              */
+
+            void InjectIntoDictionary(List<IType> types, ref Dictionary<int, IType> dictionary)
+            {
+                dictionary = new Dictionary<int, IType>(types.Count);
+                types.ForEach(item => dictionary.Add(item.Id, item));
+            }
 		}
+
+        // Instantiation
         private void CreateMenus()
         {
             Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
