@@ -106,7 +106,10 @@ namespace Shroomworld
         private void LoadFiles()
 		{
             // Load Types
-            InjectIntoDictionary(FileManager.LoadItemTypes(), ref _itemTypes);
+            Dictionary itemTypes;
+            FileManager.LoadItemTypes(out itemTypes);
+
+            InjectIntoDictionary(itemTypes, ref _itemTypes);
             InjectIntoDictionary(FileManager.LoadTileTypes(), ref _tileTypes);
             InjectIntoDictionary(FileManager.LoadBiomeTypes(), ref _biomeTypes);
             InjectIntoDictionary(FileManager.LoadEnemyTypes(), ref _enemyTypes);

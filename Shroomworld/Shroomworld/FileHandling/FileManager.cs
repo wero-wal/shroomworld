@@ -48,82 +48,119 @@ namespace Shroomworld
 		{
 			return stringToSplit.Split(_separators[level]);
 		}
-		public static List<string[]> LoadCsvFile(string path)
+		public bool LoadCsvFile(string path, out List<string[]> file)
 		{
-			List<string[]> lines = new List<string[]> { };
-			using (StreamReader sr = new StreamReader(path))
+			file = new List<string[]> { };
+			try
 			{
-				while (!sr.EndOfStream)
+				using (StreamReader sr = new StreamReader(path))
 				{
-					lines.Add(sr.ReadLine().Split(Separators[Levels.i])); // add a line (split by commas into an array)
+					while (!sr.EndOfStream)
+					{
+						file.Add(sr.ReadLine().Split(Separators[Levels.i])); // add a line (split by commas into an array)
+					}
+					sr.Close();
 				}
-				sr.Close();
+				return true;
 			}
-			return lines;
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		// Load specifics
-		public static Texture2D LoadTexture(string directory, string name)
+		public static bool LoadTexture(string directory, string name, out Texture2D)
 		{
 			return Content.Load<Texture2D>(directory + name);
 		}
-		public static List<TileType> LoadTileTypes()
+		public static bool LoadTileTypes(out List<TileType> tileTypes)
 		{
-			List<string[]> file = LoadCsvFile(FilePaths.TileData);
-			List<TileType> tiles = new List<TileType>(file.Count);
-			int i;
-			foreach(string[] line in file) // each line represents a tile
+			List<string[]> file;
+			if (!LoadCsvFile(FilePaths.TileData, out file))
 			{
-				i = 0;
-				tiles.Add(new TileType(
-					id: Convert.ToInt32(line[i++]),
-					name: line[i++],
-					pluralName: line[i++],
-					drops: ParseDrops(line[i++]),
-					isSolid: Convert.ToBoolean(line[i++]),
-					breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Levels.ii)),
-					friction: (float)Convert.ToDecimal(line[i++])));
+				return false;
 			}
-			return tiles;
-		}
-		public static List<ItemType> LoadItemTypes()
-		{
-			List<string[]> file = LoadCsvFile(FilePaths.ItemData);
-			List<ItemType> itemTypes = new List<ItemType>(file.Count);
 
+			tileTypes = new List<TileType>(file.Count);
 			int i;
-			foreach (string[] line in file)
+			try
 			{
-				i = 0;
-				itemTypes.Add(new ItemType(
-					id: Convert.ToInt32(line[i++]),
-					name: line[i++],
-					pluralName: line[i++],
-					canBePlaced: Convert.ToBoolean(line[i++]),
-					stackable: Convert.ToBoolean(line[i++])));
+				foreach(string[] line in file) // each line represents a tile
+				{
+					i = 0;
+					tiles.Add(new TileType(
+						id: Convert.ToInt32(line[i++]),
+						name: line[i++],
+						pluralName: line[i++],
+						drops: ParseDrops(line[i++]),
+						isSolid: Convert.ToBoolean(line[i++]),
+						breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Levels.ii)),
+						friction: (float)Convert.ToDecimal(line[i++])));
+				}
+				return true;
 			}
-			return itemTypes;
-		}
-		public static List<EnemyType> LoadEnemyTypes()
-		{
-			List<string[]> file = LoadCsvFile(FilePaths.ItemData);
-			List<ItemType> itemTypes = new List<NpcType>(file.Count);
-
-			int i;
-			foreach (string[] line in file)
+			catch (Exception)
 			{
-				i = 0;
-				itemTypes.Add(new NpcType(
-					id: Convert.ToInt32(line[i++]),
-					name: line[i++],
-					pluralName: line[i++],
-					canBePlaced: Convert.ToBoolean(line[i++]),
-					stackable: Convert.ToBoolean(line[i++])
+				return false;
+			}
+		}
+		public static bool LoadItemTypes(out List<ItemType> itemTypes)
+		{
+			List<string[]> file;
+			if (!LoadCsvFile(FilePaths.ItemData, out file))
+			{
+				return false;
+			}
+
+			itemTypes = new List<ItemType>(file.Count);
+			int i;
+			try
+			{
+				foreach (string[] line in file)
+				{
+					i = 0;
+					itemTypes.Add(new ItemType(
+						id: Convert.ToInt32(line[i++]),
+						name: line[i++],
+						pluralName: line[i++],
+						canBePlaced: Convert.ToBoolean(line[i++]),
+						stackable: Convert.ToBoolean(line[i++])));
+				}
+				return true;
+			}
+			catch(Exception)
+			{
+				return false;
+			}
+		}
+		public static bool LoadEnemyTypes(out List<EnemyType> enemyTypes)
+		{
+			List<string[]> file;
+			if (!LoadCsvFile(FilePaths.EnemyData, out file))
+			{
+				return false;
+			}
+
+			enemyTypes = new List<EnemyType>(file.Count);
+			int i;
+			try
+			{
+				foreach (string[] line in file)
+				{
+					i = 0;
+					enemyTypes.Add(new EnemyType(
+						// parameters here
 					));
+				}
+				return true;
 			}
-			return itemTypes;
+			catch(Exception)
+			{
+				return false;
+			}
 		}
-		public static Player LoadPlayer(int id)
+		public static bool LoadPlayer(int id, out Player player)
 		{
 			// todo: sort loadplayer out
 			string[] parts = LoadCsvFile(FilePaths.AllUsers); // load player file
@@ -140,15 +177,39 @@ namespace Shroomworld
             	quests: ParseQuests(parts[p++]),
             	statistics: ParseStatistics(parts[p++]));
 		}
-		public static List<PlayerTemplate> LoadPlayerTypes()
+		public static bool List<PlayerTemplate> LoadPlayerTypes()
 		{
 			// TODO: LoadPLayerTypes()
 		}
-		public static List<BiomeType> LoadBiomeTypes()
+		public static bool List<BiomeType> LoadBiomeTypes()
 		{
 			// TODO: LoadBiomeTypes()
+			List<string[]> file;
+			if (!LoadCsvFile(FilePaths.BiomeData, out file))
+			{
+				return false;
+			}
+
+			enemyTypes = new List<EnemyType>(file.Count);
+			int i;
+			try
+			{
+				foreach (string[] line in file)
+				{
+					i = 0;
+					enemyTypes.Add(new EnemyType(
+						// parameters here
+					));
+				}
+				return true;
+			}
+			catch(Exception)
+			{
+				return false;
+			}
+
 		}
-		public static List<FriendlyTypes> LoadFriendlyTypes()
+		public static bool List<FriendlyTypes> LoadFriendlyTypes()
 		{
 			// TODO: LoadFriendlyTypes()
 		}
