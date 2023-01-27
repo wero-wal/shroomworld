@@ -11,7 +11,7 @@ namespace Shroomworld
     internal class Menu
     {
         // ----- Fields -----
-        private const float _distanceBetweenEachMenuItem = 10;
+        private const float _distanceBetweenEachButton = 10;
 
         private readonly Button[] _items;
 
@@ -83,14 +83,16 @@ namespace Shroomworld
             
             while(true)
             {
+                // Update user inputs
                 indexOfPreviouslyHighlightedButton = indexOfHighlightedButton;
 
                 // todo: get mouse state
 
                 mouseHasBeenReleased = (!mouseDown) && prevMouseDown;
-                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(Shroomworld.GetCurrentMousePosition());
+                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(mousePosition: Shroomworld.GetCurrentMousePosition());
                 mouseIsOnAButton = indexOfHighlightedButton != -1;
 
+                // Display
                 if (!mouseIsOnAButton)
                 {
                     continue;
@@ -101,20 +103,34 @@ namespace Shroomworld
                 }
                 if (indexOfHighlightedButton != indexOfPreviouslyHighlightedButton)
                 {
-                    _items[indexOfHighlightedButton].Draw(_highlightedButtonColour, _highlightedTextColour);
-                    _items[indexOfPreviouslyHighlightedButton].Draw(_buttonColour, _textColour);
+                    _items[indexOfHighlightedButton].Draw(buttonColour: _highlightedButtonColour, textColour: _highlightedTextColour);
+                    _items[indexOfPreviouslyHighlightedButton].Draw(buttonColour: _buttonColour, textColour: _textColour);
                 }
             }
 
-            // local functions
+            // Local Functions
             int GetIndexOfButtonContainingMouse(Vector2 mousePosition) // returns -1 if no box
             {
-                int index;
-                // todo: get index of button containing mouse
-                // check if out of bounds of the menu
-                // divide
-                // check if in the space between two boxes
-                return -1;
+                const int DefaultReturnValue = -1;
+                
+                // Check if out of bounds of the menu
+                if ((mousePosition.Y < _startPosition.Y) || (mousePosition.X < _startPosition.X)
+                || (mousePosition.Y > (_startPosition.Y + (_buttonSize.Y + _distanceBetweenEachButton) * _items.Length))
+                || (mousePosition.X > (_startPosition.X + _buttonSize.X)))
+                {
+                    return DefaultReturnValue;
+                }
+
+                // Calculate index
+                int index = (int)(mousePosition.Y / (_buttonSize.Y + _distanceBetweenEachButton));
+
+                // Check if in between two buttons
+                float bottomOfButtonAtIndex = _startPosition.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
+                if (mousePosition.Y > bottomOfButtonAtIndex)
+                {
+                    return DefaultReturnValue;
+                }
+                return index;
             }
         }
 
@@ -124,7 +140,7 @@ namespace Shroomworld
             for (int i = 0; i < _items.Length; i++)
             {
                 position.X = _startPosition.X;
-                position.Y = _startPosition.Y + (_buttonSize.Y * i) + (_distanceBetweenEachMenuItem * i);
+                position.Y = _startPosition.Y + (_buttonSize.Y * i) + (_distanceBetweenEachButton * i);
                 _items[i].Sprite.SetPosition(position);
             }
         }
