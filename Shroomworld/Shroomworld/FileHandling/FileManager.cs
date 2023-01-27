@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
-using Shroomworld.FileHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -105,7 +104,7 @@ namespace Shroomworld
 			}
 			return itemTypes;
 		}
-		public static List<NpcType> LoadEnemyTypes()
+		public static List<EnemyType> LoadEnemyTypes()
 		{
 			List<string[]> file = LoadCsvFile(FilePaths.ItemData);
 			List<ItemType> itemTypes = new List<NpcType>(file.Count);
@@ -141,7 +140,19 @@ namespace Shroomworld
             	quests: ParseQuests(parts[p++]),
             	statistics: ParseStatistics(parts[p++]));
 		}
-		
+		public static List<PlayerTemplate> LoadPlayerTypes()
+		{
+			// TODO: LoadPLayerTypes()
+		}
+		public static List<BiomeType> LoadBiomeTypes()
+		{
+			// TODO: LoadBiomeTypes()
+		}
+		public static List<FriendlyTypes> LoadFriendlyTypes()
+		{
+			// TODO: LoadFriendlyTypes()
+		}
+
 		// Parsing
 		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
 		{
