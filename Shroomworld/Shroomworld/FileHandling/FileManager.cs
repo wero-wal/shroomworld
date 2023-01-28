@@ -6,6 +6,7 @@ using System.Runtime.Intrinsics.Arm;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Shroomworld.FileHandling;
 
 namespace Shroomworld
 {
@@ -13,7 +14,7 @@ namespace Shroomworld
 	{
 		//-----Enums-----
 		// used as an enum to keep track of which level of list (or separation) we are in within a file
-		public static struct Levels
+		public struct Levels
 		{
 			public const int i = 0;
 			public const int ii = 1;
@@ -48,19 +49,22 @@ namespace Shroomworld
 		{
 			return stringToSplit.Split(_separators[level]);
 		}
-		public bool LoadCsvFile(string path, out List<string[]> file)
+		public static bool LoadCsvFile(string path, out Queue<string>[] file)
 		{
-			file = new List<string[]> { };
+			List<Queue<string>> file_AsList = new List<Queue<string>>();
+			file = null;
 			try
 			{
 				using (StreamReader sr = new StreamReader(path))
 				{
 					while (!sr.EndOfStream)
 					{
-						file.Add(sr.ReadLine().Split(Separators[Levels.i])); // add a line (split by commas into an array)
+						Queue<string> line = new Queue<string>(sr.ReadLine().Split(Separators[Levels.i]));
+						file_AsList.Add(line); // add a line (split by commas into an array)
 					}
 					sr.Close();
 				}
+				file = file_AsList.ToArray();
 				return true;
 			}
 			catch (Exception)
@@ -70,15 +74,25 @@ namespace Shroomworld
 		}
 
 		// Load specifics
-		public static bool LoadTexture(string directory, string name, out Texture2D)
+		public static bool LoadTexture(string directory, string name, out Texture2D texture)
 		{
-			return Content.Load<Texture2D>(directory + name);
+			try
+			{
+				texture = Content.Load<Texture2D>(directory + name);
+				return true;
+			}
+			catch (Exception)
+			{
+				texture = null;
+				return false;
+			}
 		}
 		public static bool LoadTileTypes(out List<TileType> tileTypes)
 		{
-			List<string[]> file;
+			List<Queue<string>> file;
 			if (!LoadCsvFile(FilePaths.TileData, out file))
 			{
+				tileTypes = null;
 				return false;
 			}
 
@@ -86,18 +100,115 @@ namespace Shroomworld
 			int i;
 			try
 			{
-				foreach(string[] line in file) // each line represents a tile
+				foreach(Queue<string> line in file) // each line represents a tile
 				{
 					i = 0;
 					tiles.Add(new TileType(
-						id: Convert.ToInt32(line[i++]),
-						name: line[i++],
-						pluralName: line[i++],
-						drops: ParseDrops(line[i++]),
-						isSolid: Convert.ToBoolean(line[i++]),
-						breakableBy: ConvertStringArrayToInt(SplitAtLevel(line[i++], Levels.ii)),
-						friction: (float)Convert.ToDecimal(line[i++])));
+						id: Convert.ToInt32(line.Dequeue()),
+						name: line.Dequeue(),
+						pluralName: line.Dequeue(),
+						drops: ParseDrops(line.Dequeue()),
+						isSolid: Convert.ToBoolean(line.Dequeue()),
+						breakableBy: ConvertStringArrayToInt(SplitAtLevel(line.Dequeue(), Levels.ii)),
+						friction: (float)Convert.ToDecimal(line.Dequeue())));
 				}
+				return true;
+			}
+			catch (Exception)
+			{
+				tileTypes = null;
+				return false;
+			}
+		}
+		public static bool LoadItemTypes(out List<ItemType> itemTypes)
+		{
+			Queue<string>[] file;
+			if (!LoadCsvFile(FilePaths.ItemData, out file))
+			{
+				itemTypes = null;
+				return false;
+			}
+
+			int i;
+			itemTypes = new List<ItemType>(file.Count);
+			try
+			{
+				foreach (Queue<string> line in file)
+				{
+					i = 0;
+					itemTypes.Add(new ItemType(
+						id: Convert.ToInt32(line.Dequeue()),
+						name: line.Dequeue(),
+						pluralName: line.Dequeue(),
+						canBePlaced: Convert.ToBoolean(line.Dequeue()),
+						stackable: Convert.ToBoolean(line.Dequeue())));
+				}
+				return true;
+			}
+			catch(Exception)
+			{
+				itemTypes = null;
+				return false;
+			}
+		}
+		public static bool LoadEnemyTypes(out List<EnemyType> enemyTypes)
+		{
+			Queue<string>[] file;
+			if (!LoadCsvFile(FilePaths.EnemyData, out file))
+			{
+				enemyTypes = null;
+				return false;
+			}
+
+			int i;
+			enemyTypes = new List<EnemyType>(file.Count);
+			try
+			{
+				foreach (Queue<string> line in file)
+				{
+					i = 0;
+					enemyTypes.Add(new EnemyType(
+						// parameters here
+					));
+				}
+				return true;
+			}
+			catch(Exception)
+			{
+				enemyTypes = null;
+				return false;
+			}
+		}
+		public static bool LoadPlayer(int id, out Player player)
+		{
+			// todo: sort loadplayer out
+			Queue<string>[] file;
+			player = null;
+
+			if (!LoadCsvFile(FilePaths.AllUsers, out file))
+			{
+				return false;
+			}
+
+			Textutre2D texture;
+			try
+			{
+				Queue<string> line = file[0];
+				PlayerTemplate type = Shroomworld.PlayerTypes[Convert.ToInt32(line.Dequeue())];
+				if (!LoadTexture(line.Dequeue(), out texture))
+				{
+					return false;
+				}
+				player = new Player(
+					type: type,
+					sprite: new Sprite(texture),
+					powerUps: new PowerUp(ParsePowerUps(line.Dequeue())),
+					healthData: new HealthData(ParseHealthData(line.Dequeue()), type.ReadonlyHealthData),
+					shieldData: new HealthData(ParseHealthData(line.Dequeue())),
+					attack: new AttackAndBoostInfo(_powerUps.Damage),
+					inventory: ParseInventory(line.Dequeue()), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
+					quests: ParseQuests(line.Dequeue()),
+					statistics: ParseStatistics(line.Dequeue()));
 				return true;
 			}
 			catch (Exception)
@@ -105,99 +216,29 @@ namespace Shroomworld
 				return false;
 			}
 		}
-		public static bool LoadItemTypes(out List<ItemType> itemTypes)
-		{
-			List<string[]> file;
-			if (!LoadCsvFile(FilePaths.ItemData, out file))
-			{
-				return false;
-			}
-
-			itemTypes = new List<ItemType>(file.Count);
-			int i;
-			try
-			{
-				foreach (string[] line in file)
-				{
-					i = 0;
-					itemTypes.Add(new ItemType(
-						id: Convert.ToInt32(line[i++]),
-						name: line[i++],
-						pluralName: line[i++],
-						canBePlaced: Convert.ToBoolean(line[i++]),
-						stackable: Convert.ToBoolean(line[i++])));
-				}
-				return true;
-			}
-			catch(Exception)
-			{
-				return false;
-			}
-		}
-		public static bool LoadEnemyTypes(out List<EnemyType> enemyTypes)
-		{
-			List<string[]> file;
-			if (!LoadCsvFile(FilePaths.EnemyData, out file))
-			{
-				return false;
-			}
-
-			enemyTypes = new List<EnemyType>(file.Count);
-			int i;
-			try
-			{
-				foreach (string[] line in file)
-				{
-					i = 0;
-					enemyTypes.Add(new EnemyType(
-						// parameters here
-					));
-				}
-				return true;
-			}
-			catch(Exception)
-			{
-				return false;
-			}
-		}
-		public static bool LoadPlayer(int id, out Player player)
-		{
-			// todo: sort loadplayer out
-			string[] parts = LoadCsvFile(FilePaths.AllUsers); // load player file
-            int p = 0; // index to keep track of which part we're on
-			PlayerTemplate type = Shroomworld.PlayerTypes[Convert.ToInt32(parts[p++])];
-			return new Player(
-				type: type,
-				sprite: new Sprite(LoadTexture(parts[p++])),
-            	powerUps: new PowerUp(ParsePowerUps(parts[p++])),
-            	healthData: new HealthData(ParseHealthData(parts[p++]), type.ReadonlyHealthData),
-				shieldData: new HealthData(ParseHealthData(parts[p++])),
-            	attack: new AttackAndBoostInfo(_powerUps.Damage),
-            	inventory: ParseInventory(parts[p++]), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
-            	quests: ParseQuests(parts[p++]),
-            	statistics: ParseStatistics(parts[p++]));
-		}
-		public static bool List<PlayerTemplate> LoadPlayerTypes()
+		public static bool LoadPlayerTypes(out List<PlayerTemplate> playerTemplates)
 		{
 			// TODO: LoadPLayerTypes()
+			playerTemplates = null;
 		}
-		public static bool List<BiomeType> LoadBiomeTypes()
+		public static bool LoadBiomeTypes(out List<BiomeType> biomeTypes)
 		{
 			// TODO: LoadBiomeTypes()
-			List<string[]> file;
+			Queue<string>[] file;
 			if (!LoadCsvFile(FilePaths.BiomeData, out file))
 			{
+				biomeTypes = null;
 				return false;
 			}
 
-			enemyTypes = new List<EnemyType>(file.Count);
+			biomeTypes = new List<BiomeType>(file.Count);
 			int i;
 			try
 			{
-				foreach (string[] line in file)
+				foreach (Queue<string> line in file)
 				{
 					i = 0;
-					enemyTypes.Add(new EnemyType(
+					biomeTypes.Add(new BiomeType(
 						// parameters here
 					));
 				}
@@ -209,17 +250,18 @@ namespace Shroomworld
 			}
 
 		}
-		public static bool List<FriendlyTypes> LoadFriendlyTypes()
+		public static bool LoadFriendlyTypes(out List<FriendlyType> friendlyTypes)
 		{
 			// TODO: LoadFriendlyTypes()
+			friendlyTypes = null;
 		}
 
 		// Parsing
 		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
 		{
-			int[] parts = ConvertStringArrayToInt(SplitAtLevel(plaintext, containingLevel + 1));
+			int[] line = ConvertStringArrayToInt(SplitAtLevel(plaintext, containingLevel + 1));
 			int p = 0;
-			return new MovementData(new Vector2(parts[p++], parts[p++]));
+			return new MovementData(new Vector2(line.Dequeue(), line.Dequeue()));
 		}
 		private static List<Drop> ParseDrops(string plaintext)
 		{
@@ -240,7 +282,7 @@ namespace Shroomworld
 		}
 		private static PowerUp[] ParsePowerUps(string plaintext) // TODO: parse powerups
 		{
-			// split into parts
+			// split into line
 			// ConvertAll to powerup
 
 			// local function to use as converter
