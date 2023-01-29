@@ -60,8 +60,6 @@ namespace Shroomworld
         private List<Npc> _npcs;
         private List<Entity> _friendlyEntities; // contains references to all friendly entities in current world
         
-
-
 		private class Menus
 		{
             public Menu MainMenu;
@@ -103,30 +101,29 @@ namespace Shroomworld
 
             // TODO: use this.Content to load your game content here
         }
-        private void LoadFiles()
+        /// <summary>
+        /// Loads all generic game files.
+        /// </summary>
+        /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
+        private bool LoadGameFiles()
 		{
             // Load Types
-            Dictionary itemTypes;
-            FileManager.LoadItemTypes(out itemTypes);
-
-            InjectIntoDictionary(itemTypes, ref _itemTypes);
-            InjectIntoDictionary(FileManager.LoadTileTypes(), ref _tileTypes);
-            InjectIntoDictionary(FileManager.LoadBiomeTypes(), ref _biomeTypes);
-            InjectIntoDictionary(FileManager.LoadEnemyTypes(), ref _enemyTypes);
-            InjectIntoDictionary(FileManager.LoadPlayerTypes(), ref _playerTypes);
+            if(!(FileManager.TryLoadTypes(out _itemTypes)
+            && FileManager.TryLoadTypes(out _tileTypes)
+            && FileManager.TryLoadTypes(out _biomeTypes)
+            && FileManager.TryLoadTypes(out _enemyTypes)
+            && FileManager.TryLoadTypes(out _playerTypes)))
+            {
+                return false;
+            }
 
             /* TODO: Things to load:
              * - World names / ids
-             * - User settings
+             * - User settings --> different method
              * - Game settings
              * - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).
              */
-
-            void InjectIntoDictionary(List<IType> types, ref Dictionary<int, IType> dictionary)
-            {
-                dictionary = new Dictionary<int, IType>(types.Count);
-                types.ForEach(item => dictionary.Add(item.Id, item));
-            }
+            return true;
 		}
 
         // Instantiation
@@ -195,7 +192,7 @@ namespace Shroomworld
         // Menu
         private void UpdateMenu(GameTime gameTime)
 		{
-
+            // todo: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
 		}
         /// <summary>
         /// Adds <paramref name="menu"/> to the stack (<see cref="_activeMenus"/>).
