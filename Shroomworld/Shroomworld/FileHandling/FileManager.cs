@@ -49,7 +49,9 @@ namespace Shroomworld
 		{
 			return stringToSplit.Split(_separators[level]);
 		}
-		public static bool LoadCsvFile(string path, out Queue<string>[] file)
+
+		// Load
+		public static bool TryLoadCsvFile(string path, out Queue<string>[] file)
 		{
 			List<Queue<string>> file_AsList = new List<Queue<string>>();
 			file = null;
@@ -72,8 +74,6 @@ namespace Shroomworld
 				return false;
 			}
 		}
-
-		// Load specifics
 		public static bool LoadTexture(string directory, string name, out Texture2D texture)
 		{
 			try
@@ -87,187 +87,200 @@ namespace Shroomworld
 				return false;
 			}
 		}
-		public static bool LoadTileTypes(out List<TileType> tileTypes)
+		public static bool TryLoadTypes<T>(out Dictionary<int, T>? typeDictionary) where T : IType
 		{
-			List<Queue<string>> file;
-			if (!LoadCsvFile(FilePaths.TileData, out file))
+			// Loading
+			Queue<string>[] file;
+			if (!TryLoadCsvFile(_pathForType[typeof(T)], out file))
 			{
-				tileTypes = null;
+				typeDictionary = null;
 				return false;
 			}
 
-			tileTypes = new List<TileType>(file.Count);
-			int i;
+			// Parsing
+			string id;
+			T type;
+
+			typeDictionary = new Dictionary<int, T>(file.Count);
+
+			foreach(Queue<string> line in file) // each line represents a tile
+			{
+				if (!(line.TryDequeue(out id)
+				&& TryParse<T>(id.ToString(), line, out type)))
+				{
+					typeDictionary = null;
+					return false;
+				}
+				typeDictionary.Add(id, type);
+			}
+			return true;
+		}
+
+		// Parse types
+		public static bool TryParse<T>(int id, Queue<string> plaintext, out T? type) where T : IType
+		{
+			throw new NotImplementedException();
+		}
+		public static bool TryParse<TilType>(int id, Queue<string> plaintext, out TileType? tileType)
+		{
+			tileType = null;
 			try
 			{
-				foreach(Queue<string> line in file) // each line represents a tile
-				{
-					i = 0;
-					tiles.Add(new TileType(
-						id: Convert.ToInt32(line.Dequeue()),
-						name: line.Dequeue(),
-						pluralName: line.Dequeue(),
-						drops: ParseDrops(line.Dequeue()),
-						isSolid: Convert.ToBoolean(line.Dequeue()),
-						breakableBy: ConvertStringArrayToInt(SplitAtLevel(line.Dequeue(), Levels.ii)),
-						friction: (float)Convert.ToDecimal(line.Dequeue())));
-				}
+				tileType = new TileType
+				(
+					id: id,
+					name: plaintext.Dequeue(),
+					pluralName: plaintext.Dequeue(),
+					drops: ParseDrops(plaintext.Dequeue()),
+					isSolid: Convert.ToBoolean(plaintext.Dequeue()),
+					breakableBy: ConvertStringArrayToInt(SplitAtLevel(plaintext.Dequeue(), Levels.ii)),
+					friction: (float)Convert.ToDecimal(plaintext.Dequeue())
+				);
 				return true;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				tileTypes = null;
-				return false;
-			}
-		}
-		public static bool LoadItemTypes(out List<ItemType> itemTypes)
-		{
-			Queue<string>[] file;
-			if (!LoadCsvFile(FilePaths.ItemData, out file))
-			{
-				itemTypes = null;
-				return false;
-			}
-
-			int i;
-			itemTypes = new List<ItemType>(file.Count);
-			try
-			{
-				foreach (Queue<string> line in file)
-				{
-					i = 0;
-					itemTypes.Add(new ItemType(
-						id: Convert.ToInt32(line.Dequeue()),
-						name: line.Dequeue(),
-						pluralName: line.Dequeue(),
-						canBePlaced: Convert.ToBoolean(line.Dequeue()),
-						stackable: Convert.ToBoolean(line.Dequeue())));
-				}
-				return true;
-			}
-			catch(Exception)
-			{
-				itemTypes = null;
-				return false;
-			}
-		}
-		public static bool LoadEnemyTypes(out List<EnemyType> enemyTypes)
-		{
-			Queue<string>[] file;
-			if (!LoadCsvFile(FilePaths.EnemyData, out file))
-			{
-				enemyTypes = null;
-				return false;
-			}
-
-			int i;
-			enemyTypes = new List<EnemyType>(file.Count);
-			try
-			{
-				foreach (Queue<string> line in file)
-				{
-					i = 0;
-					enemyTypes.Add(new EnemyType(
-						// parameters here
-					));
-				}
-				return true;
-			}
-			catch(Exception)
-			{
-				enemyTypes = null;
-				return false;
-			}
-		}
-		public static bool LoadPlayer(int id, out Player player)
-		{
-			// todo: sort loadplayer out
-			Queue<string>[] file;
-			player = null;
-
-			if (!LoadCsvFile(FilePaths.AllUsers, out file))
-			{
-				return false;
-			}
-
-			Textutre2D texture;
-			try
-			{
-				Queue<string> line = file[0];
-				PlayerTemplate type = Shroomworld.PlayerTypes[Convert.ToInt32(line.Dequeue())];
-				if (!LoadTexture(line.Dequeue(), out texture))
+				// Check for expected exceptions
+				// ("expected" because I know the way they will arise will be if the files are corrupted /
+				// incorrectly formatted, and this should be the only reason for an exception to be thrown)
+				if ((e is IndexOutOfRangeException) // not enough items in queue
+				|| (e is FormatException)) // format error in one/more of: isSolid, breakableBy, friction
 				{
 					return false;
 				}
-				player = new Player(
-					type: type,
-					sprite: new Sprite(texture),
-					powerUps: new PowerUp(ParsePowerUps(line.Dequeue())),
-					healthData: new HealthData(ParseHealthData(line.Dequeue()), type.ReadonlyHealthData),
-					shieldData: new HealthData(ParseHealthData(line.Dequeue())),
-					attack: new AttackAndBoostInfo(_powerUps.Damage),
-					inventory: ParseInventory(line.Dequeue()), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
-					quests: ParseQuests(line.Dequeue()),
-					statistics: ParseStatistics(line.Dequeue()));
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
+				throw;
 			}
 		}
-		public static bool LoadPlayerTypes(out List<PlayerTemplate> playerTemplates)
+		public static bool TryParse<ItemType>(int id, Queue<string> plaintext, out ItemType? itemType)
 		{
-			// TODO: LoadPLayerTypes()
-			playerTemplates = null;
-		}
-		public static bool LoadBiomeTypes(out List<BiomeType> biomeTypes)
-		{
-			// TODO: LoadBiomeTypes()
-			Queue<string>[] file;
-			if (!LoadCsvFile(FilePaths.BiomeData, out file))
-			{
-				biomeTypes = null;
-				return false;
-			}
-
-			biomeTypes = new List<BiomeType>(file.Count);
-			int i;
+			itemType = null;
 			try
 			{
-				foreach (Queue<string> line in file)
-				{
-					i = 0;
-					biomeTypes.Add(new BiomeType(
-						// parameters here
-					));
-				}
+				itemType = new ItemType(
+					id: id,
+					name: plaintext.Dequeue(),
+					pluralName: plaintext.Dequeue(),
+					canBePlaced: Convert.ToBoolean(plaintext.Dequeue()),
+					stackable: Convert.ToBoolean(plaintext.Dequeue())
+				);
 				return true;
 			}
 			catch(Exception)
 			{
 				return false;
 			}
-
 		}
-		public static bool LoadFriendlyTypes(out List<FriendlyType> friendlyTypes)
+		public static bool TryParse<EnemyType>(int id, Queue<string> plaintext, out enemyType? enemyType)
 		{
-			// TODO: LoadFriendlyTypes()
-			friendlyTypes = null;
+			enemyTypes = null;
+			try
+			{
+				new EnemyType(
+					id: id,
+					// todo: add parameters in LoadEnemyTypes()
+				);
+				return true;
+			}
+			catch(Exception)
+			{
+				return false;
+			}
 		}
-
-		// Parsing
+		public static bool TryParse<PlayerTemplate>(int id, Queue<string> plaintext, out PlayerTemplate? playerTemplate)
+		{
+			playerTemplate = null;
+			try
+			{
+				playerTemplate = new PlayerTemplate(
+					// todo: add parameters in LoadPlayerTypes()	
+				);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				return false;				
+			}
+		}
+		public static bool TryParse<BiomeType>(int id, Queue<string> plaintext, out BiomeType? biomeType)
+		{
+			biomeType = null;
+			try
+			{
+				biomeType = new BiomeType(
+					// todo: add parameters	
+				);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				return false;				
+			}
+		}
+		public static bool TryParse<FriendlyType>(int id, Queue<string> plaintext, out FriendlyType? friendlyType)
+		{
+			friendlyType = null;
+			try
+			{
+				friendlyType = new FriendlyType(
+					// todo: add parameters
+				);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				return false;				
+			}
+		}
+		
+		// Parse components
+		public static bool LoadPlayer(int id, out Player player)
+			{
+				// todo: sort loadplayer out
+				Queue<string>[] file;
+				player = null;
+	
+				if (!LoadCsvFile(FilePaths.AllUsers, out file))
+				{
+					return false;
+				}
+	
+				Textutre2D texture;
+				try
+				{
+					Queue<string> line = file[0];
+					PlayerTemplate type = Shroomworld.PlayerTypes[Convert.ToInt32(line.Dequeue())];
+					if (!LoadTexture(line.Dequeue(), out texture))
+					{
+						return false;
+					}
+					player = new Player(
+						type: type,
+						sprite: new Sprite(texture),
+						powerUps: new PowerUp(ParsePowerUps(line.Dequeue())),
+						healthData: new HealthData(ParseHealthData(line.Dequeue()), type.ReadonlyHealthData),
+						shieldData: new HealthData(ParseHealthData(line.Dequeue())),
+						attack: new AttackAndBoostInfo(_powerUps.Damage),
+						inventory: ParseInventory(line.Dequeue()), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
+						quests: ParseQuests(line.Dequeue()),
+						statistics: ParseStatistics(line.Dequeue()));
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
 		private static MovementData ParseMovementData(string plaintext, int containingLevel) // i.e. what symbol is around the movement data? commas? semi-colons?
 		{
 			int[] line = ConvertStringArrayToInt(SplitAtLevel(plaintext, containingLevel + 1));
 			int p = 0;
 			return new MovementData(new Vector2(line.Dequeue(), line.Dequeue()));
 		}
-		private static List<Drop> ParseDrops(string plaintext)
+		private static Dictionary<int, Drop> ParseDrops(string plaintext)
 		{
-			List<Drop> drops;
+			Dictionary<int, Drop> drops;
 			string[] allDrops = SplitAtLevel(plaintext, Levels.ii);
-			drops = new List<Drop>(allDrops.Length);
+			drops = new Dictionary<int, Drop>(allDrops.Length);
 
 			foreach (string drop in allDrops)
 			{
@@ -275,7 +288,7 @@ namespace Shroomworld
 			}
 			return drops;
 		}
-        private static HealthData ParseHealthData(string plaintext, ReadonlyHealthData readonlyHealthData)
+		private static HealthData ParseHealthData(string plaintext, ReadonlyHealthData readonlyHealthData)
 		{
 			int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : Convert.ToInt32(plaintext);
 			return new HealthData(currentHealth, readonlyHealthData);
@@ -288,12 +301,12 @@ namespace Shroomworld
 			// local function to use as converter
 		}
 
-		// Saving
+		// Save
 		public static void SavePlayer(Player player)
 		{
 
 		}
-		public static void SaveWorld(List<Npc> npcs, int[,] tileMap, int width, int height, int difficulty)
+		public static void SaveWorld(Dictionary<int, Npc> npcs, int[,] tileMap, int width, int height, int difficulty)
 		{
 			
 		}
