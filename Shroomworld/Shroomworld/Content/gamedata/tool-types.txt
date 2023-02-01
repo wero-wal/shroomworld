@@ -1,0 +1,5 @@
+1,axe,axes
+2,shovel,shovels
+3,pickaxe,pickaxes
+4,sword,swords
+0,none

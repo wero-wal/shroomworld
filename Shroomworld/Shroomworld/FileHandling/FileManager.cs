@@ -121,7 +121,7 @@ namespace Shroomworld
 		{
 			throw new NotImplementedException();
 		}
-		public static bool TryParse<TilType>(int id, Queue<string> plaintext, out TileType? tileType)
+		public static bool TryParse<TileType>(int id, Queue<string> plaintext, out TileType? tileType)
 		{
 			tileType = null;
 			try
