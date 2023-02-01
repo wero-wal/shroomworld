@@ -13,7 +13,9 @@ namespace Shroomworld
 	internal static class FileManager
 	{
 		//-----Enums-----
-		// used as an enum to keep track of which level of list (or separation) we are in within a file
+		/// <summary>
+		/// used as an enum to keep track of which level of list (or separation) we are in within a file
+		/// </summary>
 		public struct Levels
 		{
 			public const int i = 0;
@@ -153,16 +155,32 @@ namespace Shroomworld
 		}
 		public static bool TryParse<ItemType>(int id, Queue<string> plaintext, out ItemType? itemType)
 		{
+			string name;
+			string pluralName;
+			bool isTool;
 			itemType = null;
 			try
 			{
-				itemType = new ItemType(
-					id: id,
-					name: plaintext.Dequeue(),
-					pluralName: plaintext.Dequeue(),
-					canBePlaced: Convert.ToBoolean(plaintext.Dequeue()),
-					stackable: Convert.ToBoolean(plaintext.Dequeue())
-				);
+				name = plaintext.Dequeue();
+				pluralName = plaintext.Dequeue();
+				isTool = Convert.ToBoolean(plaintext.Dequeue());
+				if (isTool)
+				{
+					itemType = new ItemType(
+						id, name, pluralName,
+						toolData: new ToolData(
+							type: Convert.ToInt32(plaintext.Dequeue()),
+							level: Convert.ToInt32(plaintext.Dequeue()))
+					);
+				}
+				else
+				{
+					itemType = new ItemType(
+						id, name, pluralName,
+						canBePlaced: Convert.ToBoolean(plaintext.Dequeue()),
+						stackable: Convert.ToBoolean(plaintext.Dequeue())
+					);
+				}
 				return true;
 			}
 			catch(Exception)
