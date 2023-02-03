@@ -188,7 +188,7 @@ namespace Shroomworld
 				return false;
 			}
 		}
-		public static bool TryParse<EnemyType>(int id, Queue<string> plaintext, out enemyType? enemyType)
+		public static bool TryParse<EnemyType>(int id, Queue<string> plaintext, out EnemyType? enemyType)
 		{
 			enemyTypes = null;
 			try

@@ -5,7 +5,7 @@ namespace MyPhysics
 	/// <summary>
 	/// Contains a bunch of constants
 	/// </summary>
-	public static class WorldSettings
+	public static class WorldSettings // todo: move into shroomworld project
 	{
 		public static float Gravity;
 		public static Border WorldBorder;
