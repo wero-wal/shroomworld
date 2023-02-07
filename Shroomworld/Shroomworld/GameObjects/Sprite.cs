@@ -18,6 +18,8 @@ namespace Shroomworld
         public Vertices Vertices => _vertices;
 
         // ----- Fields -----
+        private static Action<Texture2, Vector2, Color> _draw;
+
         protected Texture2D _texture;
         protected Color _colour;
         protected Vector2 _position;
@@ -32,21 +34,26 @@ namespace Shroomworld
         }
 
         // ----- Methods -----
+        public static void InjectDependencies(Action<Texture2, Vector2, Color> drawFunction)
+        {
+            _draw = drawFunction;
+        }
+
         public void UpdateVertices()
         {
             _vertices.Update(_position, _size);
         }
         public void Draw()
         {
-            Shroomworld.SpriteBatch.Draw(_texture, _position, _colour);
+            _draw.(_texture, _position, _colour);
         }
         public void Draw(Vector2 position)
         {
-            Shroomworld.SpriteBatch.Draw(_texture, position, _colour);
+            _draw(_texture, position, _colour);
         }
         public void Draw(Color colour)
         {
-            Shroomworld.SpriteBatch.Draw(_texture, _position, colour);
+            _draw(_texture, _position, colour);
         }
         public bool SetPosition(Vector2 position)
         {
