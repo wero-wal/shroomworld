@@ -5,42 +5,63 @@ namespace Shroomworld
     internal class Body
     {
 		// ----- Properties -----
-		public Vector2 Velocity => _velocity;
-		public Vector2 Position { get => _position; internal set => _position = value; }
 		public Sprite Sprite => _sprite;
 
 		// ----- Fields -----
 		// todo: add universal coefficient/constant of restitution
 		// todo: add universal acceleration
+		private const float DefaultMagnitude = 1f;
 		private readonly float _maxSpeed;
-
 		private Sprite _sprite;
-
 		private Vector2 _acceleration;
 		private Vector2 _velocity; // in m/s
-		private Vector2 _position; // in m
 
 		// ----- Constructor(s) -----
-		public Body()
+		/// <summary>
+		/// Creates an instance of a body with a velocity and an acceleration of 0.
+		/// </summary>
+		public Body(Sprite sprite, float maxSpeed)
 		{
-
+			_sprite = sprite;
+			_maxSpeed = maxSpeed;
+			_velocity = Vector2.Zero;
+			_acceleration = Vector2.Zero;
 		}
 
 		// ----- Methods -----
+		/// <summary>
+		/// Change velocity based on acceleration and position based on velocity.
+		/// <para>Note: velocity is limited by the body's max speed.</para>
+		/// </summary>
 		public void ApplyPhysics()
 		{
 			// todo: implement max speed
 			_velocity += _acceleration;
-			_position += _velocity; // todo: sort out positions (which ones are positions in the world, and which are positions on screen? etc.)
+			_position += _velocity;
 		}
 		/// <summary>
-		/// Set acceleration but don't apply it
+		/// Sets acceleration but doesn't apply it (i.e. doesn't change any other values to reflect this).
 		/// </summary>
-		/// <param name="direction"></param>
-		/// <param name="magnitude">ignore this if <paramref name="direction"/> is not normalized</param>
-		public void SetAcceleration(Vector2 direction, float magnitude = 1)
+		/// <param name="direction">
+		/// 	<para>Direction vector of the acceleration.</para>
+		/// 	<para>Can be normalised or unnormalised. If normalised, remember to set a <paramref name="magnitude"/>.</para>
+		/// </param>
+		/// <param name="magnitude">
+		/// 	<para>Magnitude of the acceleration.</para>
+		/// 	<para>Default value: <see cref="DefaultMagnitude"/></para>
+		/// </param>
+		public void SetAcceleration(Vector2 direction, float magnitude = DefaultMagnitude)
 		{
 			_acceleration = direction * magnitude;
+		}
+		/// <summary>
+		/// Changes the position of the body to move it out of the hitbox of the tile with which it has collided.
+		/// </summary>
+		/// <param name="direction">The (normalised) angle / direction at which the body has intersected with the tile.</param>
+		/// <param name="depth">The depth of the collision.</param>
+		public void ResolveCollision(Vector2 direction, float depth)
+		{
+			_sprite.Position -= direction * depth;
 		}
 	}
 }
