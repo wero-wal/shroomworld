@@ -35,8 +35,16 @@ namespace Shroomworld
 		/// </summary>
 		public void ApplyPhysics()
 		{
-			// todo: implement max speed
-			_velocity += _acceleration;
+			Vector2 newVelocity = _velocity + _acceleration;
+			float newSpeed = newVelocity.Modulus();
+			if (newSpeed > _maxSpeed)
+			{
+				_velocity = newVelocity.Normalize() * _maxSpeed;
+			}
+			else
+			{
+				_velocity = newVelocity;
+			}
 			_position += _velocity;
 		}
 		/// <summary>
