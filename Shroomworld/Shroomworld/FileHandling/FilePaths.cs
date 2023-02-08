@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shroomworld.FileHandling
 {
+    // Naming note: In this class, Dir = Directory
     internal static class FilePaths
     {
-        // Style note: In this class, Dir = Directory
-        // todo: make a Create() method here
         // ----- Enums -----
         public enum WorldFiles
         {
@@ -30,7 +25,6 @@ namespace Shroomworld.FileHandling
             Enemy,
             Friendly,
             Player,
-            Count,
         }
 
         // ----- Properties -----
@@ -90,31 +84,34 @@ namespace Shroomworld.FileHandling
         /// </summary>
         /// <param name="paths"></param>
         /// <returns>True if all file paths are set successfully; false if not enough paths were passed.</returns>
-        public static bool SetFilePaths(params string[] paths)
+        public static bool SetFilePaths(Queue<string> paths)
         {
-            int p = 0;
             try
             {
-                _generalSettings = paths[p++];
-                _menuText = paths[p++];
+                // General settings
+                _generalSettings = paths.Dequeue();
+                _menuText = paths.Dequeue();
 
+                // Types
                 _types = new Dictionary<Elements, string>(_textureElements.Length);
                 for (int i = 0; i < _typeElements.Length; i++)
                 {
-                    _types.Add(_typeElements[i], paths[p++]);
+                    _types.Add(_typeElements[i], paths.Dequeue());
                 }
 
-                _worldSavesDir = paths[p++];
+                // World files
+                _worldSavesDir = paths.Dequeue();
                 _worldSaveFiles = new Dictionary<Elements, string>(_elementsInWorldSaves.Length);
                 for (int i = 0; i < _elementsInWorldSaves.Length; i++)
                 {
-                    _worldSaveFiles.Add(_elementsInWorldSaves[i], paths[p++]);
+                    _worldSaveFiles.Add(_elementsInWorldSaves[i], paths.Dequeue());
                 }
-
+                
+                // Textures
                 _textureDirs = new Dictionary<Elements, string>(_textureElements.Length);
                 for (int i = 0; i < _textureElements.Length; i++)
                 {
-                    _textureDirs.Add(_textureElements[i], paths[p++]);
+                    _textureDirs.Add(_textureElements[i], paths.Dequeue());
                 }
             }
             catch (IndexOutOfRangeException)
