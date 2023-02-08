@@ -19,7 +19,7 @@
 2. I have chosen not to encrypt the data because I want to be able to edit it with ease and it's not confidential.
 
 ## Commits
-I try to stick to [these guidelines]().
+I try to stick to [these guidelines](https://www.conventionalcommits.org/en/v1.0.0/).
 
 Unfortunately, as this is my first project using GitHub, my earlier commits are not great, however, my newer commits should be much better as I am constantly learning and improving.
 
