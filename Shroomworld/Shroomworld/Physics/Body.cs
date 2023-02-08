@@ -27,7 +27,7 @@ namespace Shroomworld
 		}
 
 		// ----- Methods -----
-		private void ApplyPhysics()
+		public void ApplyPhysics()
 		{
 			// todo: implement max speed
 			_velocity += _acceleration;
@@ -38,9 +38,9 @@ namespace Shroomworld
 		/// </summary>
 		/// <param name="direction"></param>
 		/// <param name="magnitude">ignore this if <paramref name="direction"/> is not normalized</param>
-		public static void SetAcceleration(Vector2 direction, float magnitude = 1)
+		public void SetAcceleration(Vector2 direction, float magnitude = 1)
 		{
 			_acceleration = direction * magnitude;
 		}
-    }
+	}
 }
