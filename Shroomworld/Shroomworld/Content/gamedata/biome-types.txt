@@ -1,6 +1,6 @@
-night forest,3,grass;dirt;water,pine,mushrooms;bluebells,3,3,3,3
-red forest,0,grass;dirt;stone,red vine,mushrooms;dandelions;poppies,2,1,3,1
-fire city,2,grass;dirt;stone,burning maple,dandelions;poppies,2,2,0,1
-crystal,3,grass;stone;stone,tall mushroom,mushrooms,1,3,2,1
-potato,1,grass;dirt;dirt,potato shroom,dandelions,1,1,1,1
-green forest,0,grass;dirt;stone,oak,all,3,2,2,1
+1,night forest,3,16;2;water,17,20;18,3,3,3,3
+2,red forest,0,15;2;3,12,20;8;19,2,1,3,1
+3,fire city,2,6;2;3,7,8;19,2,2,0,1
+4,crystal,3,10;10;3,13,20,1,3,2,1
+5,potato,1,14;2;2,5,8,1,1,1,1
+6,green forest,0,1;2;3,4,all,3,2,2,1
