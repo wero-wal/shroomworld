@@ -14,13 +14,13 @@ namespace Shroomworld
 
         // ----- Fields -----
         private IdentifyingData _idData;
-        private List<Drop> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
+        private Drop[] _drops; // the IDs and mins and maxs of the items the tile can drop when broken
         private bool _isSolid; // if is solid, entities can't pass through
         private int[] _breakableBy; // IDs of the tools which can break this tile
         private float _friction;
 
         // ----- Constructors -----
-        public TileType(IdentifyingData idData, List<Drop> drops, bool isSolid, int[] breakableBy, float friction)
+        public TileType(IdentifyingData idData, Drop[] drops, bool isSolid, int[] breakableBy, float friction)
         {
             _idData = idData;
             _drops = drops;
@@ -36,7 +36,7 @@ namespace Shroomworld
         }
         public InventoryItem[] GetDrops()
         {
-            for(int i = 0; i < _drops.Count; i++)
+            for(int i = 0; i < _drops.Length; i++)
             {
                 yield return _drops[i].DropItem();
             }

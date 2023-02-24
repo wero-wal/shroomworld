@@ -142,9 +142,10 @@ namespace Shroomworld
 			}
 			catch (Exception e)
 			{
-				// Check for expected exceptions
-				// ("expected" because I know the way they will arise will be if the files are corrupted /
-				// incorrectly formatted, and this should be the only reason for an exception to be thrown)
+				/* Check for expected exceptions
+				   ("expected" because I know the way they will arise will be if the files are corrupted /
+				   incorrectly formatted, and this should be the only reason for an exception to be thrown)
+				   */ 
 				if ((e is IndexOutOfRangeException) // not enough items in queue
 				|| (e is FormatException)) // format error in one/more of: isSolid, breakableBy, friction
 				{
@@ -294,15 +295,14 @@ namespace Shroomworld
 			int p = 0;
 			return new MovementData(new Vector2(line.Dequeue(), line.Dequeue()));
 		}
-		private static Dictionary<int, Drop> ParseDrops(string plaintext)
+		private static Drop[] ParseDrops(string plaintext)
 		{
-			Dictionary<int, Drop> drops;
-			string[] allDrops = SplitAtLevel(plaintext, Levels.ii);
-			drops = new Dictionary<int, Drop>(allDrops.Length);
+			string[] drops_str = SplitAtLevel(plaintext, Levels.ii);
+			Drop[] drops = new Drop[drops_str.Length];
 
-			foreach (string drop in allDrops)
+			for (int i = 0; i < drops.Length; i++)
 			{
-				drops.Add(new Drop(ConvertStringArrayToInt(SplitAtLevel(drop, Levels.iii))));
+				drops[i] = new Drop(ConvertStringArrayToInt(SplitAtLevel(drops_str[i], Levels.iii)));
 			}
 			return drops;
 		}
