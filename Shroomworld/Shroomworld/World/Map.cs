@@ -21,14 +21,14 @@ namespace Shroomworld
 		}
 
 		// ----- Fields -----
-        private const bool _GROUND = true;
-        private const bool _AIR = false;
+        private const bool Ground = true;
+        private const bool Air = false;
 
-        private const int _numberOfAirAtTop = 2; // (min) number of empty tiles at the top of the map
-        private const int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
-        private const float _surfacePercent = 0.33f; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
-        private const int _smoothAmount = 2;
-    	private const int _randomFillPercent = 55; // what % of the underground will be ground (the rest will be air)
+        private static readonly int _numberOfAirAtTop = 2; // (min) number of empty tiles at the top of the map
+        private static readonly int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
+        private static readonly float _surfacePercent = 0.33f; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
+        private static readonly int _smoothAmount = 2;
+    	private static readonly int _randomFillPercent = 55; // what % of the underground will be ground (the rest will be air)
 
 
         private readonly int[,] _tiles;
@@ -99,7 +99,7 @@ namespace Shroomworld
             {
                 y = _numberOfAirAtTop + (int)Math.Round(perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * waveHeight);
                 _surfaceHeights[x] = y;
-                _untexturedMap[x, y] = _GROUND;
+                _untexturedMap[x, y] = Ground;
             }
         }
 
@@ -139,18 +139,18 @@ namespace Shroomworld
 					// create border on the edges
 					if ((x == 0) || (x == (_width - 1)) || (y == _surfaceHeights[x]) || (y >= (_height - _numberOfTilesAtBottom)))
 					{
-						_untexturedMap[x, y] = _GROUND;
+						_untexturedMap[x, y] = Ground;
 					}
 					else // smooth based on neighbouring tiles
 					{
 						surroundingGroundCount = GetSurroundingGroundCount(x, y);
 						if (surroundingGroundCount > (MAX_NEIGHBOURS / 2)) // if surrounded by > 2 ground tiles, become a ground tile.
 						{
-							_untexturedMap[x, y] = _GROUND;
+							_untexturedMap[x, y] = Ground;
 						}
 						else if (surroundingGroundCount < (MAX_NEIGHBOURS / 2)) // if surrounded by < 2 ground tiles, become an air tile.
 						{
-							_untexturedMap[x, y] = _AIR;
+							_untexturedMap[x, y] = Air;
 						}
 					}
 				}
@@ -196,6 +196,9 @@ namespace Shroomworld
         }
 
         // Texturing
+        /// <summary>
+        /// Randomly assign biomes of set width to the map, horizontally.
+        /// </summary>
         private void AddBiomes()
         {
             int biomeSize = _width / numberOfBiomes;
@@ -205,6 +208,10 @@ namespace Shroomworld
                 _biomes.Add(i * biomeSize, Shroomworld.BiomeTypes[random.Next(0, Shroomworld.BiomeTypes.Count)]);
             }
         }
+        /// <summary>
+        /// Convert the untextured tile map to a tile map containing tile id
+        /// values, which are chosen based on the height and biome of the tile.
+        /// </summary>
         private void PaintTiles()
         {
             int startOfcurrentLayer;
@@ -218,7 +225,7 @@ namespace Shroomworld
                     endOfcurrentLayer = Math.Min(_surfaceHeights[x] + _layerBoundaries[i], _height);
                     for (int y = startOfcurrentLayer; y < endOfcurrentLayer; y++)
                     {
-                        if (_untexturedMap[x, y] == _GROUND)
+                        if (_untexturedMap[x, y] == Ground)
                         {
                             _tiles[x, y] = _biomes[x].Tiles[i - 1];
                         }
@@ -226,6 +233,10 @@ namespace Shroomworld
                 }
             }
         }
+
+        // Adding details
+        // todo: add trees, flowers, and chests based on biomes.
+        // todo: add water
 
         // Clearing map
         private bool[,] GetEmptyMap(int width, int height)
