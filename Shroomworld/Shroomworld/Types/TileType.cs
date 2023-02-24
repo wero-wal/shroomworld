@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
@@ -12,6 +9,7 @@ namespace Shroomworld
         // ----- Enums -----
         // ----- Properties -----
         public IdentifyingData IdData => _idData;
+        public Texture2D Texture => _texture;
 
         // ----- Fields -----
         private readonly IdentifyingData _idData;
@@ -19,10 +17,10 @@ namespace Shroomworld
         private readonly bool _isSolid; // if is solid, entities can't pass through
         private readonly int[] _breakableBy; // IDs of the tools which can break this tile
         private readonly float _friction;
-        private readonly Texture _texture;
+        private readonly Texture2D _texture;
 
         // ----- Constructors -----
-        public TileType(IdentifyingData idData, Texture texture, Drop[] drops, bool isSolid, int[] breakableBy, float friction)
+        public TileType(IdentifyingData idData, Texture2D texture, Drop[] drops, bool isSolid, int[] breakableBy, float friction)
         {
             _idData = idData;
             _texture = texture;
@@ -33,10 +31,6 @@ namespace Shroomworld
         }
 
         // ----- Methods -----
-        public Sprite GetSprite()
-        {
-            return new StaticSprite(FileManager.LoadTexture(Directories.Textures.Tiles, _id.ToString()), _isSolid);
-        }
         public InventoryItem[] GetDrops()
         {
             for(int i = 0; i < _drops.Length; i++)
