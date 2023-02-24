@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld
 {
@@ -13,16 +14,18 @@ namespace Shroomworld
         public IdentifyingData IdData => _idData;
 
         // ----- Fields -----
-        private IdentifyingData _idData;
-        private Drop[] _drops; // the IDs and mins and maxs of the items the tile can drop when broken
-        private bool _isSolid; // if is solid, entities can't pass through
-        private int[] _breakableBy; // IDs of the tools which can break this tile
-        private float _friction;
+        private readonly IdentifyingData _idData;
+        private readonly Drop[] _drops; // the IDs and mins and maxs of the items the tile can drop when broken
+        private readonly bool _isSolid; // if is solid, entities can't pass through
+        private readonly int[] _breakableBy; // IDs of the tools which can break this tile
+        private readonly float _friction;
+        private readonly Texture _texture;
 
         // ----- Constructors -----
-        public TileType(IdentifyingData idData, Drop[] drops, bool isSolid, int[] breakableBy, float friction)
+        public TileType(IdentifyingData idData, Texture texture, Drop[] drops, bool isSolid, int[] breakableBy, float friction)
         {
             _idData = idData;
+            _texture = texture;
             _drops = drops;
             _isSolid = isSolid;
             _breakableBy = breakableBy;

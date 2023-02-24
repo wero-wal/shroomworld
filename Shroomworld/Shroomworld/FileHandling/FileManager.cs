@@ -76,8 +76,9 @@ namespace Shroomworld
 				return false;
 			}
 		}
-		public static bool LoadTexture(string directory, string name, out Texture2D texture)
+		public static bool TryLoadTexture(string directory, string name, out Texture2D texture)
 		{
+			texture = null;
 			try
 			{
 				texture = Content.Load<Texture2D>(directory + name);
@@ -85,15 +86,14 @@ namespace Shroomworld
 			}
 			catch (Exception)
 			{
-				texture = null;
 				return false;
 			}
 		}
-		public static bool TryLoadTypes<T>(out Dictionary<int, T>? typeDictionary) where T : IType
+		public static bool TryLoadTypes<T>(out Dictionary<int, T> typeDictionary) where T : IType
 		{
 			// Loading
 			Queue<string>[] file;
-			if (!TryLoadCsvFile(_pathForType[typeof(T)], out file))
+			if (!TryLoadCsvFile(GetPathForType(typeof(T)), out file))
 			{
 				typeDictionary = null;
 				return false;
@@ -101,21 +101,32 @@ namespace Shroomworld
 
 			// Parsing
 			string id;
+			int id_int;
 			T type;
 
 			typeDictionary = new Dictionary<int, T>(file.Count);
 
-			foreach(Queue<string> line in file) // each line represents a tile
+			
+			foreach(Queue<string> line in file) // each line represents a type
 			{
-				if (!(line.TryDequeue(out id)
-				&& TryParse<T>(id.ToString(), line, out type)))
+				if (!( line.TryDequeue(out id) && int.TryParse(id, out id_int) && TryParse<T>(id_int, line, out type))) // try to parse this line
 				{
 					typeDictionary = null;
-					return false;
+					return false; // parsing failed
 				}
-				typeDictionary.Add(id, type);
+				typeDictionary.Add(id, type); // parsing succeeded
 			}
 			return true;
+		}
+		private static string GetPathForType(Type type)
+		{
+			switch (type)
+			{
+				case typeof(TileType):
+					return FilePaths.Types[FilePaths.Elements.Tile];
+				default:
+					return "Not found";
+			}
 		}
 
 		// Parse types
@@ -123,16 +134,19 @@ namespace Shroomworld
 		{
 			throw new NotImplementedException();
 		}
-		public static bool TryParse<TileType>(int id, Queue<string> plaintext, out TileType? tileType)
+		public static bool TryParse<TileType>(int id, Queue<string> plaintext, out TileType tileType)
 		{
 			tileType = null;
+			IdentifyingData idData;
+			Texture texture;
 			try
 			{
+				idData = new IdentifyingData(id, name: plaintext.Dequeue(), pluralName: plaintext.Dequeue());
+				TryLoadTexture(FilePaths.TextureDirs[FilePaths.Elements.Tile], idData.Name, out texture);
 				tileType = new TileType
 				(
-					id: id,
-					name: plaintext.Dequeue(),
-					pluralName: plaintext.Dequeue(),
+					idData: idData,
+					texture: texture,
 					drops: ParseDrops(plaintext.Dequeue()),
 					isSolid: Convert.ToBoolean(plaintext.Dequeue()),
 					breakableBy: ConvertStringArrayToInt(SplitAtLevel(plaintext.Dequeue(), Levels.ii)),
@@ -146,12 +160,12 @@ namespace Shroomworld
 				   ("expected" because I know the way they will arise will be if the files are corrupted /
 				   incorrectly formatted, and this should be the only reason for an exception to be thrown)
 				   */ 
-				if ((e is IndexOutOfRangeException) // not enough items in queue
-				|| (e is FormatException)) // format error in one/more of: isSolid, breakableBy, friction
-				{
+				//if ((e is IndexOutOfRangeException) // not enough items in queue
+				//|| (e is FormatException)) // format error in one/more of: isSolid, breakableBy, friction
+				//{
 					return false;
-				}
-				throw;
+				//}
+				//throw;
 			}
 		}
 		public static bool TryParse<ItemType>(int id, Queue<string> plaintext, out ItemType? itemType)
