@@ -59,6 +59,7 @@ namespace Shroomworld
         private Menu _currentMenu => _activeMenus.Peek();
         private List<Npc> _npcs;
         private List<Entity> _friendlyEntities; // contains references to all friendly entities in current world
+        private World _world;
         
 		private class Menus
 		{
@@ -83,8 +84,11 @@ namespace Shroomworld
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _updateCurrentState = UpdateMenu;
-            _activeMenus = new Stack<Menu> { Menus.MainMenu };
+            SetStateToStage();
+            _world = new World(new Map(100, 100, 3, 0.2, 42), null, null);
+            _world.Generate();
+            //_updateCurrentState = UpdateMenu;
+            //_activeMenus = new Stack<Menu> { Menus.MainMenu };
             base.Initialize();
         }
         
@@ -165,11 +169,17 @@ namespace Shroomworld
 		}
         private void SetStateToError(string message = "An error has occured.")
         {
+            _updateCurrentState = UpdateError();
+            //spriteBatch.Draw(Vector2.Zero, new Rectangle(0, 0, 800, 480), Color.Red);
             // todo: display error message
+        }
+        private void UpdateError(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.Red);
         }
         private void UpdateStage(GameTime gameTime)
 		{
-            _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
+            //_checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
 		}
         
         // Gameplay
@@ -262,6 +272,19 @@ namespace Shroomworld
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+            for (int x = 0; x < _world.Map.Width; x++)
+            {
+                for (int y = 0; y < _world.Map.Height; y++)
+                {
+                    if (_world.Map[x, y] == Map.AirTile)
+                    {
+                        continue;
+                    }
+                    _tileTypes[_world.Map[x, y]].Draw(_spriteBatch);
+                }
+            }
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

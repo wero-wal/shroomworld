@@ -21,6 +21,7 @@ namespace Shroomworld
 		}
 
 		// ----- Fields -----
+        public const int AirTile = 0;
         private const bool Ground = true;
         private const bool Air = false;
 
