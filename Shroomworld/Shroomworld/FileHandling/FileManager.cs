@@ -236,11 +236,21 @@ namespace Shroomworld
 		}
 		public static bool TryParse<BiomeType>(int id, Queue<string> plaintext, out BiomeType? biomeType)
 		{
+			IdentifyingData idData;
+			Texture background;
 			biomeType = null;
 			try
 			{
+				idData = new IdentifyingData(id, plaintext.Dequeue(), plaintext.Dequeue());
+				background = TryLoadTexture(FileHandling.FilePaths.TextureDirs[FilePaths.Elements.Biome]);
 				biomeType = new BiomeType(
-					// todo: add parameters	
+					idData: idData,
+					background: background,
+					layers: ParseLayers(plaintext.Dequeue()),
+					treeType: Convert.ToInt32(plaintext.Dequeue()),
+					flowerTypes: ParseLayers(plaintext.Dequeue()),
+					treeAmount: Convert.ToInt32(plaintext.Dequeue()),
+					chestAmount: Convert.ToInt32(plaintext.Dequeue())
 				);
 				return true;
 			}
@@ -266,6 +276,13 @@ namespace Shroomworld
 		}
 		
 		// Parse components
+		private static int[] ParseLayers(string plaintext)
+		{
+			foreach (string tileType in SplitAtLevel(plaintext, Levels.ii))
+			{
+				yield return Convert.ToInt32(tileType);
+			}
+		}
 		public static bool LoadPlayer(int id, out Player player)
 			{
 				// todo: sort loadplayer out
