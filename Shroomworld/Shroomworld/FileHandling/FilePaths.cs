@@ -38,6 +38,8 @@ namespace Shroomworld.FileHandling
         public static Dictionary<Elements, string> TextureDirs => _textureDirs;
 
         // ----- Fields -----
+        public const string FilePathFile = "content/file-paths.txt";
+        
         private static Elements[] _typeElements = new Elements[] // elements of which there are types / templates
         {
             Elements.Item,
@@ -84,7 +86,7 @@ namespace Shroomworld.FileHandling
         /// </summary>
         /// <param name="paths"></param>
         /// <returns>True if all file paths are set successfully; false if not enough paths were passed.</returns>
-        public static bool SetFilePaths(Queue<string> paths)
+        public static bool TrySetFilePaths(Queue<string> paths)
         {
             try
             {
