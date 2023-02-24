@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-namespace Shroomworld
+namespace Shroomworld.Physics
 {
     internal class Vertices : IEnumerable<Vector2>
     {

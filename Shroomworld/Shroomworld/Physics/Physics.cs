@@ -1,5 +1,6 @@
 using System;
-namespace Shroomworld
+using Microsoft.Xna.Framework;
+namespace Shroomworld.Physics
 {
     internal class Physics
     {

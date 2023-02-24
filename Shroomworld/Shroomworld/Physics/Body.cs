@@ -1,22 +1,21 @@
 using System;
 using Microsoft.Xna.Framework;
-namespace Shroomworld
+namespace Shroomworld.Physics
 {
-    internal class Body
+    public class Body
     {
 		// ----- Properties -----
+		public Vector2 Velocity => _velocity;
+		public Vector2 Position { get => _sprite.Position; internal set => _position = value; }
 		public Sprite Sprite => _sprite;
 
 		// ----- Fields -----
-		// todo: add universal coefficient/constant of restitution
-		// todo: add universal acceleration
-		private const float DefaultMagnitude = 1f;
 		private readonly float _maxSpeed;
 		private Sprite _sprite;
 		private Vector2 _acceleration;
 		private Vector2 _velocity; // in m/s
 
-		// ----- Constructor(s) -----
+		// ----- Constructors -----
 		/// <summary>
 		/// Creates an instance of a body with a velocity and an acceleration of 0.
 		/// </summary>
@@ -45,22 +44,23 @@ namespace Shroomworld
 			{
 				_velocity = newVelocity;
 			}
-			_position += _velocity;
+			_sprite.Position += _velocity;
 		}
 		/// <summary>
 		/// Sets acceleration but doesn't apply it (i.e. doesn't change any other values to reflect this).
 		/// </summary>
 		/// <param name="direction">
-		/// 	<para>Direction vector of the acceleration.</para>
+		/// 	<para>Direction vector of the acceleration (excluding gravity).</para>
 		/// 	<para>Can be normalised or unnormalised. If normalised, remember to set a <paramref name="magnitude"/>.</para>
 		/// </param>
 		/// <param name="magnitude">
 		/// 	<para>Magnitude of the acceleration.</para>
 		/// 	<para>Default value: <see cref="DefaultMagnitude"/></para>
 		/// </param>
-		public void SetAcceleration(Vector2 direction, float magnitude = DefaultMagnitude)
+		public void SetAcceleration(Vector2 direction)
 		{
-			_acceleration = direction * magnitude;
+			_acceleration = direction * Constants.Acceleration;
+			_acceleration.Y += Constants.Gravity;
 		}
 		/// <summary>
 		/// Changes the position of the body to move it out of the hitbox of the tile with which it has collided.
