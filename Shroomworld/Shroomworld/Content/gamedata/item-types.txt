@@ -26,3 +26,5 @@
 27,bluebell,bluebells,0,1,1
 28,poppy,poppies,0,1,1
 29,mushroom,mushrooms,0,1,1
+30,firis,firises,0,1,1
+31,daffodil,daffodils,0,1,1
