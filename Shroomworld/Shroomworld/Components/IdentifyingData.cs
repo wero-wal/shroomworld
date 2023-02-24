@@ -1,6 +1,6 @@
 namespace Shroomworld
 {
-	internal class IdentifyingData
+	public class IdentifyingData
 	{
 		public int Id => _id;
 		public string Name => _name;

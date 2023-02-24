@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Shroomworld.FileHandling
 {
     // Naming note: In this class, Dir = Directory
-    internal static class FilePaths
+    public static class FilePaths
     {
         // ----- Enums -----
         public enum WorldFiles
