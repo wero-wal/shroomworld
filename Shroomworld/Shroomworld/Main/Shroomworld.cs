@@ -94,25 +94,36 @@ namespace Shroomworld
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Content.RootDirectory = "Content";
 
-            // FILE FORMAT for biomes: name,rarity,top-layer-tile,2nd-layer,3rd-layer,tree-texture,flower1;flower2;flower3;...,amount-of-trees,amount-of-chests,amount-of-NPCs,amount-of-enemies
+            Queue<string> filePaths;
+            if (!FileManager.TryLoadCsvFile(FileHandling.FilePaths.FilePathFile, out filePaths)
+            || !FileHandling.FilePaths.TrySetFilePaths(filePaths))
+            {
+                SetStateToError("Couldn't load file paths.");
+            }
+
+            // FILE FORMAT for biomes: name,top-layer-tile;2nd-layer;3rd-layer,tree-texture,flower1;flower2;flower3;...,amount-of-trees,amount-of-chests,amount-of-NPCs,amount-of-enemies
             // 	context	| 0		 | 1		| 2				| 3
             // 	amount	| none	 | a few	| a fair amount	| a lot
             //	rarity	| common | uncommon	| cool			| rare
 
             // TODO: use this.Content to load your game content here
+            if (!TryLoadGameFiles())
+            {
+                SetStateToError("Couldn't load game files.");
+            }
         }
         /// <summary>
         /// Loads all generic game files.
         /// </summary>
         /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
-        private bool LoadGameFiles()
+        private bool TryLoadGameFiles()
 		{
             // Load Types
-            if(!(FileManager.TryLoadTypes(out _itemTypes)
+            if(!(//FileManager.TryLoadTypes(out _itemTypes)
             && FileManager.TryLoadTypes(out _tileTypes)
             && FileManager.TryLoadTypes(out _biomeTypes)
-            && FileManager.TryLoadTypes(out _enemyTypes)
-            && FileManager.TryLoadTypes(out _playerTypes)))
+            /*&& FileManager.TryLoadTypes(out _enemyTypes)
+            && FileManager.TryLoadTypes(out _playerTypes)*/))
             {
                 return false;
             }
@@ -152,6 +163,10 @@ namespace Shroomworld
             OpenMenu(menu);
             _updateCurrentState = UpdateMenu;
 		}
+        private void SetStateToError(string message = "An error has occured.")
+        {
+            // todo: display error message
+        }
         private void UpdateStage(GameTime gameTime)
 		{
             _checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
