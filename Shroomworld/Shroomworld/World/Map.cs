@@ -16,8 +16,6 @@ namespace Shroomworld {
 
 
 		// ----- Fields -----
-        public const int AirTile = 0;
-
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
         

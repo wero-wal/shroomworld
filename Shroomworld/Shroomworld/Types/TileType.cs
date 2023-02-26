@@ -8,10 +8,19 @@ namespace Shroomworld
     {
         // ----- Enums -----
         // ----- Properties -----
+		public static int AirId => _airId;
+		public static int WaterId => _waterId;
+		public static int ChestId => _chestId;
+
         public IdentifyingData IdData => _idData;
         public Texture2D Texture => _texture;
 
-        // ----- Fields -----
+
+		// ----- Fields -----
+		private const int _airId = 0;
+        private const int _waterId = 11;
+        private const int _chestId = 23;
+
         private readonly IdentifyingData _idData;
         private readonly Drop[] _drops; // the IDs and mins and maxs of the items the tile can drop when broken
         private readonly bool _isSolid; // if is solid, entities can't pass through
