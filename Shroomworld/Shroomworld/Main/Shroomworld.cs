@@ -27,8 +27,8 @@ namespace Shroomworld
         internal static Dictionary<int, NpcType> NpcTypes => _npcTypes;
         internal static Dictionary<int, PlayerTemplate> PlayerTypes => _playerTypes;
 
-        //
         public SpriteBatch SpriteBatch => _spriteBatch;
+        public float TileSize => _tileSize;
 
         
         // ----- Fields -----
@@ -45,7 +45,8 @@ namespace Shroomworld
         private static Dictionary<int, NpcType> _npcTypes;
         private static Dictionary<int, PlayerTemplate> _playerTypes;
 
-        private static int _universalTileTypeCount; // number of default tile types
+        private static int _defaultTileTypeCount; // number of default tile types
+        private static float _tileSize;
         
         // ---
         private GraphicsDeviceManager _graphics;
@@ -271,24 +272,39 @@ namespace Shroomworld
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
             _spriteBatch.Begin();
-            for (int x = 0; x < _world.Map.Width; x++)
-            {
-                for (int y = 0; y < _world.Map.Height; y++)
-                {
-                    if (_world.Map[x, y] == Map.AirTile)
-                    {
-                        continue;
-                    }
-                    _tileTypes[_world.Map[x, y]].Draw(_spriteBatch);
-                }
-            }
+            // TODO: Add your drawing code here
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
+        /// <summary>
+        /// Displays a texture on the screen based on a position in the tile map.
+        /// </summary>
+        /// <param name="texture">texture of the tile</param>
+        /// <param name="x">x-coordinate of the object in the tile map</param>
+        /// <param name="y">y-coordinate of the object in the tile map</param>
+        private void Draw(Texture2D texture, int x, int y) {
+            _spriteBatch.Draw(texture, new Vector2(x * TileSize, y * TileSize), Color.White);
+        }
+        /// <summary>
+        /// Display a texture on the screen at a given position.
+        /// </summary>
+        /// <param name="texture">The texture to be displayed.</param>
+        /// <param name="position">The position (destination coordinates) in pixels,
+        /// of the top left corner of the texture when it is displayed on-screen.</param>
+        private void Draw(Texture2D texture, Vector2 position) {
+            _spriteBatch.Draw(texture, position, Color.White);
+        }
+        /// <summary>
+        /// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
+        /// </summary>
+        /// <param name="sprite">The sprite to be displayed.</param>
+        private void Draw(Sprite sprite) {
+            _spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
+        }
 
+        //
         public static Vector2 ClampToScreen(float x, float y)
         {
             x = Math.Clamp(x, Shroomworld.TopLeftOfScreen.X, Shroomworld.BottomRightOfScreen.X);
