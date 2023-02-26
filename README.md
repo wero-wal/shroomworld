@@ -6,7 +6,7 @@
 3. I have tried as much as possible to store all data in files. The only exception to this is file paths.
 4. I have gone with an OOP design, with some ECS-style elements (such as using component classes to store data about game objects).
 5. I have mostly opted for composition and interfaces over inheritance, except for a few small exceptions (see `QuestItem` classes).
-6. I have used standard `C#` naming conventions.
+6. I have used [standard C# naming conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names).
 
 ## File Design
 1. I use the CSV file format to store data. Sometimes I have a variable which consists of multiple components, so I have designated two other symbols to work as variable-separators, as follows:
