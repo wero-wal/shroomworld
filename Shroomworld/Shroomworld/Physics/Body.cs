@@ -1,30 +1,33 @@
 using System;
 using Microsoft.Xna.Framework;
-namespace Shroomworld.Physics
-{
-    public class Body
-    {
+namespace Shroomworld.Physics {
+	/// <summary>
+	/// A physical body
+	/// </summary>
+    public class Body {
+
 		// ----- Properties -----
 		public Vector2 Velocity => _velocity;
 		public Vector2 Position { get => _sprite.Position; internal set => _position = value; }
 		public Sprite Sprite => _sprite;
 
+		
 		// ----- Fields -----
-		private readonly float _maxSpeed;
-		private Sprite _sprite;
+		private readonly Sprite _sprite;
+		private readonly PhysicsData _physicsData;
 		private Vector2 _acceleration;
 		private Vector2 _velocity; // in m/s
 
+		
 		// ----- Constructors -----
 		/// <summary>
 		/// Creates an instance of a body with a velocity and an acceleration of 0.
 		/// </summary>
-		public Body(Sprite sprite, float maxSpeed)
-		{
+		public Body(Sprite sprite, PhysicsData physicsData) {
 			_sprite = sprite;
-			_maxSpeed = maxSpeed;
 			_velocity = Vector2.Zero;
 			_acceleration = Vector2.Zero;
+			_physicsData = physicsData;
 		}
 
 		// ----- Methods -----
@@ -32,16 +35,13 @@ namespace Shroomworld.Physics
 		/// Change velocity based on acceleration and position based on velocity.
 		/// <para>Note: velocity is limited by the body's max speed.</para>
 		/// </summary>
-		public void ApplyPhysics()
-		{
+		public void ApplyPhysics() {
 			Vector2 newVelocity = _velocity + _acceleration;
 			float newSpeed = newVelocity.Modulus();
-			if (newSpeed > _maxSpeed)
-			{
-				_velocity = newVelocity.Normalize() * _maxSpeed;
+			if (newSpeed > _physicsData.MaximumSpeed) {
+				_velocity = newVelocity.Normalize() * _physicsData.MaximumSpeed;
 			}
-			else
-			{
+			else {
 				_velocity = newVelocity;
 			}
 			_sprite.Position += _velocity;
@@ -57,18 +57,16 @@ namespace Shroomworld.Physics
 		/// 	<para>Magnitude of the acceleration.</para>
 		/// 	<para>Default value: <see cref="DefaultMagnitude"/></para>
 		/// </param>
-		public void SetAcceleration(Vector2 direction)
-		{
-			_acceleration = direction * Constants.Acceleration;
-			_acceleration.Y += Constants.Gravity;
+		public void SetAcceleration(Vector2 direction) {
+			_acceleration = direction * PhysicsData.Acceleration;
+			_acceleration.Y += PhysicsData.Gravity;
 		}
 		/// <summary>
 		/// Changes the position of the body to move it out of the hitbox of the tile with which it has collided.
 		/// </summary>
 		/// <param name="direction">The (normalised) angle / direction at which the body has intersected with the tile.</param>
 		/// <param name="depth">The depth of the collision.</param>
-		public void ResolveCollision(Vector2 direction, float depth)
-		{
+		public void ResolveCollision(Vector2 direction, float depth) {
 			_sprite.Position -= direction * depth;
 		}
 	}

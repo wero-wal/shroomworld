@@ -1,44 +1,41 @@
 ﻿using System;
-
-namespace Shroomworld
-{
-    internal class PowerUp // note: i want powerups to be shield, damage, speed
-    {
-        public int Value { get => _level * _multiplier; }
+namespace Shroomworld {
+    // Note: i want powerups to be shield, damage, speed.
+    internal class PowerUp {
+        // ----- Properties -----
+        public int Value { get => _level * s_multiplier; }
         
 
-        private static int _minLevel;
-        private static int _maxLevel;   
-        private static int _multiplier;
+        // ----- Fields -----
+        private static int s_minLevel;
+        private static int s_maxLevel;   
+        private static int s_multiplier;
         
         private int _level;
 
-        //-----methods-----
-        public PowerUp(int level)
-        {
+
+        // ----- Constructors -----
+        public PowerUp(int level) {
             _level = level;
         }
 
 
-        public static void SetMinAndMaxLevel(int min, int max)
-        {
-            if (_minLevel == _maxLevel) // haven't been set yet
-            {
-                _minLevel = min;
-                _maxLevel = max;
+        //----- Methods -----
+        public static void SetMinAndMaxLevel(int min, int max) {
+            // Check whether they've been set.
+            if (s_minLevel == s_maxLevel) {
+                s_minLevel = min;
+                s_maxLevel = max;
             }
         }
         
-        public void IncreaseLevel()
-        {
-            if (_level < MaxLevel)
-            {
+        public override string ToString() {
+            return _level.ToString();
+        }
+        public void IncreaseLevel() {
+            if (_level < MaxLevel) {
                 _level++;
             }
-        }
-        public override string ToString()
-        {
-            return _level.ToString();
         }
     }
 }
