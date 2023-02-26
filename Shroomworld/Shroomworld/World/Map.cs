@@ -19,11 +19,11 @@ namespace Shroomworld {
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
         
-        private readonly float _seed;
+        private readonly int _seed;
 
 
 		// ----- Constructor -----
-        public Map(int[,] tiles, BiomeDictionary biomes, float seed)
+        public Map(int[,] tiles, BiomeDictionary biomes, int seed)
         {
             _tiles = tiles;
             _width = tiles.GetLength(0);
