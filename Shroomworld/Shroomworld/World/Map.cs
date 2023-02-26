@@ -1,81 +1,39 @@
 using System;
 using System.Collections.Generic;
-namespace Shroomworld
-{
-	internal class Map : IEnumerable<int, int>
-	{
+namespace Shroomworld {
+    // Todo: create map generator class
+    /// <summary>
+    /// Used to generate and store a tilemap.
+    /// </summary>
+	internal class Map : IEnumerable<int, int> {
 		// ----- Properties -----
         public int Width => _width;
 		public int Height => _height;
 		public BiomeDictionary Biomes => _biomes;
-		public int this[int x, int y]
-		{
-			get
-			{
-				return _tiles[x, y];
-			}
-			set
-			{
-				_tiles[x, y] = value;
-			}
+		public int this[int x, int y] {
+			get { return _tiles[x, y]; }
+			set { _tiles[x, y] = value; }
 		}
+
 
 		// ----- Fields -----
         public const int AirTile = 0;
-        private const bool Ground = true;
-        private const bool Air = false;
-
-        private static readonly int _numberOfAirAtTop = 2; // (min) number of empty tiles at the top of the map
-        private static readonly int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
-        private static readonly float _surfacePercent = 0.33f; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
-        private static readonly int _smoothAmount = 2;
-    	private static readonly int _randomFillPercent = 55; // what % of the underground will be ground (the rest will be air)
-
 
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
-        private readonly int _width;
-        private readonly int _height;
-
-		private readonly bool[,] _untexturedMap;
-        private readonly int[] _surfaceHeights; // stores top of terrain at each x
         
         private readonly float _seed;
-        private readonly float _smoothness; // how smooth or 'janky' the terrain looks
         private readonly int _numberOfBiomes;
-        private readonly int[] _layerBoundaries = { 0, 1, 3, 0 };
+
 
 		// ----- Constructor -----
-		/// <summary>
-		/// Use this when generating a new map
-		/// </summary>
-        public Map(int width, int height, int numberOfBiomes, float smoothness, float? seed = null)
-        {
-			_tiles = new int[width, height];
-            _untexturedMap = GetEmptyMap(width, height);
-            _surfaceHeights = new int[width];
-            _layerBoundaries[^1] = height;
-
-            _width = width;
-            _height = height;
-			_numberOfBiomes = numberOfBiomes;
-			_biomes = new BiomeDictionary(numberOfBiomes);
-
-            _smoothness = smoothness;
-            _seed = seed ?? (float)new Random().NextDouble();
-        }
-		/// <summary>
-		/// Use this for instantiating an existing map
-		/// </summary>
         public Map(int[,] tiles, BiomeDictionary biomes, float seed)
         {
             _tiles = tiles;
             _width = tiles.GetLength(0);
             _height = tiles.GetLength(1);
 			_biomes = biomes;
-
             _seed = seed;
-            _surfaceHeights = new int[width]; // todo: get surface heights
         }
 
 

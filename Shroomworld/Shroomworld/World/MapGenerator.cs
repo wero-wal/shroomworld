@@ -28,7 +28,7 @@ namespace Shroomworld {
 		/// <summary>
 		/// Use this when generating a new map
 		/// </summary>
-        public Map(int width, int height, int numberOfBiomes, float smoothness, float? seed = null) {
+        public MapGenerator(int width, int height, int numberOfBiomes, float smoothness, float? seed = null) {
 			_tiles = new int[width, height];
             _untexturedMap = GetEmptyMap(width, height);
             _surfaceHeights = new int[width];
