@@ -42,18 +42,6 @@ namespace Shroomworld {
             _smoothness = smoothness;
             _seed = seed ?? (float)new Random().NextDouble();
         }
-		/// <summary>
-		/// Use this for instantiating an existing map
-		/// </summary>
-        public Map(int[,] tiles, BiomeDictionary biomes, float seed) {
-            _tiles = tiles;
-            _width = tiles.GetLength(0);
-            _height = tiles.GetLength(1);
-			_biomes = biomes;
-
-            _seed = seed;
-            _surfaceHeights = new int[width]; // todo: get surface heights
-        }
 
 		// ----- Methods -----
         // Generate surface
