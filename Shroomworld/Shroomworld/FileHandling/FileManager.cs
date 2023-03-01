@@ -1,32 +1,33 @@
 using System;
-using System.Collections.Generic;
+using System.Text;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics.Arm;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Shroomworld.FileHandling;
 
-namespace Shroomworld
-{
-	internal static class FileManager
-	{
-		//-----Enums-----
+namespace Shroomworld.FileHandling {
+	public static class FileManager {
+
+		//----- Enums -----
 		/// <summary>
-		/// used as an enum to keep track of which level of list (or separation) we are in within a file
+		/// Used as an enum to keep track of which level of list (or separation) we are in within a file.
 		/// </summary>
-		public struct Levels
-		{
+		public struct Levels {
 			public const int i = 0;
 			public const int ii = 1;
 			public const int iii = 2;
 		}
 
-		// ----- Fields -----
-		public static char[] Separators => _separators;
 
-		private static char[] _separators = { ',', ';', ':' };
+		// ----- Properties -----
+		public static char[] Separators => s_separators;
+
+
+		// ----- Fields -----
+		private readonly static char[] s_separators = { ',', ';', ':' };
+		private readonly static string[] s_separators_str = { ",", ";", ":" };
+
 
 		// ----- Methods -----
 		/// <summary>
@@ -35,98 +36,75 @@ namespace Shroomworld
 		/// <param name="level">Default: Level 1 (comma). Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
 		/// <param name="items">The array you want to convert into strings</param>
 		/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
-		private static string FormatAsCsv(int level = Levels.i, params object[] items)
-		{
-			string separator = Separators[level].ToString();
-
-			//Array.ConvertAll(items, item => item.ToString());
-			string plainText = items[0].ToString();
-			for(int i = 1; i < items.Length; i++)
-			{
-				plainText += separator + items[i].ToString();
+		private static Maybe<string> ConvertToCsv(int level = Levels.i, params object[] items) {
+			if ((items is null) || (items.Length == 0)) {
+				return Maybe.None;
 			}
-			return plainText;
+			StringBuilder csv = new StringBuilder(items[0].ToString());
+			for(int i = 1; i < items.Length; i++) {
+				csv.Append(s_separators_str[level]).Append(items[i].ToString());
+			}
+			return csv.ToString();
 		}
 		private static string[] SplitAtLevel(string stringToSplit, int level)
 		{
-			return stringToSplit.Split(_separators[level]);
+			return stringToSplit.Split(s_separators[level]);
 		}
 
-		// Load
-		public static bool TryLoadCsvFile(string path, out Queue<string>[] file)
-		{
-			List<Queue<string>> file_AsList = new List<Queue<string>>();
-			file = null;
-			try
-			{
-				using (StreamReader sr = new StreamReader(path))
-				{
-					while (!sr.EndOfStream)
-					{
-						Queue<string> line = new Queue<string>(sr.ReadLine().Split(Separators[Levels.i]));
-						file_AsList.Add(line); // add a line (split by commas into an array)
+		// Loading
+		public static Maybe<Queue<string>[]> LoadCsvFile(string path) {
+			List<Queue<string>> file = new List<Queue<string>>();
+			string line;
+			try {
+				using (StreamReader sr = new StreamReader(path)) {
+					while (!sr.EndOfStream) {
+						// Split the line using commas as separators.
+						line = sr.ReadLine().Split(s_separators[Levels.i]);
+						file.Add(new Queue<string>(line));
 					}
 					sr.Close();
 				}
-				file = file_AsList.ToArray();
-				return true;
+				return file.ToArray();
 			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-		public static bool TryLoadTexture(string directory, string name, out Texture2D texture)
-		{
-			texture = null;
-			try
-			{
-				texture = Content.Load<Texture2D>(directory + name);
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
+			catch (Exception) {
+				// The file was not found or was formatted incorrectly.
+				return Maybe.None;
 			}
 		}
-		public static bool TryLoadTypes<T>(out Dictionary<int, T> typeDictionary) where T : IType
-		{
-			// Loading
-			Queue<string>[] file;
-			if (!TryLoadCsvFile(GetPathForType(typeof(T)), out file))
-			{
-				typeDictionary = null;
-				return false;
+		public static Maybe<Texture2D> LoadTexture(string path) {
+			try {
+				return Content.Load<Texture2D>(path);
+			}
+			catch (Exception) {
+				return Maybe.None;
+			}
+		}
+		public static Maybe<Dictionary<int, T>> LoadTypes<T>() where T : IType {
+			// Load file.
+			if (!LoadCsvFile(GetPathForType(typeof(T)))
+				.TryGetValue(out Queue<string>[] file)) {
+				return Maybe.None;
 			}
 
-			// Parsing
+			// Parse file.
+			Dictionary<int, T> typeDictionary;
 			string id;
 			int id_int;
 			T type;
 
 			typeDictionary = new Dictionary<int, T>(file.Count);
 
-			
-			foreach(Queue<string> line in file) // each line represents a type
-			{
-				if (!( line.TryDequeue(out id) && int.TryParse(id, out id_int) && TryParse<T>(id_int, line, out type))) // try to parse this line
-				{
-					typeDictionary = null;
-					return false; // parsing failed
+			// Each line represents a type of x.
+			foreach (Queue<string> line in file) {
+				// Try to parse this line.
+				if (!(line.TryDequeue(out id) && int.TryParse(id, out id_int)
+				&& Parse<T>(id_int, line).TryGetValue(out type))) {
+					// Parsing failed.
+					return Maybe.None;
 				}
-				typeDictionary.Add(id, type); // parsing succeeded
+				typeDictionary.Add(id, type);
 			}
-			return true;
-		}
-		private static string GetPathForType(Type type)
-		{
-			switch (type)
-			{
-				case typeof(TileType):
-					return FilePaths.Types[FilePaths.Elements.Tile];
-				default:
-					return "Not found";
-			}
+			return typeDictionary;
 		}
 
 		// Parse types
@@ -142,7 +120,7 @@ namespace Shroomworld
 			try
 			{
 				idData = new IdentifyingData(id, name: plaintext.Dequeue(), pluralName: plaintext.Dequeue());
-				TryLoadTexture(FilePaths.TextureDirs[FilePaths.Elements.Tile], idData.Name, out texture);
+				TryLoadTexture(FilePaths.TextureDirectories[FilePaths.Elements.Tile], idData.Name, out texture);
 				tileType = new TileType
 				(
 					idData: idData,
@@ -242,7 +220,7 @@ namespace Shroomworld
 			try
 			{
 				idData = new IdentifyingData(id, plaintext.Dequeue(), plaintext.Dequeue());
-				background = TryLoadTexture(FileHandling.FilePaths.TextureDirs[FilePaths.Elements.Biome]);
+				background = TryLoadTexture(FileHandling.FilePaths.TextureDirectories[FilePaths.Elements.Biome]);
 				biomeType = new BiomeType(
 					idData: idData,
 					background: background,

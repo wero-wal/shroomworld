@@ -4,18 +4,10 @@ using System.Collections.Generic;
 namespace Shroomworld.FileHandling
 {
     // Naming note: In this class, Dir = Directory
-    public static class FilePaths
-    {
+    public static class FilePaths {
+
         // ----- Enums -----
-        public enum WorldFiles
-        {
-            Map,
-            Enemies,
-            Friendlies,
-            Player,
-        }
-        public enum Elements
-        {
+        public enum Elements {
             Menu,
             Gui,
             Item,
@@ -27,21 +19,39 @@ namespace Shroomworld.FileHandling
             Player,
         }
 
-        // ----- Properties -----
-        // general
-        public static string Users { get => _users; set => _users = value; }
-        public static string GeneralSettings { get => _generalSettings; set => _generalSettings = value; }
-        public static string MenuText { get => _menuText; set => _menuText = value; }
 
-        public static Dictionary<Elements, string> Types => _types;
-        public static Dictionary<Elements, string> WorldSaveFileNames => _worldSaveFiles;
-        public static Dictionary<Elements, string> TextureDirs => _textureDirs;
+        // ----- Properties -----
+        /// <value>
+        /// Path for the file containing names, ids, and users' settings.
+        /// </value>
+        public static string UsersFile => s_users;
+        /// <value>
+        /// Path for the file containing general (non-user-specific) game settings.
+        /// </value>
+        public static string GeneralSettingsFile => s_generalSettings;
+        /// <value>
+        /// Path for the file containing text for all menu buttons and headings for all menus.
+        /// </value>
+        public static string MenuTextFile => s_menuText;
+        /// <value>
+        /// Paths for the files containing data about the types of different <see cref="Elements"/>.
+        /// </value>
+        public static Dictionary<Elements, string> TypeFiles => s_types;
+        /// <value>
+        /// Names of the files in directories of saved worlds.
+        /// </value>
+        public static Dictionary<Elements, string> WorldSaveFileNames => s_worldSaveFileNames;
+        /// <value>
+        /// Paths for the directories containing textures for different <see cref="Elements"/>.
+        /// </value>
+        public static Dictionary<Elements, string> TextureDirectories => s_textureDirectories;
+
 
         // ----- Fields -----
         public const string FilePathFile = "content/file-paths.txt";
-        
-        private static Elements[] _typeElements = new Elements[] // elements of which there are types / templates
-        {
+
+        // Elements for which there are types / templates.
+        private static Elements[] s_typeElements = new Elements[] {
             Elements.Item,
             Elements.Tile,
             Elements.Biome,
@@ -50,15 +60,15 @@ namespace Shroomworld.FileHandling
             Elements.Friendly,
             Elements.Player
         };
-        private static Elements[] _elementsInWorldSaves = new Elements[] // elements present in worldsaves
-        {
+        // Elements for which there are files in folders of saved worlds.
+        private static Elements[] s_worldSaveElements = new Elements[] {
             Elements.Map,
             Elements.Enemy,
             Elements.Friendly,
             Elements.Player
         };
-        private static Elements[] _textureElements = new Elements[] // elements which have texture files
-        {
+        // Elements which have texture files.
+        private static Elements[] s_textureElements = new Elements[] {
             Elements.Menu,
             Elements.Gui,
             Elements.Item,
@@ -68,16 +78,22 @@ namespace Shroomworld.FileHandling
             Elements.Friendly,
             Elements.Player
         };
-
-        // General
-        private static string _users; // contains names, ids, and settings of users
-        private static string _generalSettings; // contains 
-        private static string _menuText; // contains text for all menu buttons and headings for all menus
-
-        private static Dictionary<Elements, string> _types;
-        private static string _worldSavesDir; // contains all world save directories
-        private static Dictionary<Elements, string> _worldSaveFiles; // names of the files in eachworld save directory
-        private static Dictionary<Elements, string> _textureDirs; // paths of all the texture directories
+        private static string s_users;
+        private static string s_generalSettings;
+        private static string s_menuText;
+        // Path for the directory containing all world save directories.
+        private static string s_worldSavesDirectory;
+        private static Dictionary<Elements, string> s_types;
+        private static Dictionary<Elements, string> s_worldSaveFileNames;
+        private static Dictionary<Elements, string> s_textureDirectories;
+        private static Dictionary<Type, Elements> s_elementForType = new Dictionary<Type, Elements> {
+            { typeof(ItemType), Elements.Item },
+            { typeof(TileType), Elements.Tile },
+            { typeof(BiomeType), Elements.Biome },
+            { typeof(EnemyType), Elements.Enemy },
+            { typeof(FriendlyType), Elements.Friendly },
+            { typeof(PlayerType), Elements.Player }
+        };
 
 
         // ----- Methods -----
@@ -85,46 +101,50 @@ namespace Shroomworld.FileHandling
         /// Takes a list of filepaths and saves them to the appropriate dictionaries.
         /// </summary>
         /// <param name="paths"></param>
-        /// <returns>True if all file paths are set successfully; false if not enough paths were passed.</returns>
-        public static bool TrySetFilePaths(Queue<string> paths)
-        {
-            try
-            {
+        /// <returns><see langword="true"/> if all file paths are set successfully;
+        /// <see langword="false"/> if not enough paths were passed.</returns>
+        public static bool TrySetFilePaths(Queue<string> paths) {
+            try {
                 // General settings
-                _generalSettings = paths.Dequeue();
-                _menuText = paths.Dequeue();
+                s_generalSettings = paths.Dequeue();
+                s_menuText = paths.Dequeue();
 
                 // Types
-                _types = new Dictionary<Elements, string>(_textureElements.Length);
-                for (int i = 0; i < _typeElements.Length; i++)
-                {
-                    _types.Add(_typeElements[i], paths.Dequeue());
+                s_types = new Dictionary<Elements, string>(s_textureElements.Length);
+                for (int i = 0; i < s_typeElements.Length; i++) {
+                    s_types.Add(s_typeElements[i], paths.Dequeue());
                 }
 
                 // World files
-                _worldSavesDir = paths.Dequeue();
-                _worldSaveFiles = new Dictionary<Elements, string>(_elementsInWorldSaves.Length);
-                for (int i = 0; i < _elementsInWorldSaves.Length; i++)
-                {
-                    _worldSaveFiles.Add(_elementsInWorldSaves[i], paths.Dequeue());
+                s_worldSavesDirectory = paths.Dequeue();
+                s_worldSaveFileNames = new Dictionary<Elements, string>(s_worldSaveElements.Length);
+                for (int i = 0; i < s_worldSaveElements.Length; i++) {
+                    s_worldSaveFileNames.Add(s_worldSaveElements[i], paths.Dequeue());
                 }
                 
                 // Textures
-                _textureDirs = new Dictionary<Elements, string>(_textureElements.Length);
-                for (int i = 0; i < _textureElements.Length; i++)
-                {
-                    _textureDirs.Add(_textureElements[i], paths.Dequeue());
+                s_textureDirectories = new Dictionary<Elements, string>(s_textureElements.Length);
+                for (int i = 0; i < s_textureElements.Length; i++) {
+                    s_textureDirectories.Add(s_textureElements[i], paths.Dequeue());
                 }
             }
-            catch (IndexOutOfRangeException)
-            {
+            catch (IndexOutOfRangeException) {
                 return false;
             }
             return true;
         }
-        public static string GetPathForWorldFile(int worldId, Elements file)
-        {
-            return $"{_worldSavesDir}{worldId}\\{_worldSaveFiles[file]}";
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="worldId">The ID of the world whose file's path you want.</param>
+        /// <param name="file">Specify the file whose path you want.
+        /// (options: <see cref="Elements.Map"/>, <see cref="Elements.Enemy"/>, <see cref="Elements.Friendly"/>, <see cref="Elements.Player"/>).</param>
+        /// <returns>Path for the specified <paramref name="file"/> in the directory of a specific saved world.</returns>
+        public static Maybe<string> GetPathForWorldFile(int worldId, Elements file) {
+            if (!s_worldSaveElements.Contains(file)) {
+                return Maybe.None;
+            }
+            return $"{s_worldSavesDirectory}{worldId}\\{s_worldSaveFileNames[file]}";
         }
     }
 }
