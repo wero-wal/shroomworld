@@ -1,7 +1,7 @@
 namespace Shroomworld
 {
-	internal interface IType
+	public interface IType
 	{
-		IdentifyingData IdData { get; }
+		IdData IdData { get; }
 	}
 }

@@ -22,7 +22,7 @@ namespace Shroomworld
         public event Action<> PlacedOrRemovedTile;
         public event Action<> Moved;
 
-        private readonly PlayerTemplate _type;
+        private readonly PlayerType _type;
         private readonly HealthData _healthData;
         private readonly MovementData _movementData;
         private readonly PowerUps _powerUps;
@@ -32,7 +32,7 @@ namespace Shroomworld
 
 
         // ----- Constructors -----
-        public Player(PlayerTemplate type, HealthData healthData, MovementData movementData,
+        public Player(PlayerType type, HealthData healthData, MovementData movementData,
         PowerUp[] powerUps, InventoryItem[,] inventory, List<Quest> activeQuests, StatisticsDictionary statistics)
         {
             _type = type;

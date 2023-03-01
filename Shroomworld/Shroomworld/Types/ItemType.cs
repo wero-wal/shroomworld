@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Shroomworld
 {
     public class ItemType {
-        private readonly IdentifyingData _idData;
+        private readonly IdData _idData;
         private readonly ToolData? _toolData;
         private readonly bool _stackable;
         private readonly bool _placeable;
@@ -15,7 +15,7 @@ namespace Shroomworld
         /// <summary>
         /// Constructor for non-tool items
         /// </summary>
-        public ItemType(IdentifyingData idData, bool stackable, bool placeable)
+        public ItemType(IdData idData, bool stackable, bool placeable)
         {
             _idData = idData;
             _stackable = stackable;
@@ -25,7 +25,7 @@ namespace Shroomworld
         /// <summary>
         /// Constructor for tool items
         /// </summary>
-        public ItemType(IdentifyingData idData, ToolData toolData)
+        public ItemType(IdData idData, ToolData toolData)
         {
             _idData = idData;
             _toolData = toolData;

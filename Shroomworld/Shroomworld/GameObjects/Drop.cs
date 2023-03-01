@@ -1,8 +1,7 @@
 using System;
 namespace Shroomworld
 {
-	internal class Drop
-	{
+	public class Drop {
 		// ----- Enums -----
 		// ----- Properties -----
 		public int Id => _itemId;
@@ -13,20 +12,20 @@ namespace Shroomworld
 		private readonly int _max;
 
 		// ----- Constructors -----
-		public Drop(int itemId, int minInclusive, int? maxExclusive = null)
-		{
+		public Drop(int itemId, int minInclusive, int? maxExclusive = null) {
 			_itemId = itemId;
 			_min = minInclusive;
 			_max = maxExclusive ?? minInclusive + 1;
 		}
-		internal Drop(params int[] properties)
-		{
+		public Drop(params int[] properties) {
 			_itemId = properties[0];
 			_min = properties[1];
 			_max = properties[2];
 		}
 
-        // ----- Methods -----
-		public Item DropItem() => new Item(_itemId, new Random().Next(_min, _max));
+		// ----- Methods -----
+		public InventoryItem DropItem() {
+			return new InventoryItem(_itemId, new Random().Next(_min, _max));
+		}
     }
 }

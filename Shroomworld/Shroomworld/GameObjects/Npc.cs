@@ -17,14 +17,14 @@ namespace Shroomworld
 		// Fields
 		public event Action<Entity, ReadonlyAttackData> AttackAttemptInitiated;
 
-		private readonly NpcType _type;
+		private readonly FriendlyType _type;
         private readonly HealthData _healthData;
         private readonly MovementData _movementData;
 
 		private DateTime _startOfAttack;
 
 		// Constructors
-		public Npc(NpcType type, HealthData healthData = null, MovementData movementData = null)
+		public Npc(FriendlyType type, HealthData healthData = null, MovementData movementData = null)
 		{
 			_type = type;
 			_healthData = healthData;

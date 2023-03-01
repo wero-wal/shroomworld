@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class InventoryItem
+    public class InventoryItem
     {
         // ----- Enums -----
 
