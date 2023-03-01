@@ -45,6 +45,8 @@ namespace Shroomworld.FileHandling
         /// Paths for the directories containing textures for different <see cref="Elements"/>.
         /// </value>
         public static Dictionary<Elements, string> TextureDirectories => s_textureDirectories;
+        public static Dictionary<Type, Elements> ElementForType => s_elementForType;
+        public static Elements[] TextureElements => s_textureElements;
 
 
         // ----- Fields -----
