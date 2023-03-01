@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Shroomworld
-{
-    internal class TileType : IType
-    {
-        // ----- Enums -----
+namespace Shroomworld {
+    public class TileType : IType {
+
         // ----- Properties -----
 		public static int AirId => _airId;
 		public static int WaterId => _waterId;
@@ -27,6 +25,7 @@ namespace Shroomworld
         private readonly int[] _breakableBy; // IDs of the tools which can break this tile
         private readonly float _friction;
         private readonly Texture2D _texture;
+
 
         // ----- Constructors -----
         public TileType(IdentifyingData idData, Texture2D texture, Drop[] drops, bool isSolid, int[] breakableBy, float friction)

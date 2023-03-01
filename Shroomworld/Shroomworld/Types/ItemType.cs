@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class ItemType
-    {
+    public class ItemType {
         private readonly IdentifyingData _idData;
         private readonly ToolData? _toolData;
         private readonly bool _stackable;
