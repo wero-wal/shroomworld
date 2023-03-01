@@ -1,43 +1,37 @@
-using Shroomworld._2_Types;
-using System;
+using Microsoft.Xna.Framework.Graphics;
+namespace Shroomworld;
+public class EnemyType : IEntity {
 
-namespace Shroomworld
-{
-	internal abstract class EnemyType : EntityType, IDamageableType
-	{
-		// ----- Enums -----
-		// ----- Properties -----
-		// ----- Fields -----
-		private readonly int _attackStrength;
-		private readonly int _attackRange;
-		private readonly int _attackSpeed;
-		private readonly int _attackCooldown;
+	// ----- Enums -----
+	// ----- Properties -----
+	public IdData IdData => _idData;
+	public Texture2D Texture => _texture;
+	public PhysicsData PhysicsData => _physicsData;
+	public HealthData HealthData => _healthData;
+	public AttackData AttackData => _attackData;
 
-		// ----- Constructors -----
-		public EnemyType(string plainText)
-		{
-			string[] parts = plainText.Split(File.Separators[File.Level.i]);
-			int i = 0;
-			ParseNamesAndId(ref i, parts);
 
-			_movementSpeed = Convert.ToInt32(parts[i++]);
-			_constantOfRestitution = Convert.ToSingle(parts[i++]);
+	// ----- Fields -----
+	private readonly IdData _idData;
+	private readonly Texture2D _texture;
+	private readonly PhysicsData _physicsData;
+	private readonly HealthData _healthData;
+	private readonly AttackData _attackData;
 
-			_maxHealth = Convert.ToInt32(parts[i++]);
-			_regenAmountPerSecond = Convert.ToInt32(parts[i++]);
 
-			_attackStrength = Convert.ToInt32(parts[i++]);
-			_attackRange = Convert.ToInt32(parts[i++]);
-			_attackSpeed = Convert.ToInt32(parts[i++]);
-			_attackCooldown = Convert.ToInt32(parts[i++]);
+	// ----- Constructors -----
+	public EnemyType(IdData idData, Texture2D texture, PhysicsData physicsData, HealthData healthData, AttackData attackData) {
+		_idData = idData;
+		_texture = texture;
+		_physicsData = physicsData;
+		_healthData = healthData;
+		_attackData = attackData;
+	}
 
-			AddToDictionary();
-		}
 
-		// ----- Methods -----
-		public ReadonlyAttackData GetAttackInfo()
-		{
-			return ReadonlyAttackData.CreateNew(_attackStrength, _attackRange, _attackSpeed, _attackCooldown);
-		}
+	// ----- Methods -----
+	public Enemy GetNewEnemy() {
+		var sprite = new Sprite(_texture);
+		return new Enemy(_idData.Id, sprite, new Physics.Body(sprite, _physicsData), new EntityHealthData(_healthData));
 	}
 }
