@@ -1,11 +1,11 @@
 using System;
-using System.Text;
 using System.IO;
+using System.Text;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
 
 namespace Shroomworld.FileHandling;
 public static class FileManager {
@@ -20,193 +20,35 @@ public static class FileManager {
 		public const int III = 2;
 	}
 
-
 	// ----- Properties -----
-	public static char[] Separators => s_separators;
-
-
 	// ----- Fields -----
 	private readonly static char[] s_separators = { ',', ';', ':' };
 	private readonly static string[] s_separators_str = { ",", ";", ":" };
-
-	private delegate Func<IdData, string[], Maybe<IType>> _parser();
-
+	private static Dictionary<Type, Func<IdData, string[], IType>> s_parsers = new Dictionary<Type, Func<IdData, string[], IType>> {
+		{ typeof(ItemType), ParseItemType },
+		{ typeof(TileType), ParseTileType },
+		{ typeof(BiomeType), ParseBiomeType }/*,
+		{ typeof(EnemyType), ParseEnemyType },
+		{ typeof(FriendlyType), ParseFriendlyType },
+		{ typeof(PlayerType), ParsePlayerType }*/
+	};
 
 	// ----- Methods -----
-	/// <summary>
-	/// Converts an array of <paramref name="items"/> into one line of a csv file.
-	/// </summary>
-	/// <param name="level">Default: Level 1 (comma). Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
-	/// <param name="items">The array you want to convert into strings</param>
-	/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
-	private static Maybe<string> ConvertToCsv(int level = Levels.I, params object[] items) {
-		if ((items is null) || (items.Length == 0)) {
-			return Maybe.None;
-		}
-		StringBuilder csv = new StringBuilder(items[0].ToString());
-		for(int i = 1; i < items.Length; i++) {
-			csv.Append(s_separators_str[level]).Append(items[i].ToString());
-		}
-		return csv.ToString();
-	}
-	private static string[] SplitAtLevel(string stringToSplit, int level)
-	{
-		return stringToSplit.Split(s_separators[level]);
-	}
 
-	// Loading
-	// Note: exceptions will be handled in LoadTypes and other such high level, public methods.
-	private static string[][] LoadCsvFile(string path) {
-		List<string[]> file = new List<string[]>();
-		string[] line;
-		using (StreamReader sr = new StreamReader(path)) {
-			while (!sr.EndOfStream) {
-				// Split the line using commas as separators.
-				line = sr.ReadLine().Split(s_separators[Levels.I]);
-				file.Add(line);
-			}
-			sr.Close();
-		}
-		return file.ToArray();
-	}
-	private static Texture2D LoadTexture(FilePaths.Elements element, string itemName) {
-		if (!FilePaths.TextureElements.Contains(element)) {
-			throw new ArgumentException($"There's no texture folder for this element ({element}).");
-		}
-		return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
-	}
-	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>(Func<IdData, string[], TType> parser) where TType : IType {
+	// Load:
+	// Note: exceptions will be handled in LoadTypes and other such high-level, public methods.
+	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>() where TType : IType {
 		// Load file:
 		string path = FilePaths.TypeFiles[FilePaths.ElementForType[typeof(TType)]];
 		if (!LoadCsvFile(path).TryGetValue(out string[][] file)) {
 			return Maybe.None;
 		}
 
-		// Parse file:
-		Dictionary<int, TType> typeDictionary = new Dictionary<int, TType>(file.Length);;
-		TType type = default;
-
-		// The index of the variable being parsed within the line.
-		int p;
-		IdData idData;
 		try {
-			// Each line represents one instance of a TType.
-			foreach (string[] line in file) {
-				p = 0;
-				// Parse ID data.
-				idData = new IdData(id: line[p++].ToInt(), name: line[p++], pluralName: line[p++]);
-				// Try to parse the TType. If it doesn't work, TryGetValue will be false.
-				if (!parser(idData, line.Skip(p).ToArray()).TryGetValue(out type)) {
-					return Maybe.None;
-				}
-				typeDictionary.Add(idData.Id, type);
-			}
-			return typeDictionary;
+			return ParseTypes(file);
 		}
 		catch (Exception) {
 			return Maybe.None;
-		}			
-	}
-
-	// Parse types
-	public static TileType ParseTileType(IdData idData, string[] plaintext)
-	{
-		int p = 0;
-		return new TileType(
-			idData: idData,
-			texture: LoadTexture(FilePaths.Elements.Tile, idData.Name),
-			drops: ParseDrops(plaintext[p++]),
-			isSolid: Convert.ToBoolean(plaintext[p++]),
-			breakableBy: SplitAtLevel(plaintext[p++], Levels.II).ToInt(),
-			friction: (float)Convert.ToDecimal(plaintext[p++])
-		);
-	}
-	public static ItemType ParseItemType(IdData idData, string[] plaintext) {
-		int p = 0;
-		bool isTool = Convert.ToBoolean(plaintext[p++]);
-		if (isTool) {
-			return new ItemType(
-				idData,
-				toolData: new ToolData(type: plaintext[p++].ToInt(), level: plaintext[p++].ToInt())
-				);
-		}
-		return new ItemType(
-			idData,
-			placeable: Convert.ToBoolean(plaintext[p++]),
-			stackable: Convert.ToBoolean(plaintext[p++])
-		);
-	}
-	//public static EnemyType ParseEnemyType(IdData idData, string[] plaintext)
-	//{
-	//	int p = 0;
-	//	return new EnemyType(
-	//			idData,
-	//			texture: LoadTexture(FilePaths.Elements.Enemy, idData.Name),
-	//			physicsData: ParsePhysicsData(plaintext[p++]),
-	//			healthData: ParseHealthData(plaintext[p++]),
-	//			attackData: ParseAttackData(plaintext[p++])
-	//	);
-	//}
-	//public static PlayerType ParsePlayerType(IdData idData, string[] plaintext)
-	//{
-	//	return new PlayerType(
-	//		// todo: add parameters in LoadPlayerTypes()
-	//		);
-	//}
-	//public static BiomeType ParseBiomeType(IdData idData, string[] plaintext)
-	//{
-	//	IdData idData;
-	//	Texture background;
-	//	biomeType = null;
-	//	try
-	//	{
-	//		idData = new IdData(id, plaintext[p++], plaintext[p++]);
-	//		background = TryLoadTexture(FileHandling.FilePaths.TextureDirectories[FilePaths.Elements.Biome]);
-	//		biomeType = new BiomeType(
-	//			idData: idData,
-	//			background: background,
-	//			layers: ParseLayers(plaintext[p++]),
-	//			treeType: Convert.ToInt32(plaintext[p++]),
-	//			flowerTypes: ParseLayers(plaintext[p++]),
-	//			treeAmount: Convert.ToInt32(plaintext[p++]),
-	//			chestAmount: Convert.ToInt32(plaintext[p++])
-	//		);
-	//		return true;
-	//	}
-	//	catch (System.Exception)
-	//	{
-	//		return false;				
-	//	}
-	//}
-	//public static FriendlyType ParseFriendlyType(IdData idData, string[] plaintext)
-	//{
-	//	friendlyType = null;
-	//	try
-	//	{
-	//		friendlyType = new FriendlyType(
-	//			// todo: add parameters
-	//		);
-	//		return true;
-	//	}
-	//	catch (System.Exception)
-	//	{
-	//		return false;				
-	//	}
-	//}
-	private static int ToInt(this string str) {
-		return Convert.ToInt32(str);
-	}
-	private static int[] ToInt(this string[] strArray)
-	{
-		return Array.ConvertAll(strArray, item => Convert.ToInt32(item));
-	}
-		
-	// Parse components
-	private static IEnumerable<int> ParseLayers(string plaintext)
-	{
-		foreach (string tileType in SplitAtLevel(plaintext, Levels.II))
-		{
-			yield return Convert.ToInt32(tileType);
 		}
 	}
 	//public static Maybe<Player> LoadPlayer(int id)
@@ -242,41 +84,171 @@ public static class FileManager {
 	//		return Maybe.None;
 	//	}
 	//}
-	private static PhysicsData ParsePhysicsData(string plaintext)
+	
+	private static string[][] LoadCsvFile(string path) {
+		List<string[]> file = new List<string[]>();
+		string[] line;
+		using (StreamReader sr = new StreamReader(path)) {
+			while (!sr.EndOfStream) {
+				// Split the line using commas as separators.
+				line = sr.ReadLine().Split(s_separators[Levels.I]);
+				file.Add(line);
+			}
+			sr.Close();
+		}
+		return file.ToArray();
+	}
+	private static Texture2D LoadTexture(FilePaths.Elements element, string itemName) {
+		if (!FilePaths.TextureElements.Contains(element)) {
+			throw new ArgumentException($"There's no texture folder for this element ({element}).");
+		}
+		return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
+	}
+	
+	// Parse types:
+	private static Dictionary<int, TType> ParseTypes(string[][] file) where TType : IType {
+		Dictionary<int, TType> typeDictionary = new Dictionary<int, TType>(file.Length);;
+		Func<IdData, string[], TType> parse = s_parsers[typeof(TType)];
+		TType type = default;
+		IdData idData;
+		// The index of the variable being parsed within the line.
+		int p;
+		// Each line represents one instance of a TType.
+		foreach (string[] line in file) {
+			p = 0;
+			// Parse ID data.
+			idData = new IdData(
+				id: line[p++].ToInt(),
+				name: line[p++],
+				pluralName: line[p++]);
+			type = parse(idData, line.Skip(p).ToArray());
+			typeDictionary.Add(idData.Id, type);
+		}
+		return typeDictionary;
+	}
+	private static TileType ParseTileType(IdData idData, string[] plaintext)
 	{
+		int p = 0;
+		return new TileType(
+			idData: idData,
+			texture: LoadTexture(FilePaths.Elements.Tile, idData.Name),
+			drops: ParseDrops(plaintext[p++]),
+			isSolid: Convert.ToBoolean(plaintext[p++]),
+			breakableBy: SplitAtLevel(plaintext[p++], Levels.II).ToInt(),
+			friction: (float)Convert.ToDecimal(plaintext[p++])
+		);
+	}
+	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
+		int p = 0;
+		bool isTool = Convert.ToBoolean(plaintext[p++]);
+		if (isTool) {
+			return new ItemType(
+				idData,
+				toolData: new ToolData(type: plaintext[p++].ToInt(), level: plaintext[p++].ToInt())
+				);
+		}
+		return new ItemType(
+			idData,
+			placeable: Convert.ToBoolean(plaintext[p++]),
+			stackable: Convert.ToBoolean(plaintext[p++])
+		);
+	}
+    private static BiomeType ParseBiomeType(IdData idData, string[] plaintext) {
+      	int p = 0;
+    	return new BiomeType(
+    		idData: idData,
+    		background: LoadTexture(FilePaths.Elements.Biome, idData.Name),
+    		layers: ParseLayers(plaintext[p++]),
+    		treeType: plaintext[p++].ToInt(),
+    		flowerTypes: ParseLayers(plaintext[p++]),
+    		treeAmount: plaintext[p++].ToInt(),
+    		chestAmount: plaintext[p++].ToInt()
+    	);
+    }
+    //private static EnemyType ParseEnemyType(IdData idData, string[] plaintext) {
+    //	int p = 0;
+    //	return new EnemyType(
+    //			idData,
+    //			texture: LoadTexture(FilePaths.Elements.Enemy, idData.Name),
+    //			physicsData: ParsePhysicsData(plaintext[p++]),
+    //			healthData: ParseHealthData(plaintext[p++]),
+    //			attackData: ParseAttackData(plaintext[p++])
+    //	);
+    //}
+    //private static PlayerType ParsePlayerType(IdData idData, string[] plaintext)
+    //{
+    //	return new PlayerType(
+    //		// todo: add parameters in LoadPlayerTypes()
+    //		);
+    //}
+    //private static FriendlyType ParseFriendlyType(IdData idData, string[] plaintext) {
+    //  var texture = LoadTexture(FilePaths.Elements.Friendly, idData.Name);
+    //  int p = 0;
+    //	return new FriendlyType(
+    //		idData,
+    //		texture,
+    //		// todo: add parameters
+    //	);
+    //}
+
+    // Parse components:
+    private static int[] ParseLayers(string plaintext) {
+		return SplitAtLevel(plaintext, Levels.II).ToInt();
+	}
+	private static PhysicsData ParsePhysicsData(string plaintext) {
 		return new PhysicsData(plaintext.ToInt());
 	}
-	private static Drop[] ParseDrops(string plaintext)
-	{
+	private static Drop[] ParseDrops(string plaintext) {
 		string[] drops_str = SplitAtLevel(plaintext, Levels.II);
 		Drop[] drops = new Drop[drops_str.Length];
 
-		for (int i = 0; i < drops.Length; i++)
-		{
-			drops[i] = new Drop(ToInt(SplitAtLevel(drops_str[i], Levels.III)));
+		for (int i = 0; i < drops.Length; i++) {
+			drops[i] = new Drop(SplitAtLevel(drops_str[i], Levels.III).ToInt());
 		}
 		return drops;
 	}
-	private static HealthData ParseEntityHealthData(string plaintext, ReadonlyHealthData readonlyHealthData)
-	{
-		int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : Convert.ToInt32(plaintext);
-		return new HealthData(currentHealth, readonlyHealthData);
+	private static EntityHealthData ParseEntityHealthData(string plaintext, HealthData typeHealthData) {
+		int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : plaintext.ToInt();
+		return new EntityHealthData(currentHealth, typeHealthData);
 	}
-	//private static PowerUp[] ParsePowerUps(string plaintext) // TODO: parse powerups
-	//{
-	//	// split into line
+	//private static PowerUp[] ParsePowerUps(string plaintext) {
+	//  // TODO: parse powerup
+	//  // split into line
 	//	// ConvertAll to powerup
-
 	//	// local function to use as converter
 	//}
 
-	// Save
-	//public static void SavePlayer(Player player)
-	//{
+	// Save:
+	//public static void SavePlayer(Player player) {
+	//}
+	//public static void SaveWorld() {
+	//	Dictionary<int, Npc> npcs, int[,] tileMap, int width, int height, int difficulty
+	//}
 
-	//}
-	//public static void SaveWorld(Dictionary<int, Npc> npcs, int[,] tileMap, int width, int height, int difficulty)
-	//{
-			
-	//}
+	// Helper methods:
+	/// <summary>
+	/// Converts an array of <paramref name="items"/> into one line of a csv file.
+	/// </summary>
+	/// <param name="level">Default: Level 1 (comma). Change this if you don't want it to be a csv (i.e. you want to use a different separator character).</param>
+	/// <param name="items">The array you want to convert into strings</param>
+	/// <returns>the <paramref name="items"/> combined into a string, separated by a chosen separator char.</returns>
+	private static Maybe<string> ConvertToCsv(int level = Levels.I, params object[] items) {
+		if ((items is null) || (items.Length == 0)) {
+			return Maybe.None;
+		}
+		StringBuilder csv = new StringBuilder(items[0].ToString());
+		for(int i = 1; i < items.Length; i++) {
+			csv.Append(s_separators_str[level]).Append(items[i].ToString());
+		}
+		return csv.ToString();
+	}
+	private static string[] SplitAtLevel(string stringToSplit, int level) {
+		return stringToSplit.Split(s_separators[level]);
+	}
+	private static int ToInt(this string str) {
+		return Convert.ToInt32(str);
+	}
+	private static int[] ToInt(this string[] strArray) {
+		return Array.ConvertAll(strArray, item => Convert.ToInt32(item));
+	}
 }
