@@ -36,6 +36,16 @@ public static class FileManager {
 	// ----- Methods -----
 
 	// Load:
+	public static bool TryLoadFilePaths() {
+		try {
+			string[] filePaths = LoadCsvFile(FilePaths.FilePathFile)[0];
+			FilePaths.SetFilePaths(filePaths);
+			return true;
+		}
+		catch (System.Exception) {
+			return false;
+		}
+	}
 	// Note: exceptions will be handled in LoadTypes and other such high-level, public methods.
 	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>() where TType : IType {
 		// Load file:

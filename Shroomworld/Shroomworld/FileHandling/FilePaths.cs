@@ -103,37 +103,30 @@ namespace Shroomworld.FileHandling
         /// Takes a list of filepaths and saves them to the appropriate dictionaries.
         /// </summary>
         /// <param name="paths"></param>
-        /// <returns><see langword="true"/> if all file paths are set successfully;
-        /// <see langword="false"/> if not enough paths were passed.</returns>
-        public static bool TrySetFilePaths(Queue<string> paths) {
-            try {
-                // General settings
-                s_generalSettings = paths.Dequeue();
-                s_menuText = paths.Dequeue();
+        /// <exceptions>Throws ArgumentOutOfRangeException if not enough paths were passed.</exceptions>
+        public static void SetFilePaths(string[] paths) {
+            int p = 0;
 
-                // Types
-                s_types = new Dictionary<Elements, string>(s_textureElements.Length);
-                for (int i = 0; i < s_typeElements.Length; i++) {
-                    s_types.Add(s_typeElements[i], paths.Dequeue());
-                }
+            // General settings
+            s_generalSettings = paths[p++];
+            s_menuText = paths[p++];
 
-                // World files
-                s_worldSavesDirectory = paths.Dequeue();
-                s_worldSaveFileNames = new Dictionary<Elements, string>(s_worldSaveElements.Length);
-                for (int i = 0; i < s_worldSaveElements.Length; i++) {
-                    s_worldSaveFileNames.Add(s_worldSaveElements[i], paths.Dequeue());
-                }
-                
-                // Textures
-                s_textureDirectories = new Dictionary<Elements, string>(s_textureElements.Length);
-                for (int i = 0; i < s_textureElements.Length; i++) {
-                    s_textureDirectories.Add(s_textureElements[i], paths.Dequeue());
-                }
+            // Types
+            s_types = new Dictionary<Elements, string>(s_textureElements.Length);
+            for (int i = 0; i < s_typeElements.Length; i++) {
+                s_types.Add(s_typeElements[i], paths[p++]);
             }
-            catch (IndexOutOfRangeException) {
-                return false;
+            // World files
+            s_worldSavesDirectory = paths[p++];
+            s_worldSaveFileNames = new Dictionary<Elements, string>(s_worldSaveElements.Length);
+            for (int i = 0; i < s_worldSaveElements.Length; i++) {
+                s_worldSaveFileNames.Add(s_worldSaveElements[i], paths[p++]);
             }
-            return true;
+            // Textures
+            s_textureDirectories = new Dictionary<Elements, string>(s_textureElements.Length);
+            for (int i = 0; i < s_textureElements.Length; i++) {
+                s_textureDirectories.Add(s_textureElements[i], paths[p++]);
+            }
         }
         /// <summary>
         /// 
