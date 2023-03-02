@@ -116,9 +116,9 @@ public class Shroomworld : Game {
     }
 
     // Instantiation
-    private void CreateMenus() {
+    /*private void CreateMenus() {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
-    }
+    }*/
     
     // Update cycle
     protected override void Update(GameTime gameTime) {
@@ -170,13 +170,13 @@ public class Shroomworld : Game {
         // Perhaps check if the interacted-with tile lies between them.
         // recalculate paths for npcs
     }
-    private void CreateChest(SpecialChestTypes chestType, List<Item> items) {
+    /*private void CreateChest(SpecialChestTypes chestType, List<Item> items) {
         const string CHEST = "chest";
         string name = chestType.ToString().ToLower() + CHEST;
         List<Drop> drops = items.ForEach(item => new Drop(item.Id, item.Amount));
         _tileTypes.Add(_tileTypes.Count, new TileType(new IdData(_tileTypes.Count, name, name + "s"), drops, false, ));
         // todo: use the chest item type to do this
-    }
+    }*/
 
     // Menu
     private void UpdateMenu(GameTime gameTime) {
