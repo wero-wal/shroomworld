@@ -1,16 +1,27 @@
 using System;
+using Microsoft.Xna.Framework.Graphics;
+namespace Shroomworld;
+public class PlayerType : IType {
+    // ----- Properties -----
+    
 
-namespace Shroomworld
-{
-    internal class PlayerType : IType // there will only be one instance of this
-    {
-        // ----- Properties -----
-        // todo: put these values into (a) file(s)
-        public int ID => -1;
-        public string Name => "Player";
+    // ----- Fields -----
+    private readonly IdData _idData;
+    private readonly Texture2D _texture;
+    private readonly HealthData _healthData;
+    private readonly PhysicsData _physicsData;
 
-        // ----- Fields -----
-        // ----- Constructors -----
-        // ----- Methods -----
+
+    // ----- Constructors -----
+    public PlayerType(IdData idData, Texture2D texture, HealthData healthData, PhysicsData physicsData) {
+        _idData = idData;
+        _texture = texture;
+        _healthData = healthData;
+        _physicsData = physicsData;
+    }
+
+    // ----- Methods -----
+    public Player CreatePlayer() {
+        return new Player(this, new Sprite(_texture), new EntityHealthData(_healthData));
     }
 }
