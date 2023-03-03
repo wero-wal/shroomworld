@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shroomworld;
 
-namespace Shroomworld;
+public class ItemType {
 
-public class ItemType { 
+    // ----- Properties -----
     private readonly IdData _idData;
-    private readonly ToolData? _toolData;
+    private readonly Maybe<ToolData> _toolData;
     private readonly bool _stackable;
     private readonly bool _placeable;
 
+    // ----- Constructors -----
     /// <summary>
     /// Constructor for non-tool items
     /// </summary>
@@ -19,7 +16,7 @@ public class ItemType {
         _idData = idData;
         _stackable = stackable;
         _placeable = placeable;
-        _toolData = null;
+        _toolData = Maybe.None;
     }
     /// <summary>
     /// Constructor for tool items
