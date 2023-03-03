@@ -1,8 +1,11 @@
 ﻿namespace Shroomworld;
 
-public class ItemType {
+public class ItemType : IType {
 
     // ----- Properties -----
+    public IdData IdData => _idData;
+
+    // ----- FIelds -----
     private readonly IdData _idData;
     private readonly Maybe<ToolData> _toolData;
     private readonly bool _stackable;
