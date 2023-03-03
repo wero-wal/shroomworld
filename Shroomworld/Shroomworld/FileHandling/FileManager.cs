@@ -112,7 +112,13 @@ public static class FileManager {
 		if (!FilePaths.TextureElements.Contains(element)) {
 			throw new ArgumentException($"There's no texture folder for this element ({element}).");
 		}
-		return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
+		try {
+			return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
+		}
+		catch (Exception) {
+			// Return a default texture if it couldn't be loaded.
+			return new Texture2D(new Vector2(Shroomworld.TileSize, Shroomworld.TileSize), Color.White);
+		}
 	}
 	
 	// Parse types:
