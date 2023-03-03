@@ -1,55 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using System.Microsoft.Xna.Framework;
+using Shroomworld.Physics;
 
-namespace Shroomworld
-{
-    internal class Player : IEntity
+namespace Shroomworld;
+public class Player : IEntity {
+    // ----- Enums -----
+    // ----- Properties -----
+    public IType Type => _type;
+    public EntityHealthData HealthData => _healthData;
+    public Body Body => _body;
+
+
+    // ----- Fields -----
+    public event Action<> PlacedOrRemovedTile;
+    public event Action<> Moved;
+
+    private readonly PlayerType _type;
+    private readonly Body _body;
+    private readonly Sprite _sprite;
+    private readonly EntityHealthData _healthData;
+    //private readonly PowerUps _powerUps;
+    private readonly InventoryItem[,] _inventory;
+    //private readonly List<Quest> _quests;
+    //private readonly Dictionary<string, int> _statistics;
+
+
+    // ----- Constructors -----
+    public Player(PlayerType type, EntityHealthData healthData,
+    /*PowerUp[] powerUps, InventoryItem[,] inventory, List<Quest> activeQuests, StatisticsDictionary statistics*/)
     {
-        // ----- Enums -----
-        // ----- Properties -----
-        public IType Type => _type;
-        public HealthData HealthData => _healthData;
-        public static MovementData MovementData => _movementData;
-
-
-        // ----- Fields -----
-        public event Action<> PlacedOrRemovedTile;
-        public event Action<> Moved;
-
-        private readonly PlayerType _type;
-        private readonly HealthData _healthData;
-        private readonly MovementData _movementData;
-        private readonly PowerUps _powerUps;
-        private readonly InventoryItem[,] _inventory;
-        private readonly List<Quest> _quests;
-        private readonly Dictionary<string, int> _statistics;
-
-
-        // ----- Constructors -----
-        public Player(PlayerType type, HealthData healthData, MovementData movementData,
-        PowerUp[] powerUps, InventoryItem[,] inventory, List<Quest> activeQuests, StatisticsDictionary statistics)
-        {
-            _type = type;
-            _sprite = sprite;
-            _healthData = healthData;
-            _movementData = movementData;
-            _powerUps = powerUps;
-            _inventory = inventory;
-            _quests = activeQuests ?? new List<Quest>();
-            _statistics = statistics;
-        }
-
-
-        // ----- Methods -----
-        public void Attack(out int attackStrength)
-        {
-            attackStrength = _attack.Strength;
-        }
+        _type = type;
+        _sprite = type.GetSprite();
+        _healthData = healthData;
+        /*_powerUps = powerUps;
+        _inventory = inventory;
+        _quests = activeQuests ?? new List<Quest>();
+        _statistics = statistics;*/
+        _body = new Body(_sprite, type.PhysicsData);
     }
+
+
+    // ----- Methods -----
+    /*public void Attack(out int attackStrength)
+    {
+        attackStrength = _attack.Strength;
+    }*/
 }
