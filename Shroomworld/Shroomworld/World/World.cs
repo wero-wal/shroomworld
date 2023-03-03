@@ -1,10 +1,15 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+
 namespace Shroomworld;
+
 /// <summary>
 /// Contains a tile map and lists of entities.
 /// </summary>
 public class World {
+
     // ----- Properties -----
     public Map Map => _map;
     public List<Friendly> Friendlies => _friendlies;
@@ -19,6 +24,7 @@ public class World {
     private KeyBinds _keyBinds;
 
     private static Action<Texture2D, int, int> _drawTile;
+    
     
     // ----- Constructors -----
     public static void SetDrawFunction(Action<Texture2D, int, int> drawTile) {
@@ -45,12 +51,12 @@ public class World {
 
     // ----- Methods -----
     public void Update(GameTime gameTime) {
-        _keyBinds.ProcessInputs();
+        _keyBinds.ProcessInputs(Input.GetInputs());
     }
     public void Draw() {
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
-                if (_map[x, y] == Map.AirTile) {
+                if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
                 _drawTile(Shroomworld.TileTypes[_map[x, y]].Texture, x, y);
@@ -58,18 +64,18 @@ public class World {
         }
     }
     public void SetKeyBinds() {
-        __keyBinds = new KeyBinds();
-        __keyBinds.Add(Input.Inputs.W, PlayerJump);
-        __keyBinds.Add(Input.Inputs.A, PlayerMoveLeft);
-        __keyBinds.Add(Input.Inputs.D, PlayerMoveRight);
-        __keyBinds.Add(Input.Inputs.Space, PlayerJump);
+        _keyBinds = new KeyBinds();
+        _keyBinds.Add(Input.Inputs.W, PlayerJump);
+        _keyBinds.Add(Input.Inputs.A, PlayerMoveLeft);
+        _keyBinds.Add(Input.Inputs.D, PlayerMoveRight);
+        _keyBinds.Add(Input.Inputs.Space, PlayerJump);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
-        __keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
-        __keyBinds.Add(Input.Inputs.E, OpenInventory);
-        __keyBinds.Add(Input.Inputs.N1, SwitchToHotbarSlot1);
-        __keyBinds.Add(Input.Inputs.N2, SwitchToHotbarSlot2);
-        __keyBinds.Add(Input.Inputs.N3, SwitchToHotbarSlot3);
-        __keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
+        _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
+        _keyBinds.Add(Input.Inputs.E, OpenInventory);
+        _keyBinds.Add(Input.Inputs.N1, SwitchToHotbarSlot1);
+        _keyBinds.Add(Input.Inputs.N2, SwitchToHotbarSlot2);
+        _keyBinds.Add(Input.Inputs.N3, SwitchToHotbarSlot3);
+        _keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
     }
     private void PlayerJump() {
         _player.Body.AddAcceleration(-Vector2.UnitY);
