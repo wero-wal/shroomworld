@@ -74,9 +74,7 @@ public class Shroomworld : Game {
     // Prepare
     protected override void Initialize() {
         // TODO: Add your initialization logic here
-        SetStateToStage();
-        _world = new World(new Map(100, 100, 3, 0.2, 42), null, null);
-        _world.Generate();
+        SetStateToCreatingWorld();
         //_updateCurrentState = UpdateMenu;
         //_activeMenus = new Stack<Menu> { Menus.MainMenu };
         base.Initialize();
@@ -136,6 +134,9 @@ public class Shroomworld : Game {
 
         base.Update(gameTime);
     }
+    private void SetStateToCreatingWorld() {
+        _updateCurrentState = CreateWorld;
+    }
     private void SetStateToStage() {
         _updateCurrentState = UpdateStage;
     }
@@ -154,7 +155,11 @@ public class Shroomworld : Game {
     private void UpdateStage(GameTime gameTime) {
         //_checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
     }
-    
+    private void CreateWorld(GameTime gameTime) {
+        MapGenerator mapGenerator = new(100, 50, 5, 0.2f);
+        _world = new World(mapGenerator.Generate(), _playerTypes[0].CreatePlayer());
+        SetStateToStage();
+    }
     // Gameplay
     /// <summary>
     /// This will be called whenever an enemy is able and attempts to initiate an attack.
