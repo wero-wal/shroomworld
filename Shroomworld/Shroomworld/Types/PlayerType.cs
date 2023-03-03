@@ -2,8 +2,15 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 namespace Shroomworld;
 public class PlayerType : IType {
-    // ----- Properties -----
-    
+    // ----- Properties ----- 
+    public IdData IdData => _idData;
+
+    public Texture2D Texture => _texture;
+
+    public HealthData HealthData => _healthData;
+
+    public PhysicsData PhysicsData => _physicsData;
+
 
     // ----- Fields -----
     private readonly IdData _idData;
