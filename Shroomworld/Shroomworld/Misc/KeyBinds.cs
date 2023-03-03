@@ -4,9 +4,7 @@ public class KeyBinds {
     // ----- Enums -----
     // ----- Properties -----
     // ----- Fields -----
-    public delegate Action<> OnKeyPressed();
-
-    private Dictionary<Inputs, OnKeyPressed> _bindings;
+    private Dictionary<Inputs, Action<>> _bindings;
 
 
     // ----- Constructors -----
@@ -24,12 +22,12 @@ public class KeyBinds {
         }
     }
     public void Initialize() {
-        _bindings = new Dictionary<Inputs, OnKeyPressed>((int)Inputs.None);
+        _bindings = new Dictionary<Inputs, Action<>>((int)Inputs.None);
         for (int i = 0; i < (int)Inputs.None; i++) {
             _bindings.Add((Inputs)i, DoNothing);
         }
     }
-    public void Add(Inputs input, OnKeyPressed onKeyPressed) {
+    public void Add(Inputs input, Action<> onKeyPressed) {
         if (_bindings[input] == DoNothing) {
             _bindings[input] = onKeyPressed;
         }
@@ -40,6 +38,6 @@ public class KeyBinds {
     /// <summary>
     /// Called when a key is pressed but has not been bound.
     /// </summary>
-    private OnKeyPressed DoNothing() {
+    private Action<> DoNothing() {
     }
 }
