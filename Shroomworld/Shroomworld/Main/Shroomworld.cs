@@ -50,6 +50,9 @@ public class Shroomworld : Game {
     private Stack<Menu> _activeMenus;
     private Menu _currentMenu => _activeMenus.Peek();
     private World _world;
+    private KeyBinds _menuKeyBinds;
+    private KeyBinds _inventoryKeyBinds;
+    private KeyBinds _friendlyInteractionKeyBinds;
     
     private class Menus {
         public Menu MainMenu;
@@ -119,6 +122,9 @@ public class Shroomworld : Game {
     /*private void CreateMenus() {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
     }*/
+    private void SetKeyBinds() {
+        World.SetKeyBinds();
+    }
     
     // Update cycle
     protected override void Update(GameTime gameTime) {
