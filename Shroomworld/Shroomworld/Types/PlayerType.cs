@@ -4,11 +4,8 @@ namespace Shroomworld;
 public class PlayerType : IType {
     // ----- Properties ----- 
     public IdData IdData => _idData;
-
     public Texture2D Texture => _texture;
-
     public HealthData HealthData => _healthData;
-
     public PhysicsData PhysicsData => _physicsData;
 
 
@@ -28,7 +25,7 @@ public class PlayerType : IType {
     }
 
     // ----- Methods -----
-    public Player CreatePlayer() {
+    public Player CreateNew() {
         return new Player(this, new Sprite(_texture), new EntityHealthData(_healthData));
     }
 }
