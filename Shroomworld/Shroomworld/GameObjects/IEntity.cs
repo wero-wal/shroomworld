@@ -1,13 +1,8 @@
-using System;
-
-namespace Shroomworld
-{
-    internal interface IEntity
-    {
-        public IType Type { get; }
-        public HealthData HealthData { get; }
-        public MovementData MovementData { get; }
-        public Physics.Body Body { get; }
-        public Sprite Sprite { get; }
+namespace Shroomworld {
+    public interface IEntity {
+        IType Type { get; }
+        Sprite Sprite { get; }
+        EntityHealthData HealthData { get; }
+        Physics.Body Body { get; }
     }
 }
