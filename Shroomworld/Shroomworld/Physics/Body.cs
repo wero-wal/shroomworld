@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 namespace Shroomworld.Physics {
 	/// <summary>
@@ -8,7 +7,7 @@ namespace Shroomworld.Physics {
 
 		// ----- Properties -----
 		public Vector2 Velocity => _velocity;
-		public Vector2 Position { get => _sprite.Position; internal set => _position = value; }
+		public Vector2 Position => _sprite.Position;
 		public Sprite Sprite => _sprite;
 
 		
@@ -37,14 +36,14 @@ namespace Shroomworld.Physics {
 		/// </summary>
 		public void ApplyPhysics() {
 			Vector2 newVelocity = _velocity + _acceleration;
-			float newSpeed = newVelocity.Modulus();
+			float newSpeed = newVelocity.Length();
 			if (newSpeed > _physicsData.MaximumSpeed) {
-				_velocity = newVelocity.Normalize() * _physicsData.MaximumSpeed;
+				_velocity =  Vector2.Normalize(newVelocity) * _physicsData.MaximumSpeed;
 			}
 			else {
 				_velocity = newVelocity;
 			}
-			_sprite.Position += _velocity;
+			_sprite.SetPosition(_sprite.Position + _velocity);
 		}
 		/// <summary>
 		/// Sets acceleration but doesn't apply it (i.e. doesn't change any other values to reflect this).
@@ -67,7 +66,7 @@ namespace Shroomworld.Physics {
 		/// <param name="direction">The (normalised) angle / direction at which the body has intersected with the tile.</param>
 		/// <param name="depth">The depth of the collision.</param>
 		public void ResolveCollision(Vector2 direction, float depth) {
-			_sprite.Position -= direction * depth;
+			_sprite.SetPosition(_sprite.Position - direction * depth);
 		}
 	}
 }
