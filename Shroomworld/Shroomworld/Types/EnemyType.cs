@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 namespace Shroomworld;
-public class EnemyType : IEntity {
+public class EnemyType : IType {
 
 	// ----- Enums -----
 	// ----- Properties -----
@@ -31,7 +31,6 @@ public class EnemyType : IEntity {
 
 	// ----- Methods -----
 	public Enemy GetNewEnemy() {
-		var sprite = new Sprite(_texture);
-		return new Enemy(_idData.Id, sprite, new Physics.Body(sprite, _physicsData), new EntityHealthData(_healthData));
+		return new Enemy(this, new Sprite(_texture), new EntityHealthData(_healthData));
 	}
 }
