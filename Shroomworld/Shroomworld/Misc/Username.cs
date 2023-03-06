@@ -1,57 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MyLibrary;
 
-namespace Shroomworld
-{
-    public struct Username
-    {
-        // ----- Enums -----
+namespace Shroomworld;
 
+public struct Username {
 
-        // ----- Properties -----
-        public string Name { get => _name; set => _name = value; }
+    // ----- Fields -----
+    private static Range<int> _allowedlengths;
 
-        // ----- Fields -----
-        private static Range _allowedlength;
+    private string _value;
 
-        private string _name;
+    // ----- Constructors -----
+    public Username() {
+        _value = string.Empty;
+    }
 
-        // ----- Constructors -----
-        public Username()
-        {
-            _name = string.Empty;
+    // ----- Methods -----
+    public static implicit operator string(Username username) {
+        return username._value;
+    }
+
+    /// <summary>
+    /// If a range has not yet been set, set the range for the
+    /// allowed length of usernames to <paramref name="range"/>.
+    /// </summary>
+    /// <param name="range">The (inclusive) range of allowed lengths for usernames.</param>
+    public static void SetLengthRange(Range<int> range) {
+        if (_allowedlengths is null) {
+            _allowedlengths = range;
         }
+    }
 
-        // ----- Methods -----
-        public static void SetMinAndMaxLength(byte minLength, byte maxLength)
-        {
-            if (_allowedlength == null) // This is true by default
-            {
-                _allowedlength = new Range(minLength, maxLength, true);
-            }
-            else
-            {
-                throw new Exception("Minimum and maximum username lengths have already been set."); // useful for testing purposes
-            }
+    /// <summary>
+    /// Change or set the username.
+    /// </summary>
+    /// <param name="username">The new username.</param>
+    /// <returns><see langword="true"/> if the passed <paramref name="username"/> is valid. Otherwise, <see langword="false"/>.</returns>
+    public bool TrySet(string username) {
+        if (_allowedlengths.CheckIfInRange(username.Length)) {
+            _value = username;
+            return true;
         }
-
-        public bool Update(string name)
-        {
-            if (_allowedlength.CheckIfInRange((byte)name.Length))
-            {
-                _name = name;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        return false;
     }
 }
