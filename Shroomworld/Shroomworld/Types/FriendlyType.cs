@@ -1,47 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework.Graphics;
 
-namespace Shroomworld
-{
-    internal class FriendlyType
-    {
-		public int Id => _idData.Id;
-		public string Name => _idData.Name;
-		public string PluralName => _idData.PluralName;
-		public ReadonlyHealthData HealthData => _healthData;
-		public ReadonlyAttackData AttackData => _attackData;
-		internal ReadonlyMovementData MovementData => _movementData;
-		internal Quest Quest => _quest;
+namespace Shroomworld;
 
-		public bool Friendly => _friendly;
+public class FriendlyType : IType {
 
+	// ----- Properties -----
+	public IdData IdData => _idData;
+	public HealthData HealthData => _healthData;
+	internal PhysicsData PhysicsData => _physicsData;
+	internal Quest Quest => _quest;
 
-		private readonly IdData _idData;
-		private readonly ReadonlyHealthData _healthData;
-		private readonly ReadonlyAttackData _attackData;
-		private readonly ReadonlyMovementData _movementData;
-		private readonly Quest _quest;
+	// ----- Fields -----
+	private readonly IdData _idData;
+	private readonly Texture2D _texture;
+	private readonly HealthData _healthData;
+	private readonly PhysicsData _physicsData;
+	private readonly Quest _quest;
 
-		private readonly bool _friendly;
+	// ----- Constructors -----
+	public FriendlyType(IdData idData, Texture2D texture, PhysicsData movementData, Quest quest) {
+		_idData = idData;
+		_texture = texture;
+		_physicsData = movementData;
+		_quest = quest;
+	}
 
-
-		public FriendlyType(IdData idData, ReadonlyAttackData attackData, ReadonlyMovementData movementData, Quest quest)
-		{
-			_idData = idData;
-			_attackData = attackData;
-			_movementData = movementData;
-			_quest = quest;
-
-			_friendly = attackData is null;
-		}
-
-
-        //public Npc NewNpc()
-        //{
-        //    return new Npc(FileManager.LoadTexture(FileManager.NpcDirectory, _id), _movementSpeed, _constantOfRestitution);
-        //}
-    }
+	public Friendly CreateNew() {
+		Sprite sprite = new Sprite(_texture);
+		return new Friendly(this, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
+	}
 }
