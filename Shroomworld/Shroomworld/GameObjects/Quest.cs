@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shroomworld;
 
-namespace Shroomworld
-{
-    internal class Quest
-    {
-        // ----- Enums -----
+public class Quest {
+    // ----- Enums -----
 
 
-        // ----- Properties -----
+    // ----- Properties -----
 
 
-        // ----- Fields -----
+    // ----- Fields -----
 
 
-        // ----- Constructors -----
+    // ----- Constructors -----
 
 
-        // ----- Methods -----
+    // ----- Methods -----
 
 
-    }
 }
