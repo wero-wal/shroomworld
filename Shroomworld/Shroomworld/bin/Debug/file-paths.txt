@@ -11,10 +11,10 @@ map.txt
 enemies.txt
 friendlies.txt
 player.txt
-textures\items\
-textures\tiles\
-textures\biomes\
-textures\enemies\
-textures\friendlies\
-textures\player\
-textures\menu\
+items\
+tiles\
+biomes\
+enemies\
+friendlies\
+player\
+menu\
