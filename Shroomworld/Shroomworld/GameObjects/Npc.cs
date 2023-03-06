@@ -6,25 +6,25 @@ using System.Threading.Tasks;
 
 namespace Shroomworld
 {
-    internal class Npc : IEntity
+    internal class Npc : Entity
     {
 		// Properties
-		public ReadonlyAttackData AttackData => _type.AttackData;
+		public AttackData AttackData => _type.AttackData;
 		public HealthData HealthData => _healthData;
-		public MovementData MovementData => _movementData;
+		public PhysicsData MovementData => _movementData;
 		public bool AttackCooldownFinished => (DateTime.Now - _startOfAttack).TotalMilliseconds > _type.AttackData.Cooldown;
 
 		// Fields
-		public event Action<Entity, ReadonlyAttackData> AttackAttemptInitiated;
+		public event Action<Entity, AttackData> AttackAttemptInitiated;
 
 		private readonly FriendlyType _type;
         private readonly HealthData _healthData;
-        private readonly MovementData _movementData;
+        private readonly PhysicsData _movementData;
 
 		private DateTime _startOfAttack;
 
 		// Constructors
-		public Npc(FriendlyType type, HealthData healthData = null, MovementData movementData = null)
+		public Npc(FriendlyType type, HealthData healthData = null, PhysicsData movementData = null)
 		{
 			_type = type;
 			_healthData = healthData;
@@ -43,7 +43,7 @@ namespace Shroomworld
 		}
 		public bool IsInRange(Entity opponent)
 		{
-			return _movementData.Position.DistanceTo(opponent.MovementData.Position) <= _type.AttackData.Range;
+			return (_sprite.Position - opponent.Sprite.Position).Length() <= _type.AttackData.Range;
 		}
 	}
 }
