@@ -1,38 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Shroomworld
-{
-    internal class Range
-    {
-        // ----- Enums -----
+namespace Shroomworld;
 
+public class Range<T> where T : IComparable<T> {
 
-        // ----- Properties -----
+    // ----- Fields -----
+    private readonly T _min;
+    private readonly T _max;
 
+    // ----- Constructors -----
+    /// <summary>
+    /// Create a range.
+    /// </summary>
+    /// <param name="min">Inclusive minimum value in the range.</param>
+    /// <param name="max">Inclusive maximum value in the range.</param>
+    public Range(T min, T max) {
+        _min = min;
+        _max = max;
+    }
 
-        // ----- Fields -----
-        private byte _min;
-        private byte _max;
-
-        // ----- Constructors -----
-        internal Range(byte min, byte max, bool includeMax)
-        {
-            _min = min;
-            _max = (byte)((includeMax) ? max + 1 : max);
+    // ----- Methods -----
+    /// <summary>
+    /// Check whether <paramref name="value"/> is within the range and which boundary it exceeds, if any.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><paramref name="value"/> if it's within the range, or <see cref="_min"/> or <see cref="_max"/>
+    /// if <paramref name="value"/> exceeds the range in the respective direction.</returns>
+    public T ClampToRange(T value) {
+        if (!AboveMin(value)) {
+            return _min;
         }
-
-        // ----- Methods -----
-        public byte ClampToRange(byte value)
-        {
-            return (byte)Math.Clamp(value, _min, _max - 1);
+        if (!BelowMax(value)) {
+            return _max;
         }
-        public bool CheckIfInRange(byte value)
-        {
-            return _min <= value && _max < value;
-        }
+        return value;
+    }
+    /// <summary>
+    /// Check if a given <paramref name="value"/> lies within the range.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns><see langword="true"/> if it does, <see langword="false"/> if not.</returns>
+    public bool CheckIfInRange(T value) {
+        return AboveMin(value) && BelowMax(value);
+    }
+    private bool AboveMin(T value) {
+        return _min.CompareTo(value) <= 0;
+    }
+    private bool BelowMax(T value) {
+        return _max.CompareTo(value) >= 0;
     }
 }
