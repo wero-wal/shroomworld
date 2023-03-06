@@ -1,59 +1,60 @@
 using System;
 using System.Collections.Generic;
-namespace Shroomworld
-{
-	internal class BiomeDictionary : IEnumerable // todo: complete BiomeDictionary class
-	{
-		public class CapacityReachedException : Exception
-		{
+using System.Linq;
 
-		}
+namespace Shroomworld;
 
-		private readonly int[] _biomeStartXs;
-		private readonly BiomeType[] _biomeTypes;
+/// <summary>
+/// Use to store biomes and their locations in a world.
+/// </summary>
+public class BiomeDictionary {
+	public class CapacityReachedException : Exception { }
 
-		private readonly int _end = 0;
-		private readonly int _size;
-		public int this[int xValue]
-		{
-			get
-			{
-				for (int i = 0; i < _size; i++)
-				{
-					if (xValue <= _biomeStartXs[i])
-					{
-						return _biomeTypes[i];
-					}
+	// ----- Properties -----
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="x">x-coordinate at which you want to know the biome.</param>
+	/// <returns>The biome at the given <paramref name="x"/> coordinate.</returns>
+	/// <exception cref="KeyNotFoundException">Thrown if not enough biomes have been set.</exception>
+	public BiomeType this[int x] {
+		get {
+			for (int i = 0; i < _size; i++) {
+				if (x <= _biomeStartXs[i]) {
+					return _biomeTypes[i];
 				}
+			}
+			throw new KeyNotFoundException();
+		}
+		set {
+			if (!_biomeStartXs.Contains(x)) {
 				throw new KeyNotFoundException();
 			}
-			set
-			{
-				if (!_biomeStartXs.Contains(xValue))
-				{
-					throw new KeyNotFoundException();
-				}
-
-				_biomeTypes = value;
-			}
+			_biomeTypes[x] = value;
 		}
+	}
 
-		public BiomeDictionary(int size)
-		{
-			_size = size;
-			_biomeStartXs = new int[size];
-			_biomeTypes = new BiomeType[size];
+	// ----- Fields -----
+	private readonly int[] _biomeStartXs;
+	private readonly BiomeType[] _biomeTypes;
+
+	private readonly int _size;
+	
+	private int _endPointer = 0;
+
+	// ----- Constructors -----
+	public BiomeDictionary(int size) {
+		_size = size;
+		_biomeStartXs = new int[size];
+		_biomeTypes = new BiomeType[size];
+	}
+
+	// ----- Methods -----
+	public void Add(int x, BiomeType biomeType) {
+		if (_endPointer == _size) {
+			throw new CapacityReachedException();
 		}
-
-		public void Add(int x, BiomeType biomeType)
-		{
-			if (_end == _size)
-			{
-				throw new CapacityReachedException();
-			}
-
-			_biomeStartXs[_end++] = x;
-			_biomeTypes[_end++] = biomeType;
-		}
+		_biomeStartXs[_endPointer++] = x;
+		_biomeTypes[_endPointer++] = biomeType;
 	}
 }
