@@ -121,7 +121,7 @@ public class Shroomworld : Game {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
     }*/
     private void SetKeyBinds() {
-        World.SetKeyBinds();
+        _world.SetKeyBinds();
     }
     
     // Update cycle
@@ -145,7 +145,7 @@ public class Shroomworld : Game {
         _updateCurrentState = UpdateMenu;
     }
     private void SetStateToError(string message = "An error has occured.") {
-        _updateCurrentState = UpdateError();
+        _updateCurrentState = UpdateError;
         //spriteBatch.Draw(Vector2.Zero, new Rectangle(0, 0, 800, 480), Color.Red);
         // todo: display error message
     }
@@ -157,25 +157,25 @@ public class Shroomworld : Game {
     }
     private void CreateWorld(GameTime gameTime) {
         MapGenerator mapGenerator = new(100, 50, 5, 0.2f);
-        _world = new World(mapGenerator.Generate(), _playerTypes[0].CreatePlayer());
+        _world = new World(mapGenerator.Generate(), _playerTypes[0].CreateNew());
         SetStateToStage();
     }
-    // Gameplay
-    /// <summary>
-    /// This will be called whenever an enemy is able and attempts to initiate an attack.
-    /// It will check whether any of its opponents are in range. If so, an attack will be initiated.
-    /// </summary>
-    /// <returns></returns>
-    private void TryApplyAttack(Npc source, ReadonlyAttackData attackData) {
-        // (from npc in _npcs where npc.Type.IsFriendly select npc)
-        // loop through opponents
-        foreach (Entity opponent in _friendlyEntities) {
-            // check if in range
-            if (source.IsInRange(opponent)) {
-                source.InitiateAttack();
-            }
-        }
-    }
+    //// Gameplay
+    ///// <summary>
+    ///// This will be called whenever an enemy is able and attempts to initiate an attack.
+    ///// It will check whether any of its opponents are in range. If so, an attack will be initiated.
+    ///// </summary>
+    ///// <returns></returns>
+    //private void TryApplyAttack(Npc source, ReadonlyAttackData attackData) {
+    //    // (from npc in _npcs where npc.Type.IsFriendly select npc)
+    //    // loop through opponents
+    //    foreach (Entity opponent in _friendlyEntities) {
+    //        // check if in range
+    //        if (source.IsInRange(opponent)) {
+    //            source.InitiateAttack();
+    //        }
+    //    }
+    //}
     private void CalculateNpcPaths() { 
         // this will be called upon edits to the world or changes in the player's position
         // Perhaps check if the interacted-with tile lies between them.
@@ -282,23 +282,4 @@ public class Shroomworld : Game {
         var y = Math.Clamp(vector.Y, Shroomworld.TopLeftOfScreen.Y, Shroomworld.BottomRightOfScreen.Y);
         return new Vector2(x, y);
     }
-
-    // Initialisation details
-    private Player CreatePlayer() {
-        Player player = new Player();
-        player.Moved += CalculateNpcPaths;
-        player.PlacedOrRemovedTile += CalculateNpcPaths;
-    }
-    private Npc CreateNewEnemy() {
-        Npc npc = new Npc();
-        _checkForEnemyAttacks += npc.TryToInitiateAttack(); // todo: sort this out
-        npc.AttackAttemptInitiated += TryApplyAttack;
-        return npc;
-    }
-    
-    // Display / Input
-    public Vector2 GetMousePosition() {
-        return new Vector2(); // todo: write code to get mouse position
-    }
-    public Keys[] GetNewlyPressedKeys => _currentKeyboardState.KeysPressed.Where(item => (!_previousKeyboardState.KeysPressed.Contains(item)));
 }
