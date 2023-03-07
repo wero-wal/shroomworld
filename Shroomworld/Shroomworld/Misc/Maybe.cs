@@ -19,7 +19,7 @@ namespace Shroomworld {
 
 
 		// ----- Constructors -----
-		private Maybe() {
+		public Maybe() {
 			_value = default(T);
 			_hasValue = false;
 		}
