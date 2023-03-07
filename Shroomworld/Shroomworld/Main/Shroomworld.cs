@@ -16,7 +16,7 @@ public class Shroomworld : Game {
     public static Dictionary<int, FriendlyType> NpcTypes => _friendlyTypes;
     public static Dictionary<int, PlayerType> PlayerTypes => _playerTypes;
 
-    public SpriteBatch SpriteBatch => _spriteBatch;
+    public static SpriteBatch SpriteBatch => _spriteBatch;
     public float TileSize => _tileSize;
 
     public static Vector2 TopLeftOfScreen => _topLeftOfScreen;
@@ -40,7 +40,7 @@ public class Shroomworld : Game {
     private static float _tileSize;
     
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
+    private static SpriteBatch _spriteBatch;
     // subscribe enemy Npcs to this
     private event Action _checkForAttacks;
 
