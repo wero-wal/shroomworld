@@ -48,14 +48,9 @@ public static class FileManager {
 	}
 	// Note: exceptions will be handled in LoadTypes and other such high-level, public methods.
 	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>() where TType : IType {
-		// Load file:
 		string path = FilePaths.TypeFiles[FilePaths.ElementForType[typeof(TType)]];
-		if (!LoadCsvFile(path).TryGetValue(out string[][] file)) {
-			return Maybe.None;
-		}
-
 		try {
-			return ParseTypes(file);
+			return ParseTypes<TType>(LoadCsvFile(path));
 		}
 		catch (Exception) {
 			return Maybe.None;
@@ -116,15 +111,15 @@ public static class FileManager {
 			return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
 		}
 		catch (Exception) {
-			// Return a default texture if it couldn't be loaded.
-			return new Texture2D(new Vector2(Shroomworld.TileSize, Shroomworld.TileSize), Color.White);
+			// TODO: Return a default texture if it couldn't be loaded.
+			//return new Texture2D(Shroomworld.GraphicsDevice, Shroomworld.TileSize, Shroomworld.TileSize);
 		}
 	}
 	
 	// Parse types:
-	private static Dictionary<int, TType> ParseTypes(string[][] file) where TType : IType {
+	private static Dictionary<int, TType> ParseTypes<TType>(string[][] file) where TType : IType {
 		Dictionary<int, TType> typeDictionary = new Dictionary<int, TType>(file.Length);;
-		Func<IdData, string[], TType> parse = s_parsers[typeof(TType)];
+		Func<IdData, string[], IType> parse = s_parsers[typeof(TType)];
 		TType type = default;
 		IdData idData;
 		// The index of the variable being parsed within the line.
@@ -137,7 +132,7 @@ public static class FileManager {
 				id: line[p++].ToInt(),
 				name: line[p++],
 				pluralName: line[p++]);
-			type = parse(idData, line.Skip(p).ToArray());
+			type = (TType) parse(idData, line.Skip(p).ToArray());
 			typeDictionary.Add(idData.Id, type);
 		}
 		return typeDictionary;
@@ -225,7 +220,7 @@ public static class FileManager {
 	}
 	private static EntityHealthData ParseEntityHealthData(string plaintext, HealthData typeHealthData) {
 		int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : plaintext.ToInt();
-		return new EntityHealthData(currentHealth, typeHealthData);
+		return new EntityHealthData(typeHealthData, currentHealth);
 	}
 	//private static PowerUp[] ParsePowerUps(string plaintext) {
 	//  // TODO: parse powerup
