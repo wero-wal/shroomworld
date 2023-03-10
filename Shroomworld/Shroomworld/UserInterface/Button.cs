@@ -1,44 +1,40 @@
+using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-namespace Shroomworld
-{
-	internal class Button
-	{
-		// ----- Properties -----
-		public string Text => _text;
-		public string Sprite => _sprite;
 
-		// ----- Fields -----
-		private static Action<string, Vector2, Color> _drawText;
+namespace Shroomworld;
 
-		private readonly string _text;
-		private readonly Sprite _sprite;
+public class Button {
+	// ----- Properties -----
+	public string Text => _text;
+	public Sprite Sprite => _sprite;
 
-		// ----- Constructors -----
-		public Button(string text, Sprite sprite)
-		{
-			_text = text;
-			_sprite = sprite;
-		}
+	// ----- Fields -----
+	private static Action<string, Vector2, Color> _drawText;
 
-		// ----- Methods -----
-		public static void InjectDependencies(Action<string, Vector2, Color> drawTextFunction)
-		{
-			_drawText = drawTextFunction;
-		}
+	private readonly string _text;
+	private readonly Sprite _sprite;
 
-		public void Draw(Color buttonColour, Color textColour)
-		{
-			_sprite.Draw(buttonColour);
-			_drawText(_text, _sprite.Position, textColour);
-		}
-		// public bool CheckIfPressed(MouseState mouseState)
-		// {
-		// 	// todo: write code to check if mouse is pressed and is on the button
-		// }
-		// public bool CheckIfBeingHoveredOver()
-		// {
-
-		// }
+	// ----- Constructors -----
+	public Button(string text, Sprite sprite) {
+		_text = text;
+		_sprite = sprite;
 	}
+
+	// ----- Methods -----
+	public static void InjectDependencies(Action<string, Vector2, Color> drawTextFunction) {
+		_drawText = drawTextFunction;
+	}
+
+	public void Draw(Color buttonColour, Color textColour) {
+		_sprite.Draw(buttonColour);
+		_drawText(_text, _sprite.Position, textColour);
+	}
+	// public bool CheckIfPressed(MouseState mouseState)
+	// {
+	// 	// todo: write code to check if mouse is pressed and is on the button
+	// }
+	// public bool CheckIfBeingHoveredOver()
+	// {
+
+	// }
 }
