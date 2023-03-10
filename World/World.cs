@@ -42,11 +42,11 @@ public class World {
     /// <summary>
     /// Instantiate a saved / existing world.
     /// </summary>
-    public World(Map map, Player player, List<Friendly> friendlies, List<Enemy> enemies) {
+    public World(Map map/*, Player player, List<Friendly> friendlies, List<Enemy> enemies*/) {
         _map = map;
-        _player = player;
-        _friendlies = friendlies;
-        _enemies = enemies;
+        //_player = player;
+        //_friendlies = friendlies;
+        //_enemies = enemies;
     }
 
     // ----- Methods -----

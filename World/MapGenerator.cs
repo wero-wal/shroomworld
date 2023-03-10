@@ -65,7 +65,7 @@ namespace Shroomworld {
             AddWater();
             AddFlowers();
             AddTrees();
-            AddChests();
+            //AddChests();
 
 			return new Map(_tiles, _biomes, _seed);
         }
@@ -77,9 +77,9 @@ namespace Shroomworld {
             Perlin perlin = new Perlin();
             int y;
             for (int x = 0; x < _width; x++) {
-                var yo = perlin.perlin(x, _surfaceWaveHeight, 0);
+                //var yo
                 //var yo = perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * _surfaceWaveHeight;
-                y = _topOffset + (int) Math.Round(yo);
+                y = _topOffset + (int)Math.Round(perlin.perlin(x, _surfaceWaveHeight, 0));
                 _surfaceHeights[x] = y;
                 _groundMap[x, y] = Ground;
             }
@@ -236,23 +236,23 @@ namespace Shroomworld {
                 }
             }
         }
-        private void AddChests() {
-            int airTileCount = 0;
-            for (int x = 0; x < _width; x++) {
-                for (int y = _surfaceHeights[x]; y < _height; y++) { // go through all the ground below the surface
-                    if(_tiles[x, y] == TileType.AirId) {
-                        airTileCount++;
-                    }
-                    else {
-                        if ((airTileCount >= 3) && (GetSurroundingGroundCount(x, y - 1) > 1) // the chest should be exposed (the only neighbouring tile should be the one it's standing on)
-                        && (RandomPercentage() < _biomes[x].ChestAmount)) { // chance to place chest
-                            _tiles[x, y - 1] = TileType.ChestId; // y - 1 because the current tile is not an air tile. we want to place the chest in the air tile directly above the ground
-                        }
-                        airTileCount = 0;
-                    }
-                }
-            }
-        }
+        //private void AddChests() {
+        //    int airTileCount = 0;
+        //    for (int x = 0; x < _width; x++) {
+        //        for (int y = _surfaceHeights[x]; y < _height; y++) { // go through all the ground below the surface
+        //            if(_tiles[x, y] == TileType.AirId) {
+        //                airTileCount++;
+        //            }
+        //            else {
+        //                if ((airTileCount >= 3) && (GetSurroundingGroundCount(x, y - 1) > 1) // the chest should be exposed (the only neighbouring tile should be the one it's standing on)
+        //                && (RandomPercentage() < _biomes[x].ChestAmount)) { // chance to place chest
+        //                    _tiles[x, y - 1] = TileType.ChestId; // y - 1 because the current tile is not an air tile. we want to place the chest in the air tile directly above the ground
+        //                }
+        //                airTileCount = 0;
+        //            }
+        //        }
+        //    }
+        //}
         private int RandomPercentage() {
             return _random.Next(0, 101);
         }

@@ -39,7 +39,7 @@ public class Shroomworld : Game {
 
     // Number of default tile types.
     private static int s_defaultTileTypeCount;
-    private static float s_tileSize = 10;
+    private static float s_tileSize = 50;
 
     private static ContentManager s_contentManager;
     
@@ -83,6 +83,8 @@ public class Shroomworld : Game {
     protected override void Initialize() {
         // TODO: Add your initialization logic here
         SetStateToCreatingWorld();
+        World.SetDrawFunction(Draw);
+        Window.AllowUserResizing = true;
         //_updateCurrentState = UpdateMenu;
         //_activeMenus = new Stack<Menu> { Menus.MainMenu };
         base.Initialize();
@@ -168,7 +170,7 @@ public class Shroomworld : Game {
     }
     private void CreateWorld(GameTime gameTime) {
         MapGenerator mapGenerator = new(100, 50, 5, 0.2f);
-        _world = new World(mapGenerator.Generate(), s_playerTypes[0].CreateNew());
+        _world = new World(mapGenerator.Generate()/*, s_playerTypes[0].CreateNew()*/);
         SetStateToStage();
     }
     //// Gameplay
@@ -265,7 +267,7 @@ public class Shroomworld : Game {
     /// <param name="x">x-coordinate of the object in the tile map</param>
     /// <param name="y">y-coordinate of the object in the tile map</param>
     private void Draw(Texture2D texture, int x, int y) {
-        s_spriteBatch.Draw(texture, new Vector2(x * TileSize, y * TileSize), Color.White);
+        s_spriteBatch.Draw(texture, new Rectangle(x * (int) s_tileSize, y * (int) s_tileSize, (int) s_tileSize, (int) s_tileSize), Color.White);
     }
     /// <summary>
     /// Display a texture on the screen at a given position.
