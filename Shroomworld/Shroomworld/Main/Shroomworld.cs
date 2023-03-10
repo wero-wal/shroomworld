@@ -5,22 +5,26 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Shroomworld.FileHandling;
+using Microsoft.Xna.Framework.Content;
 
 namespace Shroomworld;
 public class Shroomworld : Game {
 
     // ----- Properties -----
-    public static Dictionary<int, TileType> TileTypes => _tileTypes;
-    public static Dictionary<int, ItemType> ItemTypes => _itemTypes;
-    public static Dictionary<int, BiomeType> BiomeTypes => _biomeTypes;
-    public static Dictionary<int, FriendlyType> NpcTypes => _friendlyTypes;
-    public static Dictionary<int, PlayerType> PlayerTypes => _playerTypes;
+    public static Dictionary<int, TileType> TileTypes => s_tileTypes;
+    public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
+    public static Dictionary<int, BiomeType> BiomeTypes => s_biomeTypes;
+    public static Dictionary<int, FriendlyType> NpcTypes => s_friendlyTypes;
+    public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
-    public static SpriteBatch SpriteBatch => _spriteBatch;
-    public float TileSize => _tileSize;
+    public static SpriteBatch SpriteBatch => s_spriteBatch;
+    public static float TileSize => s_tileSize;
 
     public static Vector2 TopLeftOfScreen => _topLeftOfScreen;
     public static Vector2 BottomRightOfScreen => _bottomRightOfScreen;
+
+    public static GraphicsDeviceManager GraphicsDeviceManager => s_graphics;
+    public static ContentManager ContentManager => s_contentManager;
 
 
     // ----- Fields -----
@@ -29,26 +33,31 @@ public class Shroomworld : Game {
 
     //public static User CurrentUser;
 
-    private static Dictionary<int, ItemType> _itemTypes;
-    private static Dictionary<int, TileType> _tileTypes;
-    private static Dictionary<int, BiomeType> _biomeTypes;
-    private static Dictionary<int, FriendlyType> _friendlyTypes;
-    private static Dictionary<int, PlayerType> _playerTypes;
+    private static Dictionary<int, ItemType> s_itemTypes;
+    private static Dictionary<int, TileType> s_tileTypes;
+    private static Dictionary<int, BiomeType> s_biomeTypes;
+    private static Dictionary<int, FriendlyType> s_friendlyTypes;
+    private static Dictionary<int, PlayerType> s_playerTypes;
 
     // Number of default tile types.
-    private static int _defaultTileTypeCount;
-    private static float _tileSize;
+    private static int s_defaultTileTypeCount;
+    private static float s_tileSize;
+
+    private static ContentManager s_contentManager;
     
-    private GraphicsDeviceManager _graphics;
-    private static SpriteBatch _spriteBatch;
+    private static GraphicsDeviceManager s_graphics;
+    private static SpriteBatch s_spriteBatch;
     // subscribe enemy Npcs to this
     private event Action _checkForAttacks;
 
     /* The method to call in the main Update method. I have opted for this instead of a GameState
         enum and if statements in the Update function because it uses less processing time. */
     private Action<GameTime> _updateCurrentState;
+    private Action _drawCurrentState;
     private Stack<Menu> _activeMenus;
     private Menu _currentMenu => _activeMenus.Peek();
+
+
     private World _world;
     private KeyBinds _menuKeyBinds;
     private KeyBinds _inventoryKeyBinds;
@@ -64,8 +73,9 @@ public class Shroomworld : Game {
 
     // ----- Constructors -----
     public Shroomworld() {
-        _graphics = new GraphicsDeviceManager(this);
-        Content.RootDirectory = "Content";
+        s_graphics = new GraphicsDeviceManager(this);
+        s_contentManager = Content;
+        s_contentManager.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
@@ -82,8 +92,8 @@ public class Shroomworld : Game {
     
     // Loading
     protected override void LoadContent() {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
-        Content.RootDirectory = "Content";
+        s_spriteBatch = new SpriteBatch(GraphicsDevice);
+        s_contentManager.RootDirectory = "Content";
 
         if (!FileManager.TryLoadFilePaths()) {
             SetStateToError("Couldn't load file paths.");
@@ -99,9 +109,9 @@ public class Shroomworld : Game {
     /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
     private bool TryLoadGameFiles() {
         // Load Types
-        if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out _itemTypes)
-        && FileManager.LoadTypes<TileType>().TryGetValue(out _tileTypes)
-        && FileManager.LoadTypes<BiomeType>().TryGetValue(out _biomeTypes)/*
+        if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out s_itemTypes)
+        && FileManager.LoadTypes<TileType>().TryGetValue(out s_tileTypes)
+        && FileManager.LoadTypes<BiomeType>().TryGetValue(out s_biomeTypes)/*
         && FileManager.LoadTypes<EnemyType>().TryGetValue(out _enemyTypes)
         && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)
         && FileManager.LoadTypes<PlayerType>().TryGetValue(out _playerTypes)*/)) {
@@ -136,9 +146,11 @@ public class Shroomworld : Game {
     }
     private void SetStateToCreatingWorld() {
         _updateCurrentState = CreateWorld;
+        _drawCurrentState = DrawCreatingWorld;
     }
     private void SetStateToStage() {
         _updateCurrentState = UpdateStage;
+        _drawCurrentState = _world.Draw;
     }
     private void SetStateToMenu(Menu menu) {
         OpenMenu(menu);
@@ -146,7 +158,10 @@ public class Shroomworld : Game {
     }
     private void SetStateToError(string message = "An error has occured.") {
         _updateCurrentState = UpdateError;
-        //spriteBatch.Draw(Vector2.Zero, new Rectangle(0, 0, 800, 480), Color.Red);
+        _drawCurrentState = DrawError;
+    }
+    private void DrawError() {
+        GraphicsDevice.Clear(Color.Red);
         // todo: display error message
     }
     private void UpdateError(GameTime gameTime) {
@@ -157,7 +172,7 @@ public class Shroomworld : Game {
     }
     private void CreateWorld(GameTime gameTime) {
         MapGenerator mapGenerator = new(100, 50, 5, 0.2f);
-        _world = new World(mapGenerator.Generate(), _playerTypes[0].CreateNew());
+        _world = new World(mapGenerator.Generate(), s_playerTypes[0].CreateNew());
         SetStateToStage();
     }
     //// Gameplay
@@ -237,13 +252,15 @@ public class Shroomworld : Game {
 
     // Drawing
     protected override void Draw(GameTime gameTime) {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        _spriteBatch.Begin();
-        // TODO: Add your drawing code here
-        _spriteBatch.End();
+        s_spriteBatch.Begin();
+        _drawCurrentState();
+        s_spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+    private void DrawCreatingWorld() {
+        s_graphics.GraphicsDevice.Clear(Color.Green);
     }
     /// <summary>
     /// Displays a texture on the screen based on a position in the tile map.
@@ -252,7 +269,7 @@ public class Shroomworld : Game {
     /// <param name="x">x-coordinate of the object in the tile map</param>
     /// <param name="y">y-coordinate of the object in the tile map</param>
     private void Draw(Texture2D texture, int x, int y) {
-        _spriteBatch.Draw(texture, new Vector2(x * TileSize, y * TileSize), Color.White);
+        s_spriteBatch.Draw(texture, new Vector2(x * TileSize, y * TileSize), Color.White);
     }
     /// <summary>
     /// Display a texture on the screen at a given position.
@@ -261,14 +278,14 @@ public class Shroomworld : Game {
     /// <param name="position">The position (destination coordinates) in pixels,
     /// of the top left corner of the texture when it is displayed on-screen.</param>
     private void Draw(Texture2D texture, Vector2 position) {
-        _spriteBatch.Draw(texture, position, Color.White);
+        s_spriteBatch.Draw(texture, position, Color.White);
     }
     /// <summary>
     /// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
     /// </summary>
     /// <param name="sprite">The sprite to be displayed.</param>
     private void Draw(Sprite sprite) {
-        _spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
+        s_spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
     }
 
     //

@@ -78,22 +78,19 @@ namespace Shroomworld
             const int DefaultIndexValue = -1;
             
             Vector2 currentMousePosition;
-            bool mouseDown;
-            bool prevMouseDown;
             bool mouseHasBeenReleased;
             bool mouseIsOnAButton;
             int indexOfPreviouslyHighlightedButton;
-            int indexOfHighlightedButton;
+            int indexOfHighlightedButton = 0;
             
             while(true)
             {
                 // Update user inputs
                 indexOfPreviouslyHighlightedButton = indexOfHighlightedButton;
 
-                // todo: get mouse state
+                mouseHasBeenReleased = Input.LeftMouseButtonHasBeenReleased();
 
-                mouseHasBeenReleased = (!mouseDown) && prevMouseDown;
-                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(mousePosition: Shroomworld.GetCurrentMousePosition());
+                indexOfHighlightedButton = GetIndexOfButtonContainingMouse(Input.GetMousePosition());
                 mouseIsOnAButton = indexOfHighlightedButton != DefaultIndexValue;
 
                 // Display

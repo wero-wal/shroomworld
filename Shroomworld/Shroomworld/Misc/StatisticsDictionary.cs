@@ -123,7 +123,11 @@ namespace Shroomworld
 		// TODO: finish writing these methods
 		public bool Remove(string key)
 		{
-
+			if (_keys.Contains(key)) {
+				// TODO: remove key and value
+				return true;
+			}
+			return false;
 		}
 
 		public bool Remove(KeyValuePair<string, int> item)

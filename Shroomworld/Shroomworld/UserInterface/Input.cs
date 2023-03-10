@@ -64,7 +64,11 @@ public static class Input {
         _currentMouseState = Mouse.GetState();
         _currentKeyboardState = Keyboard.GetState();
     }
-    
+    public static bool LeftMouseButtonHasBeenReleased() {
+        return _currentMouseState.LeftButton.HasFlag(ButtonState.Released)
+            && _previousMouseState.LeftButton.HasFlag(ButtonState.Pressed);
+    }
+
     private static Inputs ToInputs(this Keys key) {
         // Letters
         if ((key >= Keys.A) && (key <= Keys.Z)) {

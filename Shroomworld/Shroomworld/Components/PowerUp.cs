@@ -33,7 +33,7 @@ namespace Shroomworld {
             return _level.ToString();
         }
         public void IncreaseLevel() {
-            if (_level < MaxLevel) {
+            if (_level < s_maxLevel) {
                 _level++;
             }
         }

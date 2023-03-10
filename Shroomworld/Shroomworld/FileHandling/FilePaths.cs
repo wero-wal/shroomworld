@@ -51,7 +51,7 @@ public static class FilePaths {
 
 
     // ----- Fields -----
-    public const string FilePathFile = "content/file-paths.txt";
+    public const string FilePathFile = "file-paths.txt";
 
     // Elements for which there are types / templates.
     private static Elements[] s_typeElements = new Elements[] {

@@ -12,8 +12,8 @@
 
 
 		// ----- Fields -----
-        private static readonly float s_acceleration;
-        private static readonly float s_gravity;      
+        private static float s_acceleration;
+        private static float s_gravity;      
 
 		private int _maximumSpeed;
 

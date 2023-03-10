@@ -3,8 +3,6 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld.FileHandling;
@@ -108,11 +106,11 @@ public static class FileManager {
 			throw new ArgumentException($"There's no texture folder for this element ({element}).");
 		}
 		try {
-			return Content.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
+			return Shroomworld.ContentManager.Load<Texture2D>(FilePaths.TextureDirectories[element] + itemName);
 		}
 		catch (Exception) {
-			// TODO: Return a default texture if it couldn't be loaded.
-			//return new Texture2D(Shroomworld.GraphicsDevice, Shroomworld.TileSize, Shroomworld.TileSize);
+			// Return a default texture if it couldn't be loaded.
+			return new Texture2D(Shroomworld.GraphicsDeviceManager.GraphicsDevice, (int)Shroomworld.TileSize, (int)Shroomworld.TileSize);
 		}
 	}
 	
@@ -144,14 +142,14 @@ public static class FileManager {
 			idData: idData,
 			texture: LoadTexture(FilePaths.Elements.Tile, idData.Name),
 			drops: ParseDrops(plaintext[p++]),
-			isSolid: Convert.ToBoolean(plaintext[p++]),
+			isSolid: plaintext[p++].ToBoolean(),
 			breakableBy: SplitAtLevel(plaintext[p++], Levels.II).ToInt(),
 			friction: (float)Convert.ToDecimal(plaintext[p++])
 		);
 	}
 	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
 		int p = 0;
-		bool isTool = Convert.ToBoolean(plaintext[p++]);
+		bool isTool = plaintext[p++].ToBoolean();
 		if (isTool) {
 			return new ItemType(
 				idData,
@@ -160,8 +158,8 @@ public static class FileManager {
 		}
 		return new ItemType(
 			idData,
-			placeable: Convert.ToBoolean(plaintext[p++]),
-			stackable: Convert.ToBoolean(plaintext[p++])
+			placeable: plaintext[p++].ToBoolean(),
+			stackable: plaintext[p++].ToBoolean()
 		);
 	}
     private static BiomeType ParseBiomeType(IdData idData, string[] plaintext) {
@@ -258,6 +256,9 @@ public static class FileManager {
 	}
 	private static int ToInt(this string str) {
 		return Convert.ToInt32(str);
+	}
+	private static bool ToBoolean(this string str) {
+		return Convert.ToBoolean(Convert.ToInt32(str));
 	}
 	private static int[] ToInt(this string[] strArray) {
 		return Array.ConvertAll(strArray, item => Convert.ToInt32(item));

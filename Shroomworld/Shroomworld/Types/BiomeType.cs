@@ -8,6 +8,7 @@ namespace Shroomworld {
 		public int[] Layers => _layers;
 		public int TreeType => _treeType;
 		public int[] FlowerTypes => _flowerTypes;
+        public int FlowerAmount => _flowerAmount;
 		public int TreeAmount => _treeAmount;
 		public int ChestAmount => _chestAmount;
 
@@ -20,11 +21,12 @@ namespace Shroomworld {
         private readonly int[] _flowerTypes;
         private readonly int _treeAmount;
         private readonly int _chestAmount;
+        private readonly int _flowerAmount;
 
 
         // ----- Constructors -----
         public BiomeType(IdData idData, Texture background, int[] layers, int treeType, int[] flowerTypes,
-            int treeAmount, int chestAmount /*, int friendlyAmount, int enemyAmount*/) {
+            int treeAmount, int chestAmount /*, int flowerAmount, int friendlyAmount, int enemyAmount*/) {
             _idData = idData;
             _background = background;
             _layers = layers;
@@ -32,6 +34,7 @@ namespace Shroomworld {
             _flowerTypes = flowerTypes;
             _treeAmount = treeAmount;
             _chestAmount = chestAmount;
+            _flowerAmount = 50;
         }
 
 		// ----- Methods -----

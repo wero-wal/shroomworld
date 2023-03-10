@@ -35,7 +35,7 @@ namespace Shroomworld {
 		/// </summary>
         public MapGenerator(int width, int height, int numberOfBiomes, float smoothness, int? seed = null) {
 			_tiles = new int[width, height];
-            _groundMap = GetEmptyMap(width, height);
+            _groundMap = GetEmptyMap();
             _surfaceHeights = new int[width];
             _layerBoundaries[^1] = height;
 
@@ -77,7 +77,7 @@ namespace Shroomworld {
             Perlin perlin = new Perlin();
             int y;
             for (int x = 0; x < _width; x++) {
-                y = _topOffset + (int)Math.Round(perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * waveHeight);
+                y = _topOffset + (int)Math.Round(perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * _surfaceWaveHeight);
                 _surfaceHeights[x] = y;
                 _groundMap[x, y] = Ground;
             }
@@ -177,7 +177,7 @@ namespace Shroomworld {
                     endY = Math.Min(_surfaceHeights[x] + _layerBoundaries[(i + 1) % _layerBoundaries.Length], _height);
                     for (int y = startY; y < endY; y++) { // go down the current column
                         if (_groundMap[x, y] == Ground) {
-                            _tiles[x, y] = _biomes[x].Tiles[i];
+                            _tiles[x, y] = _biomes[x].Layers[i];
                         }
                     }                        
                 }
@@ -215,9 +215,9 @@ namespace Shroomworld {
             int y;
             for (int x = 0; x < _width; x++) { // go over surface layer
                 y = _surfaceHeights[x] - 1; // we want the tile directly above the surface
-                if ((RandomPercentage() < _biomes[x].FlowerChance) // chance to plant flower
+                if ((RandomPercentage() < _biomes[x].FlowerAmount) // chance to plant flower
                 && (_tiles[x, y] != TileType.WaterId)) { // flowers can't be planted in water
-                    _tiles[x, y] = RandomFrom(_biomes[x].Flowers); // place random type of flower
+                    _tiles[x, y] = RandomFrom(_biomes[x].FlowerTypes); // place random type of flower
                 }
             }
         }
@@ -226,11 +226,11 @@ namespace Shroomworld {
             int y;
             for (int x = 0; x < _width; x++) { // go over the surface of the map
                 y = _surfaceHeights[x] - 1; // we want the tile directly above the surface
-                if ((RandomPercentage() < _biomes[x].TreeChance) // chance to plant tree
+                if ((RandomPercentage() < _biomes[x].TreeAmount) // chance to plant tree
                 && (_tiles[x, y] != TileType.WaterId) // trees can't be planted in water
                 && ((_tiles[x, y] == TileType.AirId) // will always replace air
                 || (RandomPercentage() < ChanceToReplaceFlower))) { // will sometimes replace flower
-                    _tiles[x, y] = _biomes[x].Tree;
+                    _tiles[x, y] = _biomes[x].TreeType;
                 }
             }
         }
@@ -243,7 +243,7 @@ namespace Shroomworld {
                     }
                     else {
                         if ((airTileCount >= 3) && (GetSurroundingGroundCount(x, y - 1) > 1) // the chest should be exposed (the only neighbouring tile should be the one it's standing on)
-                        && (RandomPercentage() < _biomes[x].ChestChance)) { // chance to place chest
+                        && (RandomPercentage() < _biomes[x].ChestAmount)) { // chance to place chest
                             _tiles[x, y - 1] = TileType.ChestId; // y - 1 because the current tile is not an air tile. we want to place the chest in the air tile directly above the ground
                         }
                         airTileCount = 0;
@@ -268,7 +268,7 @@ namespace Shroomworld {
             bool[,] map = new bool[_width, _height];
             for (int y = 0; y < _height; y++) {
                 for (int x = 0; x < _width; x++) {
-                    map[x, y] = TileType.AirId;
+                    map[x, y] = Air;
                 }
             }
             return map;

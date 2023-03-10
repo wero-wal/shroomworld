@@ -54,6 +54,8 @@ public class World {
         _keyBinds.ProcessInputs(Input.GetInputs());
     }
     public void Draw() {
+        Shroomworld.GraphicsDeviceManager.GraphicsDevice.Clear(Color.CornflowerBlue);
+
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
                 if (_map[x, y] == TileType.AirId) {
