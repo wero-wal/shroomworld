@@ -1,4 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+
 namespace Shroomworld {
     public class BiomeType : IType {
 
@@ -37,6 +39,14 @@ namespace Shroomworld {
             _flowerAmount = 50;
         }
 
-		// ----- Methods -----
-	}
+        public bool Equals(BiomeType biome) {
+            if (biome is null) {
+                return false;
+            }
+            return biome.IdData.Id == _idData.Id;
+        }
+
+        // ----- Methods -----
+
+    }
 }
