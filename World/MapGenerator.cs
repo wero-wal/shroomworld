@@ -6,11 +6,11 @@ namespace Shroomworld {
         private const bool Ground = true;
         private const bool Air = false;
 
-        private readonly int _topOffset = 2; // (min) number of empty tiles at the top of the map
+        private readonly int _topOffset = 5; // (min) number of empty tiles at the top of the map
         private readonly int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
-        private readonly int _surfacePercent = 33; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
-        private readonly int _smoothAmount = 2;
-    	private readonly int _randomFillPercent = 55; // what % of the underground will be ground (the rest will be air)
+        private readonly int _surfacePercent = 25; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
+        private readonly int _smoothAmount = 2; // how many times to smooth the cave
+    	private readonly int _randomFillPercent = 60; // what % of the underground will be ground (the rest will be air)
 
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
@@ -21,9 +21,9 @@ namespace Shroomworld {
         private readonly int[] _surfaceHeights; // stores top of terrain at each x
         
         private readonly int _seed;
-        private readonly float _smoothness; // how smooth or 'janky' the terrain looks
+        private readonly int _smoothness; // how smooth or 'janky' the terrain looks
         private readonly int _numberOfBiomes;
-        private readonly int[] _layerBoundaries = { 0, 1, 3, 0 };
+        private readonly int[] _layerWidths = { 1, 0, 0 };
 
         private readonly Random _random;
 
@@ -33,7 +33,7 @@ namespace Shroomworld {
 		/// <summary>
 		/// Use this when generating a new map
 		/// </summary>
-        public MapGenerator(int width, int height, int numberOfBiomes, float smoothness, int? seed = null) {
+        public MapGenerator(int width, int height, int numberOfBiomes, int smoothness, int? seed = null) {
             _width = width;
             _height = height;
 			_numberOfBiomes = numberOfBiomes;
@@ -42,10 +42,11 @@ namespace Shroomworld {
             _smoothness = smoothness;
             _seed = seed ?? new Random().Next();
 
-			_tiles = new int[width, height];
-            _groundMap = GetEmptyMap();
+            _tiles = GetEmptyTileMap(width, height);
+            _groundMap = GetEmptyMap(width, height);
             _surfaceHeights = new int[width];
-            _layerBoundaries[^1] = height;
+            _layerWidths[1] = height / 10;
+            _layerWidths[^1] = height;
 
             _random = new Random(_seed);
         }
@@ -58,7 +59,7 @@ namespace Shroomworld {
             GenerateCaves();
 
             // Adding variation
-            AddBiomes();
+            SetBiomes();
             PaintTiles();
 
             // Adding details
@@ -73,13 +74,10 @@ namespace Shroomworld {
 		// Generate surface
         private void GenerateSurfaceTerrain() {
             _surfaceWaveHeight = _height * _surfacePercent / 100;
-
-            Perlin perlin = new Perlin();
             int y;
+            Perlin perlin = new Perlin();
             for (int x = 0; x < _width; x++) {
-                //var yo
-                //var yo = perlin.OctavePerlin(x / _smoothness, _seed, 0, 6, _smoothness) * _surfaceWaveHeight;
-                y = _topOffset + (int)Math.Round(perlin.perlin(x, _surfaceWaveHeight, 0));
+                y = _topOffset + (int)(perlin.OctavePerlin((double)x / _smoothness, (double)_surfaceWaveHeight/ _smoothness, z: 1d / _smoothness, octaves: 3, persistence: 3) * _surfaceWaveHeight);
                 _surfaceHeights[x] = y;
                 _groundMap[x, y] = Ground;
             }
@@ -91,24 +89,27 @@ namespace Shroomworld {
         /// </summary>
         /// <param name="smoothAmount">How many times to smooth the caves. Smaller amount = bigger caves + vice versa.</param>
         private void GenerateCaves() {
-            // Generate noise
-            for (int x = 0; x < _width; x++) {
-                for (int y = _surfaceHeights[x]; y < (_height - _numberOfTilesAtBottom); y++) { // go from the surface to almost the bottom of the map
-                    _groundMap[x, y] = (RandomPercentage() < _randomFillPercent) ? Ground : Air;
-                }
-            }
-
-            // Smooth
+            GenerateNoise();
             for (int i = 0; i < _smoothAmount; i++) {
                 SmoothMap();
             }
         }
+
+        private void GenerateNoise() {
+            for (int x = 0; x < _width; x++) {
+                // Go from the surface to the bottom of the map.
+                for (int y = _surfaceHeights[x] + 1; y < (_height - _numberOfTilesAtBottom); y++) {
+                    _groundMap[x, y] = (RandomPercentage() < _randomFillPercent) ? Ground : Air;
+                }
+            }
+        }
+
         private void SmoothMap() {
             int surroundingGroundCount;
             const int MaxNeighbours = 4; // using Von Neumann’s neighbourhood
 
 			for (int x = 0; x < _width; x++) {
-				for (int y = _surfaceHeights[x]; y < _height; y++) {
+				for (int y = _surfaceHeights[x] + 1; y < _height; y++) {
 					// create border on the edges
 					if ((x == 0) || (x == (_width - 1)) || (y >= (_height - _numberOfTilesAtBottom))) {
 						_groundMap[x, y] = Ground;
@@ -158,10 +159,21 @@ namespace Shroomworld {
         /// <summary>
         /// Randomly assign biomes of set width to the map, horizontally.
         /// </summary>
-        private void AddBiomes() {
+        private void SetBiomes() {
             int biomeSize = _width / _numberOfBiomes;
+            BiomeType currentBiome;
+            BiomeType previousBiome = null;
             for (int i = 0; i < _numberOfBiomes; i++) {
-                _biomes.Add(i * biomeSize, Shroomworld.BiomeTypes[_random.Next(1, Shroomworld.BiomeTypes.Count)]);
+                // Ensure that adjacent biomes are different.
+                do {
+                    currentBiome = GetRandomBiome();
+                } while (currentBiome.Equals(previousBiome));
+
+                _biomes.Add(i * biomeSize, currentBiome);
+                previousBiome = currentBiome;
+            }
+            BiomeType GetRandomBiome() {
+                return Shroomworld.BiomeTypes[_random.Next(1, Shroomworld.BiomeTypes.Count + 1)];
             }
         }
         /// <summary>
@@ -169,19 +181,16 @@ namespace Shroomworld {
         /// values chosen based on the height and biome of the tile.
         /// </summary>
         private void PaintTiles() {
-            int startY;
-            int endY;
-            for (int x = 0; x < _width; x++) { // go across the map
-                startY = _surfaceHeights[x];
-				// the map is made up of three layers (in each column). This iterates through the layers.
-                for (int i = 0; i < (_layerBoundaries.Length - 1); i++) {
-                    startY = _surfaceHeights[x] + _layerBoundaries[i]; // start of current layer
-                    endY = Math.Min(_surfaceHeights[x] + _layerBoundaries[(i + 1) % _layerBoundaries.Length], _height);
-                    for (int y = startY; y < endY; y++) { // go down the current column
-                        if (_groundMap[x, y] == Ground) {
-                            _tiles[x, y] = _biomes[x].Layers[i];
-                        }
-                    }                        
+            int currentLayer;
+            for (int x = 0; x < _width; x++) {
+                currentLayer = 0;
+                for (int y = _surfaceHeights[x]; y < _height; y++) {
+                    if (y >= (_surfaceHeights[x] + _layerWidths[currentLayer])) {
+                        currentLayer++;
+                    }
+                    if (_groundMap[x, y] == Ground) {
+                        _tiles[x, y] = _biomes[x].Layers[currentLayer];
+                    }
                 }
             }
         }
@@ -215,8 +224,10 @@ namespace Shroomworld {
         }
         private void AddFlowers() {
             int y;
-            for (int x = 0; x < _width; x++) { // go over surface layer
-                y = _surfaceHeights[x] - 1; // we want the tile directly above the surface
+            // Iterate over surface layer.
+            for (int x = 0; x < _width; x++) {
+                // We want the tile directly above the surface.
+                y = _surfaceHeights[x] - 1;
                 if ((RandomPercentage() < _biomes[x].FlowerAmount) // chance to plant flower
                 && (_tiles[x, y] != TileType.WaterId)) { // flowers can't be planted in water
                     _tiles[x, y] = RandomFrom(_biomes[x].FlowerTypes); // place random type of flower
@@ -226,8 +237,10 @@ namespace Shroomworld {
         private void AddTrees() {
             const int ChanceToReplaceFlower = 25;
             int y;
-            for (int x = 0; x < _width; x++) { // go over the surface of the map
-                y = _surfaceHeights[x] - 1; // we want the tile directly above the surface
+            // Iterate over the surface of the map.
+            for (int x = 0; x < _width; x++) {
+                // We want the tile directly above the surface.
+                y = _surfaceHeights[x] - 1;
                 if ((RandomPercentage() < _biomes[x].TreeAmount) // chance to plant tree
                 && (_tiles[x, y] != TileType.WaterId) // trees can't be planted in water
                 && ((_tiles[x, y] == TileType.AirId) // will always replace air
@@ -266,14 +279,23 @@ namespace Shroomworld {
 		/// * <see cref="_height"/> consisting of only air tiles.
         /// </summary>
         /// <returns>A 2D tile array filled with the air tile id (<see cref="TileType.AirId"/>)</returns>
-		private bool[,] GetEmptyMap() {
-            bool[,] map = new bool[_width, _height];
-            for (int y = 0; y < _height; y++) {
-                for (int x = 0; x < _width; x++) {
+		private bool[,] GetEmptyMap(int width, int height) {
+            bool[,] map = new bool[width, height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
                     map[x, y] = Air;
                 }
             }
             return map;
         }
-	}
+        private int[,] GetEmptyTileMap(int width, int height) {
+            int[,] map = new int[width, height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    map[x, y] = TileType.AirId;
+                }
+            }
+            return map;
+        }
+    }
 }
