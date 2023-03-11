@@ -47,12 +47,12 @@ public static class FileManager {
 	// Note: exceptions will be handled in LoadTypes and other such high-level, public methods.
 	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>() where TType : IType {
 		string path = FilePaths.TypeFiles[FilePaths.ElementForType[typeof(TType)]];
-		//try {
+		try {
 			return ParseTypes<TType>(LoadCsvFile(path));
-		//}
-		//catch (Exception) {
-		//	return Maybe.None;
-		//}
+		}
+		catch (Exception) {
+			return Maybe.None;
+		}
 	}
 	//public static Maybe<Player> LoadPlayer(int id)
 	//{
