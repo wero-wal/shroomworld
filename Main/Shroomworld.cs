@@ -16,7 +16,7 @@ public class Shroomworld : Game {
     public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
     public static SpriteBatch SpriteBatch => s_spriteBatch;
-    public static float TileSize => s_tileSize;
+    public static int TileSize => s_tileSize;
 
     public static Vector2 TopLeftOfScreen => _topLeftOfScreen;
     public static Vector2 BottomRightOfScreen => _bottomRightOfScreen;
@@ -26,6 +26,8 @@ public class Shroomworld : Game {
 
 
     // ----- Fields -----
+    private const int PixelsPerTile = 8;
+
     private static Vector2 _topLeftOfScreen;
     private static Vector2 _bottomRightOfScreen;
 
@@ -39,7 +41,7 @@ public class Shroomworld : Game {
 
     // Number of default tile types.
     private static int s_defaultTileTypeCount;
-    private static float s_tileSize = 50;
+    private static readonly int s_tileSize = 20;
 
     private static ContentManager s_contentManager;
     
@@ -169,7 +171,7 @@ public class Shroomworld : Game {
         //_checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
     }
     private void CreateWorld(GameTime gameTime) {
-        MapGenerator mapGenerator = new(100, 50, 5, 0.2f);
+        MapGenerator mapGenerator = new(100, 100, 5, smoothness: 33/*, seed: 100_000*/);
         _world = new World(mapGenerator.Generate()/*, s_playerTypes[0].CreateNew()*/);
         SetStateToStage();
     }
@@ -251,7 +253,7 @@ public class Shroomworld : Game {
     // Drawing
     protected override void Draw(GameTime gameTime) {
 
-        s_spriteBatch.Begin();
+        s_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         _drawCurrentState();
         s_spriteBatch.End();
 
@@ -267,7 +269,8 @@ public class Shroomworld : Game {
     /// <param name="x">x-coordinate of the object in the tile map</param>
     /// <param name="y">y-coordinate of the object in the tile map</param>
     private void Draw(Texture2D texture, int x, int y) {
-        s_spriteBatch.Draw(texture, new Rectangle(x * (int) s_tileSize, y * (int) s_tileSize, (int) s_tileSize, (int) s_tileSize), Color.White);
+        //s_spriteBatch.Draw(texture, new Vector2(100f), null, Color.White, 0f, new Vector2(texture.Height / 2, texture.Width / 2), 10f, SpriteEffects.None, 0f);
+        s_spriteBatch.Draw(texture, new Rectangle(x * s_tileSize, y * s_tileSize * texture.Height / PixelsPerTile, s_tileSize, s_tileSize * texture.Height / PixelsPerTile), Color.White);
     }
     /// <summary>
     /// Display a texture on the screen at a given position.
