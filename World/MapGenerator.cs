@@ -10,7 +10,7 @@ namespace Shroomworld {
         private readonly int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
         private readonly int _surfacePercent = 25; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
         private readonly int _smoothAmount = 2; // how many times to smooth the cave
-    	private readonly int _randomFillPercent = 60; // what % of the underground will be ground (the rest will be air)
+    	private readonly int _randomFillPercent = 53; // what % of the underground will be ground (the rest will be air)
 
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
@@ -104,56 +104,45 @@ namespace Shroomworld {
         }
 
         private void SmoothMap() {
+            // Using Moore’s neighbourhood.
+            const int MaxNeighbours = 8;
             int surroundingGroundCount;
-            const int MaxNeighbours = 4; // using Von Neumann’s neighbourhood
 
 			for (int x = 0; x < _width; x++) {
 				for (int y = _surfaceHeights[x] + 1; y < _height; y++) {
-					// create border on the edges
+					// Create border on the edges.
 					if ((x == 0) || (x == (_width - 1)) || (y >= (_height - _numberOfTilesAtBottom))) {
 						_groundMap[x, y] = Ground;
 					}
-					else { // smooth based on neighbouring tiles
+					else {
+                        // Smooth based on neighbouring tiles.
 						surroundingGroundCount = GetSurroundingGroundCount(x, y);
-						if (surroundingGroundCount > (MaxNeighbours / 2)) { // if surrounded by > 2 ground tiles, become a ground tile.
+						if (surroundingGroundCount > (MaxNeighbours / 2)) { // if surrounded by > 4 ground tiles, become a ground tile.
 							_groundMap[x, y] = Ground;
 						}
-						else if (surroundingGroundCount < (MaxNeighbours / 2)) { // if surrounded by < 2 ground tiles, become an air tile.
+						else if (surroundingGroundCount < (MaxNeighbours / 2)) { // if surrounded by < 4 ground tiles, become an air tile.
 							_groundMap[x, y] = Air;
 						}
 					}
 				}
 			}
         }
+        private bool CheckIfWithinBounds(int x, int y) {
+            return (x >= 0) && (x < _width) && (y >= 0) && (y < _height);
+        }
         private int GetSurroundingGroundCount(int x, int y) {
-            /* using the Von Neumann Neighbourhood:
-               . n .		n = neighbour
-               n t n		t = current tile
-               . n .		. = other tile
-            */
             int surroundingGroundCount = 0;
-
-            // check to the left and right of the tile
-            for (int nebx = (x - 1); nebx <= (x + 1); nebx += 2) { // nebx = x-coord of neighbour
-                AddToGroundCount(nebx, y);
-            }
-            // check above and below the tile
-            for (int neby = (y - 1); neby <= (y + 1); neby += 2) { // neby = y-coord of neighbour
-                AddToGroundCount(x, neby);
-            }
-            return surroundingGroundCount;
-
-            // --- Local functions ---
-            void AddToGroundCount(int neighbourX, int neighbourY) {
-                if (CheckWithinBounds(neighbourX, neighbourY) && (_groundMap[neighbourX, neighbourY] == Ground)) {
-                    surroundingGroundCount ++;
+            for (int neighbourX = x - 1; neighbourX <= (x + 1); neighbourX++) {
+                for (int neighbourY = y - 1; neighbourY <= (y + 1); neighbourY++) {
+                    if ((!((neighbourX == x) && (neighbourY == y)))
+                        && CheckIfWithinBounds(neighbourX, neighbourY)
+                        && (_groundMap[neighbourX, neighbourY] == Ground)) {
+                        surroundingGroundCount++;
+                    }
                 }
             }
-            bool CheckWithinBounds(int x, int y) {
-                return ((x >= 0) && (x < _width) && (y >= 0) && (y < _height));
-            }
+            return surroundingGroundCount;
         }
-
         // Texturing
         /// <summary>
         /// Randomly assign biomes of set width to the map, horizontally.

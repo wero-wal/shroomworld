@@ -171,7 +171,7 @@ public class Shroomworld : Game {
         //_checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
     }
     private void CreateWorld(GameTime gameTime) {
-        MapGenerator mapGenerator = new(100, 100, 5);
+        MapGenerator mapGenerator = new(100, 100, 5, 69_420);
         _world = new World(mapGenerator.Generate()/*, s_playerTypes[0].CreateNew()*/);
         SetStateToStage();
     }
