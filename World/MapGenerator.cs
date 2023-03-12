@@ -21,7 +21,6 @@ namespace Shroomworld {
         private readonly int[] _surfaceHeights; // stores top of terrain at each x
         
         private readonly int _seed;
-        private readonly int _perlinConstant = 33; // how smooth or 'janky' the terrain looks
         private readonly int _numberOfBiomes;
         private readonly int[] _layerWidths = { 1, 0, 0 };
 
@@ -72,11 +71,12 @@ namespace Shroomworld {
 		
 		// Generate surface
         private void GenerateSurfaceTerrain() {
-            _surfaceWaveHeight = _height * _surfacePercent / 100;
-            int y;
             Perlin perlin = new Perlin();
+            int PerlinConstant = 33;
+            int y;
+            _surfaceWaveHeight = _height * _surfacePercent / 100;
             for (int x = 0; x < _width; x++) {
-                y = _topOffset + (int)(perlin.OctavePerlin((double)x / _perlinConstant, (double)_surfaceWaveHeight/ _perlinConstant, z: 1d / _perlinConstant, octaves: 3, persistence: 3) * _surfaceWaveHeight);
+                y = _topOffset + (int)(perlin.OctavePerlin((double)x / PerlinConstant, (double)_surfaceWaveHeight/ PerlinConstant, z: 1d / PerlinConstant, octaves: 3, persistence: 3) * _surfaceWaveHeight);
                 _surfaceHeights[x] = y;
                 _groundMap[x, y] = Ground;
             }
