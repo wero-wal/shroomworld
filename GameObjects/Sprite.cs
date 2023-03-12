@@ -45,7 +45,6 @@ public class Sprite {
         _draw(_texture, _position, colour);
     }
     public void SetPosition(Vector2 position) {
-        _position.X = Math.Clamp(position.X, Shroomworld.TopLeftOfScreen.X, Shroomworld.BottomRightOfScreen.X);
-        _position.Y = Math.Clamp(position.Y, Shroomworld.TopLeftOfScreen.Y, Shroomworld.BottomRightOfScreen.Y);
+        Shroomworld.ClampToScreen(position);
     }
 }

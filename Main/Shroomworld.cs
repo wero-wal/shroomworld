@@ -8,6 +8,14 @@ using Shroomworld.FileHandling;
 namespace Shroomworld;
 public class Shroomworld : Game {
 
+    // ----- Enums -----
+    public enum GameState {
+        CreatingWorld,
+        Playing,
+        Menu,
+        Error,
+    }
+
     // ----- Properties -----
     public static Dictionary<int, TileType> TileTypes => s_tileTypes;
     public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
@@ -15,65 +23,50 @@ public class Shroomworld : Game {
     public static Dictionary<int, FriendlyType> NpcTypes => s_friendlyTypes;
     public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
-    public static SpriteBatch SpriteBatch => s_spriteBatch;
-    public static int TileSize => s_tileSize;
-
-    public static Vector2 TopLeftOfScreen => _topLeftOfScreen;
-    public static Vector2 BottomRightOfScreen => _bottomRightOfScreen;
-
-    public static GraphicsDeviceManager GraphicsDeviceManager => s_graphics;
     public static ContentManager ContentManager => s_contentManager;
+    public static IDisplayHandler DisplayHandler => s_displayHandler;
 
 
     // ----- Fields -----
-    private const int PixelsPerTile = 8;
 
-    private static Vector2 _topLeftOfScreen;
-    private static Vector2 _bottomRightOfScreen;
-
-    //public static User CurrentUser;
-
+    // Dictionaries:
     private static Dictionary<int, ItemType> s_itemTypes;
     private static Dictionary<int, TileType> s_tileTypes;
     private static Dictionary<int, BiomeType> s_biomeTypes;
     private static Dictionary<int, FriendlyType> s_friendlyTypes;
     private static Dictionary<int, PlayerType> s_playerTypes;
 
-    // Number of default tile types.
-    private static int s_defaultTileTypeCount;
-    private static readonly int s_tileSize = 20;
-
-    private static ContentManager s_contentManager;
+    private static readonly int s_defaultTileTypeCount; // Number of default tile types.
     
-    private static GraphicsDeviceManager s_graphics;
-    private static SpriteBatch s_spriteBatch;
-    // subscribe enemy Npcs to this
-    private event Action _checkForAttacks;
+    // Monogame:
+    private static ContentManager s_contentManager;
+    private static IDisplayHandler s_displayHandler;
+    private GraphicsDeviceManager _graphicsDeviceManager;
 
-    /* The method to call in the main Update method. I have opted for this instead of a GameState
-        enum and if statements in the Update function because it uses less processing time. */
-    private Action<GameTime> _updateCurrentState;
-    private Action _drawCurrentState;
+    // State management:
+    private GameState _currentGameState;
     private Stack<Menu> _activeMenus;
-    private Menu _currentMenu => _activeMenus.Peek();
+    private event Action _checkForAttacks; // Subscribe enemy Npcs to this.
+    private string _errorMessage;
 
-
+    // Gameplay:
+    //public static User CurrentUser;
     private World _world;
     private KeyBinds _menuKeyBinds;
     private KeyBinds _inventoryKeyBinds;
     private KeyBinds _friendlyInteractionKeyBinds;
     
     private class Menus {
-        public Menu MainMenu;
-        public Menu PauseMenu;
-        public Menu StatisticsMenu;
+        public static Menu MainMenu;
+        public static Menu PauseMenu;
+        public static Menu StatisticsMenu;
         // Todo: add the rest
     }
 
 
     // ----- Constructors -----
     public Shroomworld() {
-        s_graphics = new GraphicsDeviceManager(this);
+        _graphicsDeviceManager = new GraphicsDeviceManager(this);
         s_contentManager = Content;
         s_contentManager.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -83,20 +76,19 @@ public class Shroomworld : Game {
     // ----- Methods -----
     // Prepare
     protected override void Initialize() {
-        // TODO: Add your initialization logic here
-        SetStateToCreatingWorld();
-        World.SetDrawFunction(Draw);
-        Window.AllowUserResizing = true;
-        //_updateCurrentState = UpdateMenu;
-        //_activeMenus = new Stack<Menu> { Menus.MainMenu };
+        // Set up display.
+        s_displayHandler = new DisplayHandler(this, _graphicsDeviceManager);
+        s_displayHandler.SetTitle("Shroomworld");
+
+        // Set up menus.
+        _currentGameState = GameState.Menu;
+        _activeMenus = new Stack<Menu>();
+
         base.Initialize();
     }
     
     // Loading
     protected override void LoadContent() {
-        s_spriteBatch = new SpriteBatch(GraphicsDevice);
-        s_contentManager.RootDirectory = "Content";
-
         if (!FileManager.TryLoadFilePaths()) {
             SetStateToError("Couldn't load file paths.");
             return;
@@ -132,48 +124,41 @@ public class Shroomworld : Game {
     /*private void CreateMenus() {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
     }*/
-    private void SetKeyBinds() {
-        _world.SetKeyBinds();
-    }
-    
-    // Update cycle
+    private Menu GetCurrentMenu => _activeMenus.Peek();
+
     protected override void Update(GameTime gameTime) {
-        _updateCurrentState(gameTime);
-        //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-        //    Exit();
+        switch (_currentGameState) {
 
-        // TODO: Add your update logic here
+            case GameState.CreatingWorld:
+                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate()/*, s_playerTypes[0].CreateNew()*/);
+                _currentGameState = GameState.Playing;
+                break;
 
+            case GameState.Playing:
+                _world.Update();
+                break;
+
+            case GameState.Menu:
+                _currentGameState = GameState.CreatingWorld;
+                // TODO: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
+                break;
+
+            case GameState.Error:
+                break;
+
+            default:
+                SetStateToError("Unknown gamestate.");
+                break;
+        }
         base.Update(gameTime);
     }
-    private void SetStateToCreatingWorld() {
-        _updateCurrentState = CreateWorld;
-        _drawCurrentState = DrawCreatingWorld;
-    }
-    private void SetStateToStage() {
-        _updateCurrentState = UpdateStage;
-        _drawCurrentState = _world.Draw;
+    private void SetStateToError(string errorMessage) {
+        _errorMessage = errorMessage;
+        _currentGameState = GameState.Error;
     }
     private void SetStateToMenu(Menu menu) {
         OpenMenu(menu);
-        _updateCurrentState = UpdateMenu;
-    }
-    private void SetStateToError(string message = "An error has occured.") {
-        _updateCurrentState = UpdateError;
-        _drawCurrentState = DrawError;
-    }
-    private void DrawError() {
-        GraphicsDevice.Clear(Color.Red);
-        // todo: display error message
-    }
-    private void UpdateError(GameTime gameTime) { }
-    private void UpdateStage(GameTime gameTime) {
-        //_checkForAttacks?.Invoke(); // all subcribed npcs will now attempt to initiate an attack
-    }
-    private void CreateWorld(GameTime gameTime) {
-        MapGenerator mapGenerator = new(100, 100, 5, 69_420);
-        _world = new World(mapGenerator.Generate()/*, s_playerTypes[0].CreateNew()*/);
-        SetStateToStage();
+        _currentGameState = GameState.Menu;
     }
     //// Gameplay
     ///// <summary>
@@ -205,9 +190,6 @@ public class Shroomworld : Game {
     }*/
 
     // Menu
-    private void UpdateMenu(GameTime gameTime) {
-        // todo: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
-    }
     /// <summary>
     /// Adds <paramref name="menu"/> to the stack (<see cref="_activeMenus"/>).
     /// </summary>
@@ -229,75 +211,51 @@ public class Shroomworld : Game {
         
         // If there are no more open menus, go back to playing the game
         if (_activeMenus.Count == 0) {
-            SetStateToStage();
+            _currentGameState = GameState.Playing;
         }
         // (else: go back to previous menu)
 
         return true; // the current menu was closed successfully
     }
     
-    // Saving
-    /// <summary>
-    /// idk
-    /// </summary>
-    private void SaveSettings() {
-        // Save user settings
-    }
-    /// <summary>
-    /// save a world
-    /// </summary>
-    private void SaveWorld() {
-        // Save world
-    }
-
     // Drawing
     protected override void Draw(GameTime gameTime) {
+        s_displayHandler.Begin();
 
-        s_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        _drawCurrentState();
-        s_spriteBatch.End();
+        switch (_currentGameState) {
+            case GameState.CreatingWorld:
+                s_displayHandler.SetBackground(Color.Green);
+                s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
+                break;
 
+            case GameState.Playing:
+                _world.Draw();
+                break;
+
+            case GameState.Menu:
+                s_displayHandler.SetBackground(Color.White);
+                s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
+                break;
+
+            case GameState.Error:
+                string errorMsg = "An error has occured";
+                s_displayHandler.SetBackground(Color.Red);
+                s_displayHandler.DrawText(errorMsg, Vector2.Zero, Color.White);
+                break;
+
+            default:
+                break;
+        }
+        s_displayHandler.End();
         base.Draw(gameTime);
     }
-    private void DrawCreatingWorld() {
-        s_graphics.GraphicsDevice.Clear(Color.Green);
-    }
-    /// <summary>
-    /// Displays a texture on the screen based on a position in the tile map.
-    /// </summary>
-    /// <param name="texture">texture of the tile</param>
-    /// <param name="x">x-coordinate of the object in the tile map</param>
-    /// <param name="y">y-coordinate of the object in the tile map</param>
-    private void Draw(Texture2D texture, int x, int y) {
-        //s_spriteBatch.Draw(texture, new Vector2(100f), null, Color.White, 0f, new Vector2(texture.Height / 2, texture.Width / 2), 10f, SpriteEffects.None, 0f);
-        s_spriteBatch.Draw(texture, new Rectangle(x * s_tileSize, y * s_tileSize * texture.Height / PixelsPerTile, s_tileSize, s_tileSize * texture.Height / PixelsPerTile), Color.White);
-    }
-    /// <summary>
-    /// Display a texture on the screen at a given position.
-    /// </summary>
-    /// <param name="texture">The texture to be displayed.</param>
-    /// <param name="position">The position (destination coordinates) in pixels,
-    /// of the top left corner of the texture when it is displayed on-screen.</param>
-    private void Draw(Texture2D texture, Vector2 position) {
-        s_spriteBatch.Draw(texture, position, Color.White);
-    }
-    /// <summary>
-    /// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
-    /// </summary>
-    /// <param name="sprite">The sprite to be displayed.</param>
-    private void Draw(Sprite sprite) {
-        s_spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
-    }
-
     //
     public static Vector2 ClampToScreen(float x, float y) {
-        x = Math.Clamp(x, Shroomworld.TopLeftOfScreen.X, Shroomworld.BottomRightOfScreen.X);
-        y = Math.Clamp(y, Shroomworld.TopLeftOfScreen.Y, Shroomworld.BottomRightOfScreen.Y);
+        x = Math.Clamp(x, DisplayHandler.TopLeftOfScreen.X, DisplayHandler.BottomRightOfScreen.X);
+        y = Math.Clamp(y, DisplayHandler.TopLeftOfScreen.Y, DisplayHandler.BottomRightOfScreen.Y);
         return new Vector2(x, y);
     }
     public static Vector2 ClampToScreen(Vector2 vector) {
-        var x = Math.Clamp(vector.X, Shroomworld.TopLeftOfScreen.X, Shroomworld.BottomRightOfScreen.X);
-        var y = Math.Clamp(vector.Y, Shroomworld.TopLeftOfScreen.Y, Shroomworld.BottomRightOfScreen.Y);
-        return new Vector2(x, y);
+        return ClampToScreen(vector.X, vector.Y);
     }
 }

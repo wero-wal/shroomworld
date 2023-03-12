@@ -38,6 +38,9 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
+    public static implicit operator TileType(int id) {
+        return Shroomworld.TileTypes[id];
+    }
     public InventoryItem[] GetDrops()
     {
         if (!_drops.TryGetValue(out Drop[] drops)) {

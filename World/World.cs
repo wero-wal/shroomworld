@@ -23,13 +23,8 @@ public class World {
     private readonly Player _player;
     private KeyBinds _keyBinds;
 
-    private static Action<Texture2D, int, int> _drawTile;
-    
     
     // ----- Constructors -----
-    public static void SetDrawFunction(Action<Texture2D, int, int> drawTile) {
-        _drawTile = drawTile;
-    }
     /// <summary>
     /// Create a new world.
     /// </summary>
@@ -38,6 +33,7 @@ public class World {
         _player = player;
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
+        SetKeyBinds();
     }
     /// <summary>
     /// Instantiate a saved / existing world.
@@ -50,18 +46,18 @@ public class World {
     }
 
     // ----- Methods -----
-    public void Update(GameTime gameTime) {
-        _keyBinds.ProcessInputs(Input.GetInputs());
+    public void Update() {
+        //_keyBinds.ProcessInputs(Input.GetInputs());
     }
     public void Draw() {
-        Shroomworld.GraphicsDeviceManager.GraphicsDevice.Clear(Color.CornflowerBlue);
+        Shroomworld.DisplayHandler.SetBackground(Color.CornflowerBlue);
 
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                _drawTile(Shroomworld.TileTypes[_map[x, y]].Texture, x, y);
+                Shroomworld.DisplayHandler.Draw(((TileType)_map[x, y]).Texture, x, y);
             }
         }
     }
