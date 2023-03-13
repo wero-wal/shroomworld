@@ -113,7 +113,7 @@ public static class FilePaths {
         s_menuText = paths[p++];
 
         // Types
-        s_types = new Dictionary<Elements, string>(s_textureElements.Length);
+        s_types = new Dictionary<Elements, string>(s_typeElements.Length);
         for (int i = 0; i < s_typeElements.Length; i++) {
             s_types.Add(s_typeElements[i], paths[p++]);
         }
