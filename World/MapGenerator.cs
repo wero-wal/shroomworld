@@ -6,11 +6,12 @@ namespace Shroomworld {
         private const bool Ground = true;
         private const bool Air = false;
 
-        private readonly int _topOffset = 5; // (min) number of empty tiles at the top of the map
+        private readonly int _minCaveDepth = 5;
+        private readonly int _topOffset = 0; // (min) number of empty tiles at the top of the map
         private readonly int _numberOfTilesAtBottom = 1; // (min) number of solid tiles at the bottom of the map
-        private readonly int _surfacePercent = 25; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
+        private readonly int _surfacePercent = 27; // percentage of the map (vertically) that makes up the surface (height of the perlin wave)
         private readonly int _smoothAmount = 2; // how many times to smooth the cave
-    	private readonly int _randomFillPercent = 53; // what % of the underground will be ground (the rest will be air)
+    	private readonly int _randomFillPercent = 54; // what % of the underground will be ground (the rest will be air)
 
         private readonly int[,] _tiles;
 		private readonly BiomeDictionary _biomes;
@@ -54,7 +55,9 @@ namespace Shroomworld {
         public Map Generate() {
             // Main terrain generation
             GenerateSurfaceTerrain();
+            FillWithGround();
             GenerateCaves();
+            SmoothCaves();
 
             // Adding variation
             SetBiomes();
@@ -87,18 +90,25 @@ namespace Shroomworld {
         /// 
         /// </summary>
         /// <param name="smoothAmount">How many times to smooth the caves. Smaller amount = bigger caves + vice versa.</param>
-        private void GenerateCaves() {
-            GenerateNoise();
+        private void SmoothCaves() {
             for (int i = 0; i < _smoothAmount; i++) {
                 SmoothMap();
             }
         }
 
-        private void GenerateNoise() {
+        private void GenerateCaves() {
             for (int x = 0; x < _width; x++) {
                 // Go from the surface to the bottom of the map.
-                for (int y = _surfaceHeights[x] + 1; y < (_height - _numberOfTilesAtBottom); y++) {
+                for (int y = _surfaceHeights[x] + _minCaveDepth; y < (_height - _numberOfTilesAtBottom); y++) {
                     _groundMap[x, y] = (RandomPercentage() < _randomFillPercent) ? Ground : Air;
+                }
+            }
+        }
+
+        private void FillWithGround() {
+            for (int x = 0; x < _width; x++) {
+                for (int y = _surfaceHeights[x] + 1; y < (_height - _numberOfTilesAtBottom); y++) {
+                    _groundMap[x, y] = Ground;
                 }
             }
         }
@@ -109,7 +119,7 @@ namespace Shroomworld {
             int surroundingGroundCount;
 
 			for (int x = 0; x < _width; x++) {
-				for (int y = _surfaceHeights[x] + 1; y < _height; y++) {
+				for (int y = _surfaceHeights[x] + _minCaveDepth; y < _height; y++) {
 					// Create border on the edges.
 					if ((x == 0) || (x == (_width - 1)) || (y >= (_height - _numberOfTilesAtBottom))) {
 						_groundMap[x, y] = Ground;
@@ -218,12 +228,13 @@ namespace Shroomworld {
                 y = _surfaceHeights[x] - 1;
                 if ((RandomPercentage() < _biomes[x].FlowerAmount) // chance to plant flower
                 && (_tiles[x, y] != TileType.WaterId)) { // flowers can't be planted in water
-                    _tiles[x, y] = RandomFrom(_biomes[x].FlowerTypes); // place random type of flower
+                    // Place random type of flower.
+                    _tiles[x, y] = RandomFrom(_biomes[x].FlowerTypes);
                 }
             }
         }
         private void AddTrees() {
-            const int ChanceToReplaceFlower = 25;
+            const int ChanceToReplaceFlower = 100;
             int y;
             // Iterate over the surface of the map.
             for (int x = 0; x < _width; x++) {
@@ -233,6 +244,7 @@ namespace Shroomworld {
                 && (_tiles[x, y] != TileType.WaterId) // trees can't be planted in water
                 && ((_tiles[x, y] == TileType.AirId) // will always replace air
                 || (RandomPercentage() < ChanceToReplaceFlower))) { // will sometimes replace flower
+                    // Place tree.
                     _tiles[x, y] = _biomes[x].TreeType;
                 }
             }
