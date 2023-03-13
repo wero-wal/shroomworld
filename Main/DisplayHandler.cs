@@ -40,8 +40,16 @@ public class DisplayHandler : IDisplayHandler {
     public void End() {
         _spriteBatch.End();
     }
+    /// <summary>
+    /// Main drawing method.
+    /// </summary>
+    /// <param name="texture"></param>
+    /// <param name="position">scaled-up on-screen position</param>
+    /// <param name="colour"></param>
     public void Draw(Texture2D texture, Vector2 position, Color colour) {
-		_spriteBatch.Draw(texture, position, colour);
+		_spriteBatch.Draw(texture,
+            destinationRectangle: new Rectangle((int)position.X, (int)position.Y, TileSize, TileSize * GetHeightInTiles(texture)),
+            colour);
     }
     /// <summary>
     /// Displays a texture on the screen based on a position in the tile map.
@@ -56,21 +64,24 @@ public class DisplayHandler : IDisplayHandler {
     /// <param name="position">The position (destination coordinates) in pixels,
     /// of the top left corner of the texture when it is displayed on-screen.</param>
     public void Draw(Texture2D texture, int x, int y) {
-        _spriteBatch.Draw(texture, new Rectangle(x * TileSize, (y - GetHeightInTiles(texture) + 1) * TileSize, TileSize, TileSize * texture.Height / PixelsPerTile), Color.White);
+        Draw(texture,
+            position: new Vector2(x * TileSize, (y - GetHeightInTiles(texture) + 1) * TileSize),
+            colour: Color.White);
     }
     public void DrawText(string text, Vector2 position, Color colour) {
 		// todo: draw text
 	}
 	public void DrawRectangle(Vector2 size, Vector2 position, Color colour) {
-		// todo: draw rectangle
+        Draw(BlankTexture, position, colour);
 	}
     /// <summary>
     /// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
     /// </summary>
     /// <param name="sprite">The sprite to be displayed.</param>
     public void Draw(Sprite sprite) {
-		_spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
+		Draw(sprite.Texture, sprite.Position, Color.White);
 	}
+    
     public int GetHeightInTiles(Texture2D texture) {
         return texture.Height / PixelsPerTile;
     }
