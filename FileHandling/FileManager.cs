@@ -110,7 +110,7 @@ public static class FileManager {
 		}
 		catch (Exception) {
 			// Return a default texture if it couldn't be loaded.
-			return Shroomworld.DisplayHandler.GetBlankTexture();
+			return Shroomworld.DisplayHandler.BlankTexture;
 		}
 	}
 	

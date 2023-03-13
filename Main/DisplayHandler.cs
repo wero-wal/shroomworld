@@ -4,11 +4,11 @@ namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
     // ----- Properties -----
-    public SpriteBatch SpriteBatch => _spriteBatch;
-    public Vector2 TopLeftOfScreen => _topLeftOfScreen;
-    public Vector2 BottomRightOfScreen => _bottomRightOfScreen;
-
     public GraphicsDeviceManager GraphicsDeviceManager => _graphicsDeviceManager;
+    public SpriteBatch SpriteBatch => _spriteBatch;
+    public Vector2 TopLeftOfScreen => new(_window.ClientBounds.Left, _window.ClientBounds.Top);
+    public Vector2 BottomRightOfScreen => new(_window.ClientBounds.Right, _window.ClientBounds.Bottom);
+    public Texture2D BlankTexture { get; private set; }
 
     // ----- Fields -----
     private const int PixelsPerTile = 8;
@@ -17,22 +17,20 @@ public class DisplayHandler : IDisplayHandler {
     private GraphicsDeviceManager _graphicsDeviceManager;
     private SpriteBatch _spriteBatch;
     private GameWindow _window;
-    private static Vector2 _topLeftOfScreen;
-    private static Vector2 _bottomRightOfScreen;
 
     // ----- Constructor -----
     public DisplayHandler(Game game, GraphicsDeviceManager graphicsDeviceManager) {
         _graphicsDeviceManager = graphicsDeviceManager;
         _spriteBatch = new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
-        // Increase window size.
+
+        // Configure window.
         _graphicsDeviceManager.PreferredBackBufferWidth = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Width;
         _graphicsDeviceManager.PreferredBackBufferHeight = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Height;
         _graphicsDeviceManager.ApplyChanges();
-
         _window = game.Window;
         _window.AllowUserResizing = true;
-        _topLeftOfScreen = Vector2.Zero;
-        _bottomRightOfScreen = new Vector2(_window.ClientBounds.Right, _window.ClientBounds.Bottom);
+
+        BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
     }
 
     // ----- Methods -----
@@ -58,7 +56,7 @@ public class DisplayHandler : IDisplayHandler {
     /// <param name="position">The position (destination coordinates) in pixels,
     /// of the top left corner of the texture when it is displayed on-screen.</param>
     public void Draw(Texture2D texture, int x, int y) {
-        _spriteBatch.Draw(texture, new Rectangle(x * TileSize, y * TileSize * texture.Height / PixelsPerTile, TileSize, TileSize * texture.Height / PixelsPerTile), Color.White);
+        _spriteBatch.Draw(texture, new Rectangle(x * TileSize, (y - GetHeightInTiles(texture) + 1) * TileSize, TileSize, TileSize * texture.Height / PixelsPerTile), Color.White);
     }
     public void DrawText(string text, Vector2 position, Color colour) {
 		// todo: draw text
@@ -73,8 +71,8 @@ public class DisplayHandler : IDisplayHandler {
     public void Draw(Sprite sprite) {
 		_spriteBatch.Draw(sprite.Texture, sprite.Position, Color.White);
 	}
-    public Texture2D GetBlankTexture() {
-        return new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
+    public int GetHeightInTiles(Texture2D texture) {
+        return texture.Height / PixelsPerTile;
     }
     public void SetBackground(Color colour) {
         _graphicsDeviceManager.GraphicsDevice.Clear(colour);
