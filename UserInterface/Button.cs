@@ -26,7 +26,7 @@ public class Button {
 	}
 
 	public void Draw(Color buttonColour, Color textColour) {
-		_sprite.Draw(buttonColour);
+		//_sprite.Draw(buttonColour);
 		_drawText(_text, _sprite.Position, textColour);
 	}
 	// public bool CheckIfPressed(MouseState mouseState)
