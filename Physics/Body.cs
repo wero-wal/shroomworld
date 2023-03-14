@@ -43,6 +43,10 @@ namespace Shroomworld.Physics {
 			else {
 				_velocity = newVelocity;
 			}
+			// Decelerate
+			if (_acceleration.Equals(Vector2.Zero)) {
+				_velocity *= 0.95f;
+			}
 			_sprite.SetPosition(_sprite.Position + _velocity);
 		}
 		/// <summary>
