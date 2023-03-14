@@ -25,10 +25,10 @@ public static class FileManager {
 	private static Dictionary<Type, Func<IdData, string[], IType>> s_parsers = new Dictionary<Type, Func<IdData, string[], IType>> {
 		{ typeof(ItemType), ParseItemType },
 		{ typeof(TileType), ParseTileType },
-		{ typeof(BiomeType), ParseBiomeType }/*,
+		{ typeof(BiomeType), ParseBiomeType },/*
 		{ typeof(EnemyType), ParseEnemyType },
-		{ typeof(FriendlyType), ParseFriendlyType },
-		{ typeof(PlayerType), ParsePlayerType }*/
+		{ typeof(FriendlyType), ParseFriendlyType },*/
+		{ typeof(PlayerType), ParsePlayerType }
 	};
 
 	// ----- Methods -----
@@ -184,8 +184,7 @@ public static class FileManager {
     //			attackData: ParseAttackData(plaintext[p++])
     //	);
     //}
-    private static PlayerType ParsePlayerType(IdData idData, string[] plaintext)
-    {
+    private static PlayerType ParsePlayerType(IdData idData, string[] plaintext) {
 		int p = 0;
     	return new PlayerType(
     		idData,
