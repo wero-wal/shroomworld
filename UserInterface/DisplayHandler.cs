@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace Shroomworld;
@@ -6,13 +8,11 @@ public class DisplayHandler : IDisplayHandler {
     // ----- Properties -----
     public GraphicsDeviceManager GraphicsDeviceManager => _graphicsDeviceManager;
     public SpriteBatch SpriteBatch => _spriteBatch;
-    public Vector2 TopLeftOfScreen => new(_window.ClientBounds.Left, _window.ClientBounds.Top);
-    public Vector2 BottomRightOfScreen => new(_window.ClientBounds.Right, _window.ClientBounds.Bottom);
     public Texture2D BlankTexture { get; private set; }
 
     // ----- Fields -----
-    private const int PixelsPerTile = 8;
-    private const int TileSize = 20;
+    private const int TileSize = 8; // Number of pixels per tile side length.
+    private const int ScaleFactor = 20;
 
     private GraphicsDeviceManager _graphicsDeviceManager;
     private SpriteBatch _spriteBatch;
@@ -48,7 +48,7 @@ public class DisplayHandler : IDisplayHandler {
     /// <param name="colour"></param>
     public void Draw(Texture2D texture, Vector2 position, Color colour) {
 		_spriteBatch.Draw(texture,
-            destinationRectangle: new Rectangle((int)position.X, (int)position.Y, TileSize, TileSize * GetHeightInTiles(texture)),
+            destinationRectangle: new Rectangle((int)position.X, (int)position.Y, ScaleFactor, ScaleFactor * GetHeightInTiles(texture)),
             colour);
     }
     /// <summary>
@@ -65,7 +65,7 @@ public class DisplayHandler : IDisplayHandler {
     /// of the top left corner of the texture when it is displayed on-screen.</param>
     public void Draw(Texture2D texture, int x, int y) {
         Draw(texture,
-            position: new Vector2(x * TileSize, (y - GetHeightInTiles(texture) + 1) * TileSize),
+            position: new Vector2(x * ScaleFactor, (y - GetHeightInTiles(texture) + 1) * ScaleFactor),
             colour: Color.White);
     }
     public void DrawText(string text, Vector2 position, Color colour) {
@@ -81,10 +81,18 @@ public class DisplayHandler : IDisplayHandler {
     public void Draw(Sprite sprite) {
 		Draw(sprite.Texture, sprite.Position, Color.White);
 	}
-    
-    public int GetHeightInTiles(Texture2D texture) {
-        return texture.Height / PixelsPerTile;
+
+    public Vector2 ClampToScreen(Rectangle hitbox) {
+        return new Vector2(
+            x: Math.Clamp(hitbox.X, _window.ClientBounds.Left, _window.ClientBounds.Right - hitbox.Width),
+            y: Math.Clamp(hitbox.Y, _window.ClientBounds.Top, _window.ClientBounds.Right - hitbox.Height)
+        );
     }
+
+    public int GetHeightInTiles(Texture2D texture) {
+        return texture.Height / TileSize;
+    }
+
     public void SetBackground(Color colour) {
         _graphicsDeviceManager.GraphicsDevice.Clear(colour);
 	}
