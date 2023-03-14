@@ -47,7 +47,7 @@ public class World {
 
     // ----- Methods -----
     public void Update() {
-        //_keyBinds.ProcessInputs(Input.GetInputs());
+        _keyBinds.ProcessInputs(Input.CurrentInputs);
     }
     public void Draw() {
         Shroomworld.DisplayHandler.SetBackground(Color.CornflowerBlue);
@@ -61,7 +61,7 @@ public class World {
             }
         }
     }
-    public void SetKeyBinds() {
+    private void SetKeyBinds() {
         _keyBinds = new KeyBinds();
         _keyBinds.Add(Input.Inputs.W, PlayerJump);
         _keyBinds.Add(Input.Inputs.A, PlayerMoveLeft);
