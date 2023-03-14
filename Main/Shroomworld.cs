@@ -83,6 +83,8 @@ public class Shroomworld : Game {
         _currentGameState = GameState.Menu;
         _activeMenus = new Stack<Menu>();
 
+        Input.Initialise();
+
         base.Initialize();
     }
     
@@ -126,6 +128,7 @@ public class Shroomworld : Game {
     private Menu GetCurrentMenu => _activeMenus.Peek();
 
     protected override void Update(GameTime gameTime) {
+        Input.Update();
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
