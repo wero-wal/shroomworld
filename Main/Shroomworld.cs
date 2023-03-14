@@ -132,7 +132,7 @@ public class Shroomworld : Game {
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
-                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate()/*, s_playerTypes[0].CreateNew()*/);
+                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate(), s_playerTypes[0].CreateNew());
                 _currentGameState = GameState.Playing;
                 break;
 
