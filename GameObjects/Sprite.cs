@@ -9,42 +9,27 @@ public class Sprite {
     public Texture2D Texture => _texture;
     public Color Colour => _colour;
     public Vector2 Position => _position;
-    public Vector2 Size => _size;
-    public Vertices Vertices => _vertices;
+    public Rectangle Hitbox => _hitbox;
 
     // ----- Fields -----
-    private static Action<Texture2D, Vector2, Color> _draw;
-
     private readonly Texture2D _texture;
-    private readonly Vector2 _size;
     private readonly Color _colour;
-    private readonly Vertices _vertices;
+    private Rectangle _hitbox;
     private Vector2 _position;
 
     // ----- Constructors -----
     public Sprite(Texture2D texture) {
         _texture = texture;
-        _size = new Vector2(_texture.Width, _texture.Height);
+        _hitbox = new Rectangle(Point.Zero, new Point(texture.Width, texture.Height));
     }
 
     // ----- Methods -----
-    public static void InjectDependencies(Action<Texture2D, Vector2, Color> drawFunction) {
-        _draw = drawFunction;
-    }
-
-    public void UpdateVertices() {
-        _vertices.Update(_position, _size);
-    }
-    public void Draw() {
-        _draw(_texture, _position, _colour);
-    }
-    public void Draw(Vector2 position) {
-        _draw(_texture, position, _colour);
-    }
-    public void Draw(Color colour) {
-        _draw(_texture, _position, colour);
-    }
     public void SetPosition(Vector2 position) {
-        Shroomworld.ClampToScreen(position);
+        UpdateHitbox(position);
+        _position = Shroomworld.DisplayHandler.ClampToScreen(_hitbox);
+    }
+    private void UpdateHitbox(Vector2 position) {
+        _hitbox.X = (int) position.X;
+        _hitbox.Y = (int) position.Y;
     }
 }

@@ -47,7 +47,9 @@ public class World {
 
     // ----- Methods -----
     public void Update() {
-        //_keyBinds.ProcessInputs(Input.GetInputs());
+        _keyBinds.ProcessInputs(Input.CurrentInputs);
+        _player.Body.ApplyPhysics();
+        _player.Body.ResetAcceleration();
     }
     public void Draw() {
         Shroomworld.DisplayHandler.SetBackground(Color.CornflowerBlue);
@@ -60,13 +62,16 @@ public class World {
                 Shroomworld.DisplayHandler.Draw(((TileType)_map[x, y]).Texture, x, y);
             }
         }
+
+        Shroomworld.DisplayHandler.Draw(_player.Sprite);
     }
-    public void SetKeyBinds() {
+    private void SetKeyBinds() {
         _keyBinds = new KeyBinds();
         _keyBinds.Add(Input.Inputs.W, PlayerJump);
         _keyBinds.Add(Input.Inputs.A, PlayerMoveLeft);
         _keyBinds.Add(Input.Inputs.D, PlayerMoveRight);
         _keyBinds.Add(Input.Inputs.Space, PlayerJump);
+        _keyBinds.Add(Input.Inputs.S, PlayerMoveDown);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
         _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
         _keyBinds.Add(Input.Inputs.E, OpenInventory);
@@ -83,5 +88,8 @@ public class World {
     }
     private void PlayerMoveRight() {
         _player.Body.AddAcceleration(Vector2.UnitX);
+    }
+    private void PlayerMoveDown() {
+        _player.Body.AddAcceleration(Vector2.UnitY);
     }
 }

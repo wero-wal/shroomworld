@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -7,20 +8,24 @@ namespace Shroomworld;
 public static class Input {
 
     // ----- Enums -----
+    [DefaultValue(None)]
     public enum Inputs {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         N0, N1, N2, N3, N4, N5, N6, N7, N8, N9,
         Escape, Enter, Space,
         RightArrow, LeftArrow, UpArrow, DownArrow,
-        LeftMouseButtonDown, RightMouseButtonDown,
+        LeftMouseButton, RightMouseButton,
         None
     }
 
+    // ----- Properties -----
+    public static List<Inputs> CurrentInputs => _currentInputs;
+
     // ----- Fields -----
-    private static MouseState _currentMouseState;
-    private static MouseState _previousMouseState;
-    private static KeyboardState _currentKeyboardState;
-    private static KeyboardState _previousKeyboardState;
+    private static MouseState _mouseState;
+    private static KeyboardState _keyboardState;
+    private static List<Inputs> _currentInputs;
+    private static List<Inputs> _previousInputs;
 
     private static Dictionary<Keys, Inputs> _miscKeysToInputs = new() {
         { Keys.Escape, Inputs.Escape },
@@ -34,41 +39,43 @@ public static class Input {
 
 
     // ----- Methods -----
-    public static Vector2 GetMousePosition() {
-        return _currentMouseState.Position.ToVector2();
+    public static void Initialise() {
+        _currentInputs = new List<Inputs>(capacity: (int)Inputs.None);
     }
-    public static Inputs[] GetInputs() {
-        List<Inputs> inputs = new(capacity: (int) Inputs.None);
-        Inputs key;
+    public static void Update() {
+        _mouseState = Mouse.GetState();
+        _keyboardState = Keyboard.GetState();
+        _previousInputs = _currentInputs;
+        // Update current inputs.
+        ExtractInputsFromStates();
+    }
+    public static bool HasBeenReleased(Inputs input) {
+        return _currentInputs.Contains(input)
+        && (!_previousInputs.Contains(input));
+    }
+    public static Vector2 GetMousePosition() {
+        return _mouseState.Position.ToVector2();
+    }
+
+    private static void ExtractInputsFromStates() {
+        _currentInputs.Clear();
 
         // Convert key presses to Inputs.
-        foreach (Keys pressedKey in _currentKeyboardState.GetPressedKeys()) {
-            key = pressedKey.ToInputs();
-            if (key != Inputs.None) {
-                inputs.Add(key);
+        Inputs input;
+        foreach (Keys key in _keyboardState.GetPressedKeys()) {
+            input = key.ToInputs();
+            if (input != Inputs.None) {
+                _currentInputs.Add(input);
             }
         }
         // Convert mouse button presses to Inputs.
-        if (_currentMouseState.LeftButton.HasFlag(ButtonState.Pressed)) {
-            inputs.Add(Inputs.LeftMouseButtonDown);
+        if (_mouseState.LeftButton.HasFlag(ButtonState.Pressed)) {
+            _currentInputs.Add(Inputs.LeftMouseButton);
         }
-        if (_currentMouseState.RightButton.HasFlag(ButtonState.Pressed)) {
-            inputs.Add(Inputs.RightMouseButtonDown);
+        if (_mouseState.RightButton.HasFlag(ButtonState.Pressed)) {
+            _currentInputs.Add(Inputs.RightMouseButton);
         }
-
-        return inputs.ToArray();
     }
-    public static void Update() {
-        _previousMouseState = _currentMouseState;
-        _previousKeyboardState = _currentKeyboardState;
-        _currentMouseState = Mouse.GetState();
-        _currentKeyboardState = Keyboard.GetState();
-    }
-    public static bool LeftMouseButtonHasBeenReleased() {
-        return _currentMouseState.LeftButton.HasFlag(ButtonState.Released)
-            && _previousMouseState.LeftButton.HasFlag(ButtonState.Pressed);
-    }
-
     private static Inputs ToInputs(this Keys key) {
         // Letters
         if ((key >= Keys.A) && (key <= Keys.Z)) {

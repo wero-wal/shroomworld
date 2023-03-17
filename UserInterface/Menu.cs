@@ -62,7 +62,7 @@ namespace Shroomworld
         /// </summary>
         public void DisplayMenu()
         {
-            _background.Draw();
+            //_background.Draw();
             for(int i = 0; i < _items.Length; i++)
             {
                 _items[i].Draw(_buttonColour, _textColour);
@@ -88,7 +88,7 @@ namespace Shroomworld
                 // Update user inputs
                 indexOfPreviouslyHighlightedButton = indexOfHighlightedButton;
 
-                mouseHasBeenReleased = Input.LeftMouseButtonHasBeenReleased();
+                mouseHasBeenReleased = Input.HasBeenReleased(Input.Inputs.LeftMouseButton);
 
                 indexOfHighlightedButton = GetIndexOfButtonContainingMouse(Input.GetMousePosition());
                 mouseIsOnAButton = indexOfHighlightedButton != DefaultIndexValue;

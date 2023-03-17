@@ -2,8 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace Shroomworld;
 public interface IDisplayHandler {
-	Vector2 TopLeftOfScreen { get; }
-	Vector2 BottomRightOfScreen { get; }
 	Texture2D BlankTexture { get; }
 
 	void Begin();
@@ -13,6 +11,8 @@ public interface IDisplayHandler {
 	void Draw(Texture2D texture, Vector2 position, Color colour);
 	void Draw(Sprite sprite);
 	void Draw(Texture2D texture, int x, int y);
+
+	Vector2 ClampToScreen(Rectangle hitbox);
 
 	int GetHeightInTiles(Texture2D texture);
 

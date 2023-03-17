@@ -8,7 +8,7 @@ public class Physics {
 		depth = 1;
 		return false;
 	}
-	private static bool CheckUsingSepAxisTheorem(Vertices a, Vertices b, out Vector2 direction, out float depth)
+	private static bool CheckUsingSepAxisTheorem(Rectangle a, Rectangle b, out Vector2 direction, out float depth)
 	{
 		// todo: paste code here
 		direction = Vector2.Zero;

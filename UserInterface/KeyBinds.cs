@@ -19,9 +19,9 @@ public class KeyBinds {
     /// <summary>
     /// Execute the functions bound to the active inputs.
     /// </summary>
-    public void ProcessInputs(Input.Inputs[] inputs) {
+    public void ProcessInputs(IEnumerable<Input.Inputs> inputs) {
         foreach (Input.Inputs input in inputs) {
-            _bindings[input]();
+            _bindings[input].Invoke();
         }
     }
     /// <summary>

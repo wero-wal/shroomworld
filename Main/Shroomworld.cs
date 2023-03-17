@@ -83,6 +83,9 @@ public class Shroomworld : Game {
         _currentGameState = GameState.Menu;
         _activeMenus = new Stack<Menu>();
 
+        Input.Initialise();
+        PhysicsData.SetAcceleration(0.2f);
+
         base.Initialize();
     }
     
@@ -106,8 +109,8 @@ public class Shroomworld : Game {
         && FileManager.LoadTypes<TileType>().TryGetValue(out s_tileTypes)
         && FileManager.LoadTypes<BiomeType>().TryGetValue(out s_biomeTypes)/*
         && FileManager.LoadTypes<EnemyType>().TryGetValue(out _enemyTypes)
-        && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)
-        && FileManager.LoadTypes<PlayerType>().TryGetValue(out _playerTypes)*/)) {
+        && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)*/
+        && FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes))) {
             return false;
         }
 
@@ -126,10 +129,11 @@ public class Shroomworld : Game {
     private Menu GetCurrentMenu => _activeMenus.Peek();
 
     protected override void Update(GameTime gameTime) {
+        Input.Update();
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
-                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate()/*, s_playerTypes[0].CreateNew()*/);
+                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate(), s_playerTypes[0].CreateNew());
                 _currentGameState = GameState.Playing;
                 break;
 
@@ -247,14 +251,5 @@ public class Shroomworld : Game {
         }
         s_displayHandler.End();
         base.Draw(gameTime);
-    }
-    //
-    public static Vector2 ClampToScreen(float x, float y) {
-        x = Math.Clamp(x, DisplayHandler.TopLeftOfScreen.X, DisplayHandler.BottomRightOfScreen.X);
-        y = Math.Clamp(y, DisplayHandler.TopLeftOfScreen.Y, DisplayHandler.BottomRightOfScreen.Y);
-        return new Vector2(x, y);
-    }
-    public static Vector2 ClampToScreen(Vector2 vector) {
-        return ClampToScreen(vector.X, vector.Y);
     }
 }

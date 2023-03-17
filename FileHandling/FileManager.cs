@@ -25,10 +25,10 @@ public static class FileManager {
 	private static Dictionary<Type, Func<IdData, string[], IType>> s_parsers = new Dictionary<Type, Func<IdData, string[], IType>> {
 		{ typeof(ItemType), ParseItemType },
 		{ typeof(TileType), ParseTileType },
-		{ typeof(BiomeType), ParseBiomeType }/*,
+		{ typeof(BiomeType), ParseBiomeType },/*
 		{ typeof(EnemyType), ParseEnemyType },
-		{ typeof(FriendlyType), ParseFriendlyType },
-		{ typeof(PlayerType), ParsePlayerType }*/
+		{ typeof(FriendlyType), ParseFriendlyType },*/
+		{ typeof(PlayerType), ParsePlayerType }
 	};
 
 	// ----- Methods -----
@@ -184,12 +184,15 @@ public static class FileManager {
     //			attackData: ParseAttackData(plaintext[p++])
     //	);
     //}
-    //private static PlayerType ParsePlayerType(IdData idData, string[] plaintext)
-    //{
-    //	return new PlayerType(
-    //		// todo: add parameters in LoadPlayerTypes()
-    //		);
-    //}
+    private static PlayerType ParsePlayerType(IdData idData, string[] plaintext) {
+		int p = 0;
+    	return new PlayerType(
+    		idData,
+			texture: LoadTexture(FilePaths.Elements.Player, idData.Name),
+			healthData: ParseHealthData(SplitAtLevel(plaintext[p++], Levels.II)),
+			physicsData: ParsePhysicsData(plaintext[p++])
+		);
+    }
     //private static FriendlyType ParseFriendlyType(IdData idData, string[] plaintext) {
     //  var texture = LoadTexture(FilePaths.Elements.Friendly, idData.Name);
     //  int p = 0;
@@ -205,7 +208,7 @@ public static class FileManager {
 		return SplitAtLevel(plaintext, Levels.II).ToInt();
 	}
 	private static PhysicsData ParsePhysicsData(string plaintext) {
-		return new PhysicsData(plaintext.ToInt());
+		return new PhysicsData(maxSpeed: plaintext.ToInt());
 	}
 	private static Maybe<Drop[]> ParseDrops(string plaintext) {
 		if (string.IsNullOrEmpty(plaintext)) {
@@ -224,6 +227,13 @@ public static class FileManager {
 		}
 		return SplitAtLevel(plaintext, Levels.II).ToInt();
     }
+	private static HealthData ParseHealthData(string[] plaintext) {
+		int p = 0;
+		return new HealthData(
+			maxHealth: plaintext[p++].ToInt(),
+			regenerationAmountPerSecond: plaintext[p++].ToInt()
+		);
+	}
 	private static EntityHealthData ParseEntityHealthData(string plaintext, HealthData typeHealthData) {
 		int? currentHealth = String.IsNullOrEmpty(plaintext) ? null : plaintext.ToInt();
 		return new EntityHealthData(typeHealthData, currentHealth);
