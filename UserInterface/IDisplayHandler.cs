@@ -4,7 +4,10 @@ namespace Shroomworld;
 public interface IDisplayHandler {
 	Texture2D BlankTexture { get; }
 
-	void Begin();
+	void MoveCamera(Rectangle playerHitbox);
+	void UpdateCameraBounds();
+
+    void Begin();
 	void End();
 	void DrawText(string text, Vector2 position, Color colour);
 	void DrawRectangle(Vector2 size, Vector2 position, Color colour);

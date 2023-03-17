@@ -13,10 +13,12 @@ public class DisplayHandler : IDisplayHandler {
     // ----- Fields -----
     private const int TileSize = 8; // Number of pixels per tile side length.
     private const int ScaleFactor = 20;
+    private const int CameraMovementBoundOffset = 10;
 
     private GraphicsDeviceManager _graphicsDeviceManager;
     private SpriteBatch _spriteBatch;
     private GameWindow _window;
+    private Camera _camera;
 
     // ----- Constructor -----
     public DisplayHandler(Game game, GraphicsDeviceManager graphicsDeviceManager) {
@@ -29,11 +31,19 @@ public class DisplayHandler : IDisplayHandler {
         _graphicsDeviceManager.ApplyChanges();
         _window = game.Window;
         _window.AllowUserResizing = true;
+        _camera = new Camera(game.Window.ClientBounds, CameraMovementBoundOffset);
 
         BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
     }
 
     // ----- Methods -----
+    public void MoveCamera(Rectangle playerHitbox) {
+        _camera.Move(playerHitbox);
+    }
+    public void UpdateCameraBounds() {
+        _camera.UpdateMovementBounds(CameraMovementBoundOffset, _window.ClientBounds);
+    }
+
     public void Begin() {
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
     }
@@ -47,6 +57,7 @@ public class DisplayHandler : IDisplayHandler {
     /// <param name="position">scaled-up on-screen position</param>
     /// <param name="colour"></param>
     public void Draw(Texture2D texture, Vector2 position, Color colour) {
+        position = _camera.CalibratePosition(position);
 		_spriteBatch.Draw(texture,
             destinationRectangle: new Rectangle((int)position.X, (int)position.Y, ScaleFactor, ScaleFactor * GetHeightInTiles(texture)),
             colour);

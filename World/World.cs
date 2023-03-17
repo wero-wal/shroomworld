@@ -11,6 +11,7 @@ namespace Shroomworld;
 public class World {
 
     // ----- Properties -----
+    public Player Player => _player;
     public Map Map => _map;
     public List<Friendly> Friendlies => _friendlies;
     public List<Enemy> Enemies => _enemies;
@@ -31,6 +32,7 @@ public class World {
     public World(Map map, Player player) {
         _map = map;
         _player = player;
+        _player.Sprite.SetPosition(new Vector2(100, 100));
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
         SetKeyBinds();

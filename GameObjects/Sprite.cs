@@ -26,7 +26,8 @@ public class Sprite {
     // ----- Methods -----
     public void SetPosition(Vector2 position) {
         UpdateHitbox(position);
-        _position = Shroomworld.DisplayHandler.ClampToScreen(_hitbox);
+        _position = position;
+        //_position = Shroomworld.DisplayHandler.ClampToScreen(_hitbox);
     }
     private void UpdateHitbox(Vector2 position) {
         _hitbox.X = (int) position.X;

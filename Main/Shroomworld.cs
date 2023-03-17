@@ -139,6 +139,8 @@ public class Shroomworld : Game {
 
             case GameState.Playing:
                 _world.Update();
+                s_displayHandler.MoveCamera(_world.Player.Sprite.Hitbox);
+                s_displayHandler.UpdateCameraBounds();
                 break;
 
             case GameState.Menu:
