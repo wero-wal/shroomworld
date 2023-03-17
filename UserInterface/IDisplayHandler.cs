@@ -5,7 +5,7 @@ public interface IDisplayHandler {
 	Texture2D BlankTexture { get; }
 
 	void MoveCamera(Rectangle playerHitbox);
-	void UpdateCameraBounds();
+	void UpdateCentreOfScreen();
 
     void Begin();
 	void End();
@@ -19,6 +19,7 @@ public interface IDisplayHandler {
 
 	int GetHeightInTiles(Texture2D texture);
 
+	void SetBounds(int width, int height);
 	void SetBackground(Color colour);
 	void SetTitle(string title);
 }

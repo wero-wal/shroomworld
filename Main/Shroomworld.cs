@@ -134,13 +134,14 @@ public class Shroomworld : Game {
 
             case GameState.CreatingWorld:
                 _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate(), s_playerTypes[0].CreateNew());
+                s_displayHandler.SetBounds(_world.Map.Width, _world.Map.Height);
                 _currentGameState = GameState.Playing;
                 break;
 
             case GameState.Playing:
                 _world.Update();
                 s_displayHandler.MoveCamera(_world.Player.Sprite.Hitbox);
-                s_displayHandler.UpdateCameraBounds();
+                s_displayHandler.UpdateCentreOfScreen();
                 break;
 
             case GameState.Menu:

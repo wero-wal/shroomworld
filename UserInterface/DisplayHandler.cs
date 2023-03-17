@@ -13,12 +13,13 @@ public class DisplayHandler : IDisplayHandler {
     // ----- Fields -----
     private const int TileSize = 8; // Number of pixels per tile side length.
     private const int ScaleFactor = 20;
-    private const int CameraMovementBoundOffset = 10;
 
     private GraphicsDeviceManager _graphicsDeviceManager;
     private SpriteBatch _spriteBatch;
     private GameWindow _window;
     private Camera _camera;
+
+    private Rectangle _worldBounds; // its the world bounds but in screen scale
 
     // ----- Constructor -----
     public DisplayHandler(Game game, GraphicsDeviceManager graphicsDeviceManager) {
@@ -31,17 +32,17 @@ public class DisplayHandler : IDisplayHandler {
         _graphicsDeviceManager.ApplyChanges();
         _window = game.Window;
         _window.AllowUserResizing = true;
-        _camera = new Camera(game.Window.ClientBounds, CameraMovementBoundOffset);
+        _camera = new Camera(game.Window.ClientBounds);
 
         BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
     }
 
     // ----- Methods -----
     public void MoveCamera(Rectangle playerHitbox) {
-        _camera.Move(playerHitbox);
+        _camera.MoveToPlayer(playerHitbox);
     }
-    public void UpdateCameraBounds() {
-        _camera.UpdateMovementBounds(CameraMovementBoundOffset, _window.ClientBounds);
+    public void UpdateCentreOfScreen() {
+        _camera.UpdateCentreOfScreen(_window.ClientBounds);
     }
 
     public void Begin() {
@@ -76,7 +77,7 @@ public class DisplayHandler : IDisplayHandler {
     /// of the top left corner of the texture when it is displayed on-screen.</param>
     public void Draw(Texture2D texture, int x, int y) {
         Draw(texture,
-            position: new Vector2(x * ScaleFactor, (y - GetHeightInTiles(texture) + 1) * ScaleFactor),
+            position: ToScreenScale(x, y, GetHeightInTiles(texture)),
             colour: Color.White);
     }
     public void DrawText(string text, Vector2 position, Color colour) {
@@ -92,11 +93,14 @@ public class DisplayHandler : IDisplayHandler {
     public void Draw(Sprite sprite) {
 		Draw(sprite.Texture, sprite.Position, Color.White);
 	}
+    public Vector2 ToScreenScale(int x, int y, int heightInTiles) {
+        return new Vector2(x * ScaleFactor, (y - heightInTiles + 1) * ScaleFactor);
+    }
 
     public Vector2 ClampToScreen(Rectangle hitbox) {
         return new Vector2(
-            x: Math.Clamp(hitbox.X, _window.ClientBounds.Left, _window.ClientBounds.Right - hitbox.Width),
-            y: Math.Clamp(hitbox.Y, _window.ClientBounds.Top, _window.ClientBounds.Right - hitbox.Height)
+            x: Math.Clamp(hitbox.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width),
+            y: Math.Clamp(hitbox.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height)
         );
     }
 
@@ -104,6 +108,9 @@ public class DisplayHandler : IDisplayHandler {
         return texture.Height / TileSize;
     }
 
+    public void SetBounds(int width, int height) {
+        _worldBounds = new Rectangle(Point.Zero, ToScreenScale(width, height, 1).ToPoint());
+    }
     public void SetBackground(Color colour) {
         _graphicsDeviceManager.GraphicsDevice.Clear(colour);
 	}
