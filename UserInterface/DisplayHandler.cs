@@ -1,7 +1,7 @@
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
@@ -97,15 +97,30 @@ public class DisplayHandler : IDisplayHandler {
         return new Vector2(x * ScaleFactor, (y - heightInTiles + 1) * ScaleFactor);
     }
 
-    public Vector2 ClampToScreen(Rectangle hitbox) {
-        return new Vector2(
-            x: Math.Clamp(hitbox.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width),
-            y: Math.Clamp(hitbox.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height)
-        );
+    public void ClampToScreen(ref Rectangle hitbox, ref Vector2 position) {
+        hitbox.X = Math.Clamp(hitbox.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width);
+        hitbox.Y = Math.Clamp(hitbox.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height);
+        position.X = Math.Clamp(position.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width);
+        position.Y = Math.Clamp(position.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height);
+    }
+    public void ClampToScreen(Rectangle hitbox, ref Vector2 position) {
+        position.X = Math.Clamp(position.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width);
+        position.Y = Math.Clamp(position.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height);
     }
 
     public int GetHeightInTiles(Texture2D texture) {
         return texture.Height / TileSize;
+    }
+    public Point GetSizeInTiles(Texture2D texture) {
+        return new Point(texture.Width / TileSize, texture.Height / TileSize);
+    }
+
+    public Point ToWorldScale(Sprite sprite, Func<float, int> round) {
+        Vector2 worldScalePosition = sprite.Position;
+        worldScalePosition.X /= TileSize;
+        worldScalePosition.Y /= TileSize;
+        worldScalePosition.Y += 1 - GetHeightInTiles(sprite.Texture);
+        return new Point(round(worldScalePosition.X), round(worldScalePosition.Y));
     }
 
     public void SetBounds(int width, int height) {
@@ -116,5 +131,18 @@ public class DisplayHandler : IDisplayHandler {
 	}
     public void SetTitle(string title) {
         _window.Title = title;
+    }
+
+    public Rectangle GetHitboxOfTile(int x, int y, Texture2D texture) {
+        return new Rectangle(ToScreenScale(x, y, GetHeightInTiles(texture)).ToPoint(), ScalePoint(texture.Bounds.Size, ScaleFactor));
+    }
+    private void ScalePoint(ref Point p, int scaleFactor) {
+        p.X *= scaleFactor;
+        p.Y *= scaleFactor;
+    }
+    private Point ScalePoint(Point p, int scaleFactor) {
+        p.X *= scaleFactor;
+        p.Y *= scaleFactor;
+        return p;
     }
 }
