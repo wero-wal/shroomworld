@@ -1,5 +1,6 @@
-using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+
 namespace Shroomworld.Physics;
 
 public class Physics {
@@ -25,14 +26,13 @@ public class Physics {
 	/// <param name="entity"></param>
 	/// <param name="tiles">Tiles which may potentially intersect the entity.
 	/// (All the tiles in the area from the top left corner of the entity's hitbox to the bottom right.)</param>
-	public void ResolveCollisions(Body entity, Rectangle[] tiles) {
-		Vector2 resolutionVector;
-		foreach(Rectangle tile in tiles) {
-			if (CheckIfIntersect(entity, tile, out resolutionVector)) {
-				entity.ResolveCollision(resolutionVector);
-			}
-		}
-	}
+	public void ResolveCollisions(Body entity, IEnumerable<Rectangle> tiles) {
+        foreach (Rectangle tile in tiles) {
+            if (CheckIfIntersect(entity, tile, out Vector2 resolutionVector)) {
+                entity.ResolveCollision(resolutionVector);
+            }
+        }
+    }
 	/// <summary>
 	/// Use the Separating Axis Theorem to check whether or not two tiles intersect.
 	/// </summary>
@@ -61,7 +61,7 @@ public class Physics {
 		// - top
 		if ((tile.Top < entity.Sprite.Hitbox.Top)
 		&& (entity.Sprite.Hitbox.Top < tile.Bottom)) {
-			resolutionVector.Y += entity.Sprite.Hitbox.Top - tile.Top;
+			resolutionVector.Y += tile.Bottom - entity.Sprite.Hitbox.Top;
 			intersects = true;
 		}
 		// - bottom
