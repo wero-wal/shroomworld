@@ -53,15 +53,15 @@ public class Body {
 	/// <summary>
 	/// Add gravity to the acceleration in the positive vertical direction.
 	/// </summary>
-	public void AddGravity() {
-		_acceleration.Y += PhysicsData.Gravity;
+	public void AddGravity(float gravity) {
+		_acceleration.Y += gravity;
 	}
 	/// <summary>
 	/// Add acceleration of magnitude <see cref="PhysicsData.Acceleration"/> in the given <paramref name="direction"/> (but don't apply it).
 	/// </summary>
 	/// <param name="direction">Direction of the acceleration.</param>
-	public void AddAcceleration(Vector2 direction) {
-		_acceleration += direction * PhysicsData.Acceleration;
+	public void AddAcceleration(Vector2 acceleration) {
+		_acceleration += acceleration;
 	}
 	/// <summary>
 	/// Set acceleration to zero.

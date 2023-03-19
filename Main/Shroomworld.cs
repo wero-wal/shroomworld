@@ -84,7 +84,6 @@ public class Shroomworld : Game {
         _activeMenus = new Stack<Menu>();
 
         Input.Initialise();
-        PhysicsData.SetAcceleration(0.2f);
 
         base.Initialize();
     }

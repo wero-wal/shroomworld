@@ -23,6 +23,7 @@ public class World {
     private readonly List<Enemy> _enemies;
     private readonly Player _player;
     private KeyBinds _keyBinds;
+    private Physics.Physics _physics;
 
     
     // ----- Constructors -----
@@ -35,6 +36,7 @@ public class World {
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
         SetKeyBinds();
+        _physics = new Physics.Physics(acceleration: 0.2f, gravity: 6f);
     }
     /// <summary>
     /// Instantiate a saved / existing world.
@@ -82,15 +84,15 @@ public class World {
         _keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
     }
     private void PlayerJump() {
-        _player.Body.AddAcceleration(-Vector2.UnitY);
+        _player.Body.AddAcceleration(-Vector2.UnitY * _physics.Acceleration);
     }
     private void PlayerMoveLeft() {
-        _player.Body.AddAcceleration(-Vector2.UnitX);
+        _player.Body.AddAcceleration(-Vector2.UnitX * _physics.Acceleration);
     }
     private void PlayerMoveRight() {
-        _player.Body.AddAcceleration(Vector2.UnitX);
+        _player.Body.AddAcceleration(Vector2.UnitX * _physics.Acceleration);
     }
     private void PlayerMoveDown() {
-        _player.Body.AddAcceleration(Vector2.UnitY);
+        _player.Body.AddAcceleration(Vector2.UnitY * _physics.Acceleration);
     }
 }
