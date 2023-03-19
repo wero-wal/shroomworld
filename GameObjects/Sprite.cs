@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld;
@@ -25,8 +24,12 @@ public class Sprite {
 
     // ----- Methods -----
     public void SetPosition(Vector2 position) {
-        UpdateHitbox(position);
-        _position = Shroomworld.DisplayHandler.ClampToScreen(_hitbox);
+        _position = position;
+        Shroomworld.DisplayHandler.ClampToScreen(ref _hitbox, ref _position);
+    }
+    public void ChangePosition(Vector2 changeBy) {
+        _position += changeBy;
+        Shroomworld.DisplayHandler.ClampToScreen(ref _hitbox, ref _position);
     }
     private void UpdateHitbox(Vector2 position) {
         _hitbox.X = (int) position.X;
