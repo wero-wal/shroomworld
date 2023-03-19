@@ -51,8 +51,7 @@ public class World {
     // ----- Methods -----
     public void Update() {
         _keyBinds.ProcessInputs(Input.CurrentInputs);
-        _player.Body.ApplyPhysics();
-        _player.Body.ResetAcceleration();
+        ApplyPhysics();
     }
     public void Draw() {
         Shroomworld.DisplayHandler.SetBackground(Color.CornflowerBlue);
@@ -68,6 +67,7 @@ public class World {
 
         Shroomworld.DisplayHandler.Draw(_player.Sprite);
     }
+
     private void SetKeyBinds() {
         _keyBinds = new KeyBinds();
         _keyBinds.Add(Input.Inputs.W, PlayerJump);
@@ -94,5 +94,27 @@ public class World {
     }
     private void PlayerMoveDown() {
         _player.Body.AddAcceleration(Vector2.UnitY * _physics.Acceleration);
+    }
+    private void ApplyPhysics() {
+        _player.Body.ApplyKinematics();
+        _player.Body.ResetAcceleration();
+        ResolveCollisions(_player);
+    }
+    private void ResolveCollisions(Entity entity) {
+        // Get the coordinates of the tiles at the top left and bottom right of the entity's hitbox.
+        Point topLeft = Shroomworld.DisplayHandler.ToWorldScale(entity.Sprite, i => (int)Math.Floor(i)); // todo: clamp to map width and height. fix this in general.
+        Point bottomRight = topLeft + Shroomworld.DisplayHandler.GetSizeInTiles(entity.Sprite.Texture);
+
+        // Find all the tiles within that range.
+        int maxIntersectingTiles = (entity.Sprite.Texture.Height + 1) * (entity.Sprite.Texture.Width + 1);
+        List<Rectangle> tiles = new List<Rectangle>(capacity: maxIntersectingTiles);
+        for (int x = topLeft.X; x <= bottomRight.X; x++) {
+            for (int y = topLeft.Y; y <= bottomRight.Y; y++) {
+                if (_map[x, y] != TileType.AirId) {
+                    tiles.Add(Shroomworld.DisplayHandler.GetHitboxOfTile(x, y, Shroomworld.TileTypes[_map[x, y]].Texture));
+                }
+            }
+        }
+        _physics.ResolveCollisions(entity.Body, tiles);
     }
 }
