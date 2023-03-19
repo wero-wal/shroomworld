@@ -23,7 +23,7 @@ public class Shroomworld : Game {
     public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
     public static ContentManager ContentManager => s_contentManager;
-    public static IDisplayHandler DisplayHandler => s_displayHandler;
+    public static DisplayHandler DisplayHandler => s_displayHandler;
 
 
     // ----- Fields -----
@@ -39,7 +39,7 @@ public class Shroomworld : Game {
     
     // Monogame:
     private static ContentManager s_contentManager;
-    private static IDisplayHandler s_displayHandler;
+    private static DisplayHandler s_displayHandler;
     private GraphicsDeviceManager _graphicsDeviceManager;
 
     // State management:
