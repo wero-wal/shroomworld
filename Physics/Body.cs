@@ -35,7 +35,7 @@ public class Body {
 	/// Change velocity based on acceleration and position based on velocity.
 	/// <para>Note: velocity is limited by the body's max speed.</para>
 	/// </summary>
-	public void ApplyPhysics() {
+	public void ApplyKinematics() {
 		Vector2 newVelocity = _velocity + _acceleration;
 		float newSpeed = newVelocity.Length();
 		if (newSpeed > _physicsData.MaximumSpeed) {
@@ -48,7 +48,7 @@ public class Body {
 		if (_acceleration.Equals(Vector2.Zero)) {
 			_velocity *= 0.95f;
 		}
-		_sprite.SetPosition(_sprite.Position + _velocity);
+		_sprite.ChangePosition(_velocity);
 	}
 	/// <summary>
 	/// Add gravity to the acceleration in the positive vertical direction.
@@ -76,6 +76,6 @@ public class Body {
 	/// The vector by which the body should be moved in order to resolve the collision.
 	/// </param>
 	public void ResolveCollision(Vector2 resolutionVector) {
-		_sprite.SetPosition(_sprite.Position + resolutionVector);
+		_sprite.ChangePosition(resolutionVector);
 	}
 }
