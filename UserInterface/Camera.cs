@@ -17,7 +17,7 @@ public class Camera {
         // Find the vector from the camera to the position and add it to the centre of the screen.
         return _centreOfScreen + rawPosition - _position;
     }
-    public void MoveToPlayer(Rectangle playerHitbox) {
-        _position = playerHitbox.Location.ToVector2();
+    public void MoveToPlayer(Vector2 playerPosition) {
+        _position = playerPosition;
     }
 }
