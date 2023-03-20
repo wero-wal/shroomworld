@@ -19,7 +19,12 @@ public class Sprite {
     // ----- Constructors -----
     public Sprite(Texture2D texture) {
         _texture = texture;
-        _hitbox = new Rectangle(Point.Zero, new Point(texture.Width, texture.Height));
+        _hitbox = new Rectangle(Point.Zero, texture.Bounds.Size);
+    }
+    public Sprite(Texture2D texture, Vector2 position) {
+        _texture = texture;
+        _position = position;
+        _hitbox = new Rectangle(position.ToPoint(), texture.Bounds.Size);
     }
 
     // ----- Methods -----
