@@ -1,5 +1,6 @@
-using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 namespace Shroomworld;
 public class PlayerType : IType {
     // ----- Properties ----- 
@@ -25,7 +26,7 @@ public class PlayerType : IType {
     }
 
     // ----- Methods -----
-    public Player CreateNew() {
-        return new Player(this, new Sprite(_texture), new EntityHealthData(_healthData));
+    public Player CreateNew(Vector2 position) {
+        return new Player(this, new Sprite(_texture, position), new EntityHealthData(_healthData));
     }
 }
