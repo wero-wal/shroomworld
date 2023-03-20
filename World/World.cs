@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
 namespace Shroomworld;
@@ -61,11 +60,11 @@ public class World {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                Shroomworld.DisplayHandler.Draw(((TileType)_map[x, y]).Texture, x, y);
+                Shroomworld.DisplayHandler.DrawTile(x, y, ((TileType)_map[x, y]).Texture);
             }
         }
 
-        Shroomworld.DisplayHandler.Draw(_player.Sprite);
+        Shroomworld.DisplayHandler.DrawSprite(_player.Sprite);
     }
 
     private void SetKeyBinds() {
@@ -102,8 +101,10 @@ public class World {
     }
     private void ResolveCollisions(Entity entity) {
         // Get the coordinates of the tiles at the top left and bottom right of the entity's hitbox.
-        Point topLeft = Shroomworld.DisplayHandler.ToWorldScale(entity.Sprite, i => (int)Math.Floor(i)); // todo: clamp to map width and height. fix this in general.
+        Point topLeft = Shroomworld.DisplayHandler.GetTileCoords(entity.Sprite, i => (int)Math.Floor(i));
         Point bottomRight = topLeft + Shroomworld.DisplayHandler.GetSizeInTiles(entity.Sprite.Texture);
+        ClampToMap(ref topLeft);
+        ClampToMap(ref bottomRight);
 
         // Find all the tiles within that range.
         int maxIntersectingTiles = (entity.Sprite.Texture.Height + 1) * (entity.Sprite.Texture.Width + 1);
@@ -111,10 +112,15 @@ public class World {
         for (int x = topLeft.X; x <= bottomRight.X; x++) {
             for (int y = topLeft.Y; y <= bottomRight.Y; y++) {
                 if (_map[x, y] != TileType.AirId) {
-                    tiles.Add(Shroomworld.DisplayHandler.GetHitboxOfTile(x, y, Shroomworld.TileTypes[_map[x, y]].Texture));
+                    tiles.Add(Shroomworld.DisplayHandler.CalculateTileHitbox(x, y, Shroomworld.TileTypes[_map[x, y]].Texture));
                 }
             }
         }
         _physics.ResolveCollisions(entity.Body, tiles);
+
+        void ClampToMap(ref Point p) {
+            p.X = Math.Clamp(p.X, 0, _map.Width - 1);
+            p.Y = Math.Clamp(p.Y, 0, _map.Height - 1);
+        }
     }
 }
