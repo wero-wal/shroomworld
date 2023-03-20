@@ -14,15 +14,15 @@ public interface IDisplayHandler {
 	void DrawText(string text, Vector2 position, Color colour);
 	void DrawRectangle(Vector2 size, Vector2 position, Color colour);
 	void Draw(Texture2D texture, Vector2 position, Color colour);
-	void Draw(Sprite sprite);
-	void Draw(Texture2D texture, int x, int y);
+	void DrawSprite(Sprite sprite);
+	void DrawTile(Texture2D texture, int x, int y);
 
 	void ClampToScreen(ref Rectangle hitbox, ref Vector2 position);
     int GetHeightInTiles(Texture2D texture);
-    Point ToWorldScale(Sprite sprite, Func<float, int> round);
-	Vector2 ToScreenScale(int x, int y, int heightInTiles);
+    Point GetTileCoords(Sprite sprite, Func<float, int> round);
+	Vector2 CalculateTilePosition(int x, int y, int heightInTiles);
 
-	Rectangle GetHitboxOfTile(int x, int y, Texture2D texture);
+	Rectangle CalculateTileHitbox(int x, int y, Texture2D texture);
 
     void SetBounds(int width, int height);
 	void SetBackground(Color colour);
