@@ -54,7 +54,7 @@ public class DisplayHandler /*: IDisplayHandler*/ {
         _camera.MoveToPlayer(playerPosition);
     }
     public void UpdateCentreOfScreen() {
-        _camera.UpdateCentreOfScreen(_movementBounds/*_window.ClientBounds*/);
+        _camera.UpdateCentreOfScreen(_window.ClientBounds);
     }
 
     // Drawing
