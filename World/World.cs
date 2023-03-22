@@ -15,6 +15,8 @@ public class World {
     public List<Friendly> Friendlies => _friendlies;
     public List<Enemy> Enemies => _enemies;
 
+    public static string DebugText = string.Empty;
+
 
     // ----- Fields -----
     private readonly Map _map;
@@ -101,13 +103,14 @@ public class World {
     }
     private void ResolveCollisions(Entity entity) {
         // Get the coordinates of the tiles at the top left and bottom right of the entity's hitbox.
-        Point topLeft = Shroomworld.DisplayHandler.GetTileCoords(entity.Sprite, i => (int)Math.Floor(i));
-        Point bottomRight = topLeft + Shroomworld.DisplayHandler.GetSizeInTiles(entity.Sprite.Texture);
+        Point topLeft = Shroomworld.DisplayHandler.GetTileCoords(entity.Sprite, i => (int)Math.Floor(i)); // tile pos in map
+        Point bottomRight = topLeft + Shroomworld.DisplayHandler.GetSizeInTiles(entity.Sprite.Texture); //tile coords
         ClampToMap(ref topLeft);
         ClampToMap(ref bottomRight);
+        DebugText = $"top left: {topLeft.X}, {topLeft.Y}     bottom right: {bottomRight.X}, {bottomRight.Y}";
 
         // Find all the tiles within that range.
-        int maxIntersectingTiles = (entity.Sprite.Texture.Height + 1) * (entity.Sprite.Texture.Width + 1);
+        int maxIntersectingTiles = (Shroomworld.DisplayHandler.GetSizeInTiles(entity.Sprite.Texture).Y + 1) * (entity.Sprite.Texture.Width + 1);
         List<Rectangle> tiles = new List<Rectangle>(capacity: maxIntersectingTiles);
         for (int x = topLeft.X; x <= bottomRight.X; x++) {
             for (int y = topLeft.Y; y <= bottomRight.Y; y++) {
