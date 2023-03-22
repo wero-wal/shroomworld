@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Shroomworld.FileHandling;
 
 namespace Shroomworld;
@@ -90,6 +91,8 @@ public class Shroomworld : Game {
     
     // Loading
     protected override void LoadContent() {
+        DisplayHandler.Font = Content.Load<SpriteFont>("font");
+
         if (!FileManager.TryLoadFilePaths()) {
             SetStateToError("Couldn't load file paths.");
             return;
@@ -132,10 +135,10 @@ public class Shroomworld : Game {
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
-                const int Width = 1000;
+                const int Width = 100;
                 const int Height = 50;
                 const int NumberOfBiomes = 10;
-                Player player = s_playerTypes[0].CreateNew(new Vector2(16f, 16f));
+                Player player = s_playerTypes[0].CreateNew(Vector2.Zero);
 
                 s_displayHandler.SetBounds(Width, Height);
                 _world = new World(new MapGenerator(Width, Height, NumberOfBiomes, 69_420).Generate(), player);
@@ -143,9 +146,9 @@ public class Shroomworld : Game {
                 break;
 
             case GameState.Playing:
-                s_displayHandler.UpdateCentreOfScreen();
-                s_displayHandler.MoveCamera(_world.Player.Sprite.Position);
+                //s_displayHandler.UpdateCentreOfScreen();
                 _world.Update();
+                s_displayHandler.Update(_world.Player.Sprite.Position);
                 break;
 
             case GameState.Menu:
@@ -235,7 +238,10 @@ public class Shroomworld : Game {
         switch (_currentGameState) {
             case GameState.CreatingWorld:
                 s_displayHandler.SetBackground(Color.Green);
+                s_displayHandler.End();
+                s_displayHandler.BeginText();
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
+                s_displayHandler.End();
                 break;
 
             case GameState.Playing:
@@ -256,6 +262,9 @@ public class Shroomworld : Game {
             default:
                 break;
         }
+        s_displayHandler.End();
+        s_displayHandler.BeginText();
+        s_displayHandler.DrawText(World.DebugText, new Vector2(10f, 10f), Color.Black);
         s_displayHandler.End();
         base.Draw(gameTime);
     }

@@ -6,18 +6,20 @@ namespace Shroomworld;
 public class DisplayHandler /*: IDisplayHandler*/ {
 
     // ----- Properties -----
-    public GraphicsDeviceManager GraphicsDeviceManager => _graphicsDeviceManager;
-    public SpriteBatch SpriteBatch => _spriteBatch;
+    public Vector2 CentreOfScreen => _centreOfScreen;
     public Texture2D BlankTexture { get; private set; }
 
     // ----- Fields -----
     private const int TileSize = 8; // Number of pixels per square tile side length.
-    private const int ScaleFactor = 20;
+    private const int ScaleFactor = 5;
 
     private GraphicsDeviceManager _graphicsDeviceManager;
     private SpriteBatch _spriteBatch;
+    public static SpriteFont Font;
     private GameWindow _window;
     private Camera _camera;
+
+    private Vector2 _centreOfScreen;
 
     private Rectangle _movementBounds; // World bounds in world scale.
 
@@ -32,7 +34,7 @@ public class DisplayHandler /*: IDisplayHandler*/ {
         _graphicsDeviceManager.ApplyChanges();
         _window = game.Window;
         _window.AllowUserResizing = true;
-        _camera = new Camera(game.Window.ClientBounds);
+        _camera = new Camera();
 
         BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
     }
@@ -49,17 +51,17 @@ public class DisplayHandler /*: IDisplayHandler*/ {
         _window.Title = title;
     }
 
-    // Camera management
-    public void MoveCamera(Vector2 playerPosition) {
-        _camera.MoveToPlayer(playerPosition);
-    }
-    public void UpdateCentreOfScreen() {
-        _camera.UpdateCentreOfScreen(_window.ClientBounds);
+    public void Update(Vector2 playerPosition) {
+        _centreOfScreen = _window.Position.ToVector2() / 2;
+        _camera.Follow(playerPosition);
     }
 
     // Drawing
     public void Begin() {
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+    }
+    public void BeginText() {
+        _spriteBatch.Begin();
     }
     public void End() {
         _spriteBatch.End();
@@ -71,10 +73,9 @@ public class DisplayHandler /*: IDisplayHandler*/ {
     /// <param name="position">scaled-up on-screen position</param>
     /// <param name="colour"></param>
     public void Draw(Texture2D texture, Vector2 position, Color colour) {
-        position = _camera.CalibratePosition(position);
 		_spriteBatch.Draw(texture,
             destinationRectangle: new Rectangle(ScalePoint(position.ToPoint(), ScaleFactor), ScalePoint(texture.Bounds.Size, ScaleFactor)),
-            colour);
+            Color.White);
     }
     /// <summary>
     /// Displays a texture on the screen based on a position in the tile map.
@@ -104,7 +105,7 @@ public class DisplayHandler /*: IDisplayHandler*/ {
         Draw(BlankTexture, position, colour);
 	}
     public void DrawText(string text, Vector2 position, Color colour) {
-		// todo: draw text
+        _spriteBatch.DrawString(Font, text, position, colour);
 	}
 
     // Vector conversions
