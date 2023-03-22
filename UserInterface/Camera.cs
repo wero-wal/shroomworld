@@ -2,22 +2,21 @@
 
 namespace Shroomworld;
 public class Camera {
-    private Vector2 _position;
-    private Vector2 _centreOfScreen;
 
-    public Camera(Rectangle window) {
-        UpdateCentreOfScreen(window);
-        _position = _centreOfScreen;
-    }
+    // ----- Properties -----
+    public Matrix Transform => _transform;
 
-    public void UpdateCentreOfScreen(Rectangle windowBounds) {
-        _centreOfScreen = new Vector2((windowBounds.Left + windowBounds.Right) / 2, (windowBounds.Top + windowBounds.Bottom) / 2);
-    }
-    public Vector2 CalibratePosition(Vector2 rawPosition) {
-        // Find the vector from the camera to the position and add it to the centre of the screen.
-        return _centreOfScreen + rawPosition - _position;
-    }
-    public void MoveToPlayer(Vector2 playerPosition) {
-        _position = playerPosition;
+    // ----- Fields -----
+    private Matrix _transform;
+
+    // ----- Constructors -----
+
+
+    // ----- Methods -----
+    public void Follow(Vector2 targetPosiion)
+    {
+        Matrix position = Matrix.CreateTranslation(-targetPosiion.X, -targetPosiion.Y, 0);
+        Matrix offset = Matrix.CreateTranslation(Shroomworld.DisplayHandler.CentreOfScreen.X, Shroomworld.DisplayHandler.CentreOfScreen.Y, 0);
+        _transform = position * offset;
     }
 }
