@@ -11,6 +11,7 @@ public class TileType : IType {
 
     public IdData IdData => _idData;
     public Texture2D Texture => _texture;
+    public bool IsSolid => _isSolid;
 
 
 	// ----- Fields -----
@@ -27,8 +28,7 @@ public class TileType : IType {
 
 
     // ----- Constructors -----
-    public TileType(IdData idData, Texture2D texture, Maybe<Drop[]> drops, bool isSolid, int[] breakableBy, float friction)
-    {
+    public TileType(IdData idData, Texture2D texture, Maybe<Drop[]> drops, bool isSolid, int[] breakableBy, float friction) {
         _idData = idData;
         _texture = texture;
         _drops = drops;
@@ -38,11 +38,7 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public static implicit operator TileType(int id) {
-        return Shroomworld.TileTypes[id];
-    }
-    public InventoryItem[] GetDrops()
-    {
+    public InventoryItem[] GetDrops() {
         if (!_drops.TryGetValue(out Drop[] drops)) {
             return Array.Empty<InventoryItem>();
         }
