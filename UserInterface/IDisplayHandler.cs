@@ -12,6 +12,7 @@ public interface IDisplayHandler {
 	void DrawText(string text, Vector2 position, Color colour);
 	void DrawRectangle(Vector2 size, Vector2 position, Color colour);
 	void Draw(Texture2D texture, Vector2 position, Color colour);
+	void Draw(Texture2D texture, Vector2 position);
 	void Draw(Sprite sprite);
 	void Draw(Texture2D texture, int x, int y);
 
