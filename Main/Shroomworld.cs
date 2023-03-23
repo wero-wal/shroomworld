@@ -8,7 +8,7 @@ namespace Shroomworld;
 public class Shroomworld : Game {
 
     // ----- Enums -----
-    public enum GameState {
+    public enum GameStates {
         CreatingWorld,
         Playing,
         Menu,
@@ -43,8 +43,8 @@ public class Shroomworld : Game {
     private GraphicsDeviceManager _graphicsDeviceManager;
 
     // State management:
-    private GameState _currentGameState;
-    private Stack<Menu> _activeMenus;
+    private GameStates _currentGameState;
+    private Stack<ButtonMenu> _activeMenus;
     private event Action _checkForAttacks; // Subscribe enemy Npcs to this.
     private string _errorMessage;
 
@@ -56,9 +56,9 @@ public class Shroomworld : Game {
     private KeyBinds _friendlyInteractionKeyBinds;
     
     private class Menus {
-        public static Menu MainMenu;
-        public static Menu PauseMenu;
-        public static Menu StatisticsMenu;
+        public static ButtonMenu MainMenu;
+        public static ButtonMenu PauseMenu;
+        public static ButtonMenu StatisticsMenu;
         // Todo: add the rest
     }
 
@@ -80,8 +80,8 @@ public class Shroomworld : Game {
         s_displayHandler.SetTitle("Shroomworld");
 
         // Set up menus.
-        _currentGameState = GameState.Menu;
-        _activeMenus = new Stack<Menu>();
+        _currentGameState = GameStates.Menu;
+        _activeMenus = new Stack<ButtonMenu>();
 
         Input.Initialise();
         PhysicsData.SetAcceleration(0.2f);
@@ -98,6 +98,14 @@ public class Shroomworld : Game {
         if (!TryLoadGameFiles()) {
             SetStateToError("Couldn't load game files.");
         }
+        try {
+            List<ButtonMenu> menus = FileManager.LoadButtonMenus();
+            Menus.MainMenu = menus[0];
+        }
+        catch (System.Exception) {
+            SetStateToError("Menu loading failed.");
+        }
+        _activeMenus.Push(Menus.MainMenu);
     }
     /// <summary>
     /// Loads all generic game files.
@@ -126,30 +134,30 @@ public class Shroomworld : Game {
     /*private void CreateMenus() {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
     }*/
-    private Menu GetCurrentMenu => _activeMenus.Peek();
+    private ButtonMenu GetCurrentMenu => _activeMenus.Peek();
 
     protected override void Update(GameTime gameTime) {
         Input.Update();
         switch (_currentGameState) {
 
-            case GameState.CreatingWorld:
+            case GameStates.CreatingWorld:
                 _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate(), s_playerTypes[0].CreateNew());
                 s_displayHandler.SetBounds(_world.Map.Width, _world.Map.Height);
-                _currentGameState = GameState.Playing;
+                _currentGameState = GameStates.Playing;
                 break;
 
-            case GameState.Playing:
+            case GameStates.Playing:
                 _world.Update();
                 s_displayHandler.MoveCamera(_world.Player.Sprite.Hitbox);
                 s_displayHandler.UpdateCentreOfScreen();
                 break;
 
-            case GameState.Menu:
-                _currentGameState = GameState.CreatingWorld;
+            case GameStates.Menu:
+                _currentGameState = _activeMenus.Peek().Update(GameStates.Menu);
                 // TODO: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
                 break;
 
-            case GameState.Error:
+            case GameStates.Error:
                 break;
 
             default:
@@ -160,11 +168,11 @@ public class Shroomworld : Game {
     }
     private void SetStateToError(string errorMessage) {
         _errorMessage = errorMessage;
-        _currentGameState = GameState.Error;
+        _currentGameState = GameStates.Error;
     }
-    private void SetStateToMenu(Menu menu) {
+    private void SetStateToMenu(ButtonMenu menu) {
         OpenMenu(menu);
-        _currentGameState = GameState.Menu;
+        _currentGameState = GameStates.Menu;
     }
     //// Gameplay
     ///// <summary>
@@ -200,7 +208,7 @@ public class Shroomworld : Game {
     /// Adds <paramref name="menu"/> to the stack (<see cref="_activeMenus"/>).
     /// </summary>
     /// <param name="menu">The menu you would like to open (add to the <see cref="_activeMenus"/> stack).</param>
-    private void OpenMenu(Menu menu) {
+    private void OpenMenu(ButtonMenu menu) {
         _activeMenus.Push(menu);
     }
     /// <summary>
@@ -217,7 +225,7 @@ public class Shroomworld : Game {
         
         // If there are no more open menus, go back to playing the game
         if (_activeMenus.Count == 0) {
-            _currentGameState = GameState.Playing;
+            _currentGameState = GameStates.Playing;
         }
         // (else: go back to previous menu)
 
@@ -229,21 +237,22 @@ public class Shroomworld : Game {
         s_displayHandler.Begin();
 
         switch (_currentGameState) {
-            case GameState.CreatingWorld:
+            case GameStates.CreatingWorld:
                 s_displayHandler.SetBackground(Color.Green);
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
                 break;
 
-            case GameState.Playing:
+            case GameStates.Playing:
                 _world.Draw();
                 break;
 
-            case GameState.Menu:
+            case GameStates.Menu:
                 s_displayHandler.SetBackground(Color.White);
                 s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
+                _activeMenus.Peek().Draw();
                 break;
 
-            case GameState.Error:
+            case GameStates.Error:
                 string errorMsg = "An error has occured";
                 s_displayHandler.SetBackground(Color.Red);
                 s_displayHandler.DrawText(errorMsg, Vector2.Zero, Color.White);
