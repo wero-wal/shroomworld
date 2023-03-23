@@ -17,7 +17,6 @@ public class Shroomworld : Game {
     }
 
     // ----- Properties -----
-    public static Dictionary<int, TileType> TileTypes => s_tileTypes;
     public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
     public static Dictionary<int, BiomeType> BiomeTypes => s_biomeTypes;
     public static Dictionary<int, FriendlyType> NpcTypes => s_friendlyTypes;
@@ -31,7 +30,6 @@ public class Shroomworld : Game {
 
     // Dictionaries:
     private static Dictionary<int, ItemType> s_itemTypes;
-    private static Dictionary<int, TileType> s_tileTypes;
     private static Dictionary<int, BiomeType> s_biomeTypes;
     private static Dictionary<int, FriendlyType> s_friendlyTypes;
     private static Dictionary<int, PlayerType> s_playerTypes;
@@ -106,15 +104,19 @@ public class Shroomworld : Game {
     /// </summary>
     /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
     private bool TryLoadGameFiles() {
-        // Load Types
+		// Load Types
+		Dictionary<int, TileType> tileTypes;
+
         if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out s_itemTypes)
-        && FileManager.LoadTypes<TileType>().TryGetValue(out s_tileTypes)
+        && FileManager.LoadTypes<TileType>().TryGetValue(out tileTypes)
         && FileManager.LoadTypes<BiomeType>().TryGetValue(out s_biomeTypes)/*
         && FileManager.LoadTypes<EnemyType>().TryGetValue(out _enemyTypes)
         && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)*/
         && FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes))) {
             return false;
         }
+
+        World.SetUp(s_displayHandler, tileTypes);
 
         /* TODO: Things to load:
            - World names / ids
@@ -132,6 +134,7 @@ public class Shroomworld : Game {
 
     protected override void Update(GameTime gameTime) {
         Input.Update();
+        World.DebugText = string.Empty;
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
@@ -233,30 +236,28 @@ public class Shroomworld : Game {
     
     // Drawing
     protected override void Draw(GameTime gameTime) {
-        s_displayHandler.Begin();
-
         switch (_currentGameState) {
             case GameState.CreatingWorld:
-                s_displayHandler.SetBackground(Color.Green);
-                s_displayHandler.End();
                 s_displayHandler.BeginText();
+                s_displayHandler.SetBackground(Color.Green);
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
-                s_displayHandler.End();
                 break;
 
             case GameState.Playing:
+                s_displayHandler.Begin();
                 _world.Draw();
                 break;
 
             case GameState.Menu:
+                s_displayHandler.BeginText();
                 s_displayHandler.SetBackground(Color.White);
                 s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
                 break;
 
             case GameState.Error:
-                string errorMsg = "An error has occured";
-                s_displayHandler.SetBackground(Color.Red);
-                s_displayHandler.DrawText(errorMsg, Vector2.Zero, Color.White);
+				s_displayHandler.BeginText();
+				s_displayHandler.SetBackground(Color.Red);
+                s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);
                 break;
 
             default:
