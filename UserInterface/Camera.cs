@@ -13,9 +13,8 @@ public class Camera {
 
 
     // ----- Methods -----
-    public void Follow(Vector2 targetPosiion)
-    {
-        Matrix position = Matrix.CreateTranslation(-targetPosiion.X, -targetPosiion.Y, 0);
+    public void Follow(Vector2 targetPosition) {
+        Matrix position = Matrix.CreateTranslation(-targetPosition.X, -targetPosition.Y, 0);
         Matrix offset = Matrix.CreateTranslation(Shroomworld.DisplayHandler.CentreOfScreen.X, Shroomworld.DisplayHandler.CentreOfScreen.Y, 0);
         _transform = position * offset;
     }
