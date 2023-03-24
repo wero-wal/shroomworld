@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Shroomworld.FileHandling;
 
 namespace Shroomworld;
@@ -16,21 +17,19 @@ public class Shroomworld : Game {
     }
 
     // ----- Properties -----
-    public static Dictionary<int, TileType> TileTypes => s_tileTypes;
     public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
     public static Dictionary<int, BiomeType> BiomeTypes => s_biomeTypes;
     public static Dictionary<int, FriendlyType> NpcTypes => s_friendlyTypes;
     public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
     public static ContentManager ContentManager => s_contentManager;
-    public static IDisplayHandler DisplayHandler => s_displayHandler;
+    public static DisplayHandler DisplayHandler => s_displayHandler;
 
 
     // ----- Fields -----
 
     // Dictionaries:
     private static Dictionary<int, ItemType> s_itemTypes;
-    private static Dictionary<int, TileType> s_tileTypes;
     private static Dictionary<int, BiomeType> s_biomeTypes;
     private static Dictionary<int, FriendlyType> s_friendlyTypes;
     private static Dictionary<int, PlayerType> s_playerTypes;
@@ -39,7 +38,7 @@ public class Shroomworld : Game {
     
     // Monogame:
     private static ContentManager s_contentManager;
-    private static IDisplayHandler s_displayHandler;
+    private static DisplayHandler s_displayHandler;
     private GraphicsDeviceManager _graphicsDeviceManager;
 
     // State management:
@@ -84,13 +83,14 @@ public class Shroomworld : Game {
         _activeMenus = new Stack<ButtonMenu>();
 
         Input.Initialise();
-        PhysicsData.SetAcceleration(0.2f);
 
         base.Initialize();
     }
     
     // Loading
     protected override void LoadContent() {
+        DisplayHandler.Font = Content.Load<SpriteFont>("font");
+
         if (!FileManager.TryLoadFilePaths()) {
             SetStateToError("Couldn't load file paths.");
             return;
@@ -112,15 +112,19 @@ public class Shroomworld : Game {
     /// </summary>
     /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
     private bool TryLoadGameFiles() {
-        // Load Types
+		// Load Types
+		Dictionary<int, TileType> tileTypes;
+
         if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out s_itemTypes)
-        && FileManager.LoadTypes<TileType>().TryGetValue(out s_tileTypes)
+        && FileManager.LoadTypes<TileType>().TryGetValue(out tileTypes)
         && FileManager.LoadTypes<BiomeType>().TryGetValue(out s_biomeTypes)/*
         && FileManager.LoadTypes<EnemyType>().TryGetValue(out _enemyTypes)
         && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)*/
         && FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes))) {
             return false;
         }
+
+        World.SetUp(s_displayHandler, tileTypes);
 
         /* TODO: Things to load:
            - World names / ids
@@ -140,16 +144,21 @@ public class Shroomworld : Game {
         Input.Update();
         switch (_currentGameState) {
 
-            case GameStates.CreatingWorld:
-                _world = new World(new MapGenerator(100, 100, 5, 69_420).Generate(), s_playerTypes[0].CreateNew());
-                s_displayHandler.SetBounds(_world.Map.Width, _world.Map.Height);
-                _currentGameState = GameStates.Playing;
+            case GameState.CreatingWorld:
+                const int Width = 100;
+                const int Height = 50;
+                const int NumberOfBiomes = 10;
+                Player player = s_playerTypes[0].CreateNew(Vector2.Zero);
+
+                s_displayHandler.SetBounds(Width, Height);
+                _world = new World(new MapGenerator(Width, Height, NumberOfBiomes, 69_420).Generate(), player);
+                _currentGameState = GameState.Playing;
                 break;
 
-            case GameStates.Playing:
+            case GameState.Playing:
+
                 _world.Update();
-                s_displayHandler.MoveCamera(_world.Player.Sprite.Hitbox);
-                s_displayHandler.UpdateCentreOfScreen();
+                s_displayHandler.Update(_world.Player.Sprite.Position);
                 break;
 
             case GameStates.Menu:
@@ -234,29 +243,31 @@ public class Shroomworld : Game {
     
     // Drawing
     protected override void Draw(GameTime gameTime) {
-        s_displayHandler.Begin();
-
         switch (_currentGameState) {
-            case GameStates.CreatingWorld:
+
+            case GameState.CreatingWorld:
+                s_displayHandler.BeginText();
                 s_displayHandler.SetBackground(Color.Green);
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
                 break;
 
-            case GameStates.Playing:
+            case GameState.Playing:
+                s_displayHandler.Begin();
                 _world.Draw();
                 break;
 
-            case GameStates.Menu:
+            case GameState.Menu:
+                s_displayHandler.BeginText();
                 s_displayHandler.SetBackground(Color.White);
                 s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
                 _activeMenus.Peek().Draw();
                 break;
 
-            case GameStates.Error:
-                string errorMsg = "An error has occured";
-                s_displayHandler.SetBackground(Color.Red);
-                s_displayHandler.DrawText(errorMsg, Vector2.Zero, Color.White);
-                break;
+            case GameState.Error:
+				      s_displayHandler.BeginText();
+				      s_displayHandler.SetBackground(Color.Red);
+              s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);
+              break;
 
             default:
                 break;

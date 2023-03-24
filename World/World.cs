@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
 namespace Shroomworld;
@@ -18,11 +17,15 @@ public class World {
 
 
     // ----- Fields -----
+    private static IDisplayHandler _display;
+    private static Dictionary<int, TileType> _tileTypes;
+
     private readonly Map _map;
     private readonly List<Friendly> _friendlies;
     private readonly List<Enemy> _enemies;
     private readonly Player _player;
     private KeyBinds _keyBinds;
+    private Physics.Physics _physics;
 
     
     // ----- Constructors -----
@@ -35,6 +38,7 @@ public class World {
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
         SetKeyBinds();
+        _physics = new Physics.Physics(acceleration: 0.2f, gravity: 6f);
     }
     /// <summary>
     /// Instantiate a saved / existing world.
@@ -47,25 +51,30 @@ public class World {
     }
 
     // ----- Methods -----
+    public static void SetUp(IDisplayHandler displayHandler, Dictionary<int, TileType> tileTypes) {
+        _display = displayHandler;
+        _tileTypes = tileTypes;
+    }
+
     public void Update() {
         _keyBinds.ProcessInputs(Input.CurrentInputs);
-        _player.Body.ApplyPhysics();
-        _player.Body.ResetAcceleration();
+        ApplyPhysics();
     }
     public void Draw() {
-        Shroomworld.DisplayHandler.SetBackground(Color.CornflowerBlue);
+        _display.SetBackground(Color.CornflowerBlue);
 
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                Shroomworld.DisplayHandler.Draw(((TileType)_map[x, y]).Texture, x, y);
+                _display.DrawTile(x, y, _tileTypes[_map[x, y]].Texture);
             }
         }
 
-        Shroomworld.DisplayHandler.Draw(_player.Sprite);
+        _display.DrawSprite(_player.Sprite);
     }
+
     private void SetKeyBinds() {
         _keyBinds = new KeyBinds();
         _keyBinds.Add(Input.Inputs.W, PlayerJump);
@@ -82,15 +91,50 @@ public class World {
         _keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
     }
     private void PlayerJump() {
-        _player.Body.AddAcceleration(-Vector2.UnitY);
+        _player.Body.AddAcceleration(_physics.AccelerationUp);
     }
     private void PlayerMoveLeft() {
-        _player.Body.AddAcceleration(-Vector2.UnitX);
+        _player.Body.AddAcceleration(_physics.AccelerationLeft);
     }
     private void PlayerMoveRight() {
-        _player.Body.AddAcceleration(Vector2.UnitX);
+        _player.Body.AddAcceleration(_physics.AccelerationRight);
     }
     private void PlayerMoveDown() {
-        _player.Body.AddAcceleration(Vector2.UnitY);
+        _player.Body.AddAcceleration(_physics.AccelerationDown);
+    }
+    private void ApplyPhysics() {
+        _player.Body.ApplyPhysics(CheckForCollisions);
+    }
+    /// <summary>
+    /// Checks whether the given <paramref name="hitbox"/> intersects with any solid tiles.
+    /// </summary>
+    /// <param name="hitbox">The hitbox of the entity for which you are checking collisions.</param>
+    /// <returns></returns>
+    private bool CheckForCollisions(Rectangle hitbox) {
+        // Get the tilemap coordinates of the tiles at the top left and bottom right of the entity's hitbox.
+        (Point topLeft, Point bottomRight) corners = _display.GetTileCoords(hitbox);
+        ClampToMap(ref corners.topLeft);
+        ClampToMap(ref corners.bottomRight);
+
+        // Check whether the tiles that intersect with the hitbox are solid.
+        TileType tile;
+        for (int x = corners.topLeft.X; x <= corners.bottomRight.X; x++) {
+            for (int y = corners.topLeft.Y; y <= corners.bottomRight.Y; y++) {
+                tile = _tileTypes[_map[x, y]];
+                if (tile.IsSolid) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
+        /// <summary>
+        /// Clamps the given <see cref="Point"/> to the tile map.
+        /// </summary>
+        /// <param name="point">Tile map coordinates.</param>
+        void ClampToMap(ref Point point) {
+            point.X = Math.Clamp(point.X, 0, _map.Width - 1);
+            point.Y = Math.Clamp(point.Y, 0, _map.Height - 1);
+        }
     }
 }

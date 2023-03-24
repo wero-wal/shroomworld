@@ -1,120 +1,158 @@
 using System;
-
+using System.Runtime.Serialization.Formatters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
-    // ----- Properties -----
-    public GraphicsDeviceManager GraphicsDeviceManager => _graphicsDeviceManager;
-    public SpriteBatch SpriteBatch => _spriteBatch;
-    public Texture2D BlankTexture { get; private set; }
+	// ----- Properties -----
+	public Vector2 CentreOfScreen => _centreOfScreen;
+	public Texture2D BlankTexture { get; private set; }
 
-    // ----- Fields -----
-    private const int TileSize = 8; // Number of pixels per tile side length.
-    private const int ScaleFactor = 20;
+	// ----- Fields -----
+	private const int TileSize = 8; // Number of pixels per square tile side length.
+	private const int ScaleFactor = 5;
 
-    private GraphicsDeviceManager _graphicsDeviceManager;
-    private SpriteBatch _spriteBatch;
-    private GameWindow _window;
-    private Camera _camera;
+	private GraphicsDeviceManager _graphicsDeviceManager;
+	private SpriteBatch _spriteBatch;
+	public static SpriteFont Font;
+	private GameWindow _window;
+	private Camera _camera;
 
-    private Rectangle _worldBounds; // its the world bounds but in screen scale
+	private Vector2 _centreOfScreen;
 
-    // ----- Constructor -----
-    public DisplayHandler(Game game, GraphicsDeviceManager graphicsDeviceManager) {
-        _graphicsDeviceManager = graphicsDeviceManager;
-        _spriteBatch = new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
+	private Rectangle _movementBounds; // World bounds in world scale.
 
-        // Configure window.
-        _graphicsDeviceManager.PreferredBackBufferWidth = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Width;
-        _graphicsDeviceManager.PreferredBackBufferHeight = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Height;
-        _graphicsDeviceManager.ApplyChanges();
-        _window = game.Window;
-        _window.AllowUserResizing = true;
-        _camera = new Camera(game.Window.ClientBounds);
+	// ----- Constructor -----
+	public DisplayHandler(Game game, GraphicsDeviceManager graphicsDeviceManager) {
+		_graphicsDeviceManager = graphicsDeviceManager;
+		_spriteBatch = new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
 
-        BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
-    }
+		// Configure window.
+		_graphicsDeviceManager.PreferredBackBufferWidth = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Width;
+		_graphicsDeviceManager.PreferredBackBufferHeight = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Height;
+		_graphicsDeviceManager.ApplyChanges();
+		_window = game.Window;
+		_window.AllowUserResizing = true;
+		_camera = new Camera();
 
-    // ----- Methods -----
-    public void MoveCamera(Rectangle playerHitbox) {
-        _camera.MoveToPlayer(playerHitbox);
-    }
-    public void UpdateCentreOfScreen() {
-        _camera.UpdateCentreOfScreen(_window.ClientBounds);
-    }
+		BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
+	}
 
-    public void Begin() {
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-    }
-    public void End() {
-        _spriteBatch.End();
-    }
-    /// <summary>
-    /// Main drawing method.
-    /// </summary>
-    /// <param name="texture"></param>
-    /// <param name="position">scaled-up on-screen position</param>
-    /// <param name="colour"></param>
-    public void Draw(Texture2D texture, Vector2 position, Color colour) {
-        position = _camera.CalibratePosition(position);
+	// ----- Methods -----
+	// Initialising
+	public void SetBounds(int width, int height) {
+		_movementBounds = new Rectangle(Point.Zero, new Point(width * TileSize, height * TileSize));
+	}
+	public void SetBackground(Color colour)	{
+		_graphicsDeviceManager.GraphicsDevice.Clear(colour);
+	}
+	public void SetTitle(string title) {
+		_window.Title = title;
+	}
+
+	public void Update(Vector2 playerPosition) {
+		_centreOfScreen = _window.ClientBounds.Size.ToVector2() / 2;
+		_camera.Follow(playerPosition * ScaleFactor);
+	}
+
+	// Drawing
+	public void Begin() {
+		_spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+	}
+	public void BeginText() {
+		_spriteBatch.Begin();
+	}
+	public void End() {
+		_spriteBatch.End();
+	}
+	/// <summary>
+	/// Main drawing method.
+	/// </summary>
+	/// <param name="texture"></param>
+	/// <param name="position">scaled-up on-screen position</param>
+	/// <param name="colour"></param>
+	public void Draw(Texture2D texture, Vector2 position, Color colour) {
 		_spriteBatch.Draw(texture,
-            destinationRectangle: new Rectangle((int)position.X, (int)position.Y, ScaleFactor, ScaleFactor * GetHeightInTiles(texture)),
-            colour);
-    }
-    /// <summary>
-    /// Displays a texture on the screen based on a position in the tile map.
-    /// </summary>
-    /// <param name="texture">texture of the tile</param>
-    /// <param name="x">x-coordinate of the object in the tile map</param>
-    /// <param name="y">y-coordinate of the object in the tile map</param>
-    /// <summary>
-    /// Display a texture on the screen at a given position.
-    /// </summary>
-    /// <param name="texture">The texture to be displayed.</param>
-    /// <param name="position">The position (destination coordinates) in pixels,
-    /// of the top left corner of the texture when it is displayed on-screen.</param>
-    public void Draw(Texture2D texture, int x, int y) {
-        Draw(texture,
-            position: ToScreenScale(x, y, GetHeightInTiles(texture)),
-            colour: Color.White);
-    }
-    public void DrawText(string text, Vector2 position, Color colour) {
-		// todo: draw text
+			destinationRectangle: new Rectangle(position.ToPoint().ScaleBy(ScaleFactor), texture.Bounds.Size.ScaleBy(ScaleFactor)),
+			Color.White);
 	}
-	public void DrawRectangle(Vector2 size, Vector2 position, Color colour) {
-        Draw(BlankTexture, position, colour);
+	/// <summary>
+	/// Displays a texture on the screen based on a position in the tile map.
+	/// </summary>
+	/// <param name="texture">texture of the tile</param>
+	/// <param name="x">x-coordinate of the object in the tile map</param>
+	/// <param name="y">y-coordinate of the object in the tile map</param>
+	/// <summary>
+	/// Display a texture on the screen at a given position.
+	/// </summary>
+	/// <param name="texture">The texture to be displayed.</param>
+	/// <param name="position">The position (destination coordinates) in pixels,
+	/// of the top left corner of the texture when it is displayed on-screen.</param>
+	public void DrawTile(int x, int y, Texture2D texture) {
+		Draw(texture,
+			position: GetTilePosition(x, y, texture.Bounds.Size),
+			colour: Color.White);
 	}
-    /// <summary>
-    /// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
-    /// </summary>
-    /// <param name="sprite">The sprite to be displayed.</param>
-    public void Draw(Sprite sprite) {
+	/// <summary>
+	/// Display a sprite on the screen using its <see cref="Sprite.Texture"/> and <see cref="Sprite.Position"/> properties.
+	/// </summary>
+	/// <param name="sprite">The sprite to be displayed.</param>
+	public void DrawSprite(Sprite sprite) {
 		Draw(sprite.Texture, sprite.Position, Color.White);
 	}
-    public Vector2 ToScreenScale(int x, int y, int heightInTiles) {
-        return new Vector2(x * ScaleFactor, (y - heightInTiles + 1) * ScaleFactor);
-    }
-
-    public Vector2 ClampToScreen(Rectangle hitbox) {
-        return new Vector2(
-            x: Math.Clamp(hitbox.X, _worldBounds.Left, _worldBounds.Right - hitbox.Width),
-            y: Math.Clamp(hitbox.Y, _worldBounds.Top, _worldBounds.Right - hitbox.Height)
-        );
-    }
-
-    public int GetHeightInTiles(Texture2D texture) {
-        return texture.Height / TileSize;
-    }
-
-    public void SetBounds(int width, int height) {
-        _worldBounds = new Rectangle(Point.Zero, ToScreenScale(width, height, 1).ToPoint());
-    }
-    public void SetBackground(Color colour) {
-        _graphicsDeviceManager.GraphicsDevice.Clear(colour);
+	public void DrawRectangle(Vector2 size, Vector2 position, Color colour) {
+		Draw(BlankTexture, position, colour);
 	}
-    public void SetTitle(string title) {
-        _window.Title = title;
-    }
+	public void DrawText(string text, Vector2 position, Color colour) {
+		_spriteBatch.DrawString(Font, text, position, colour);
+	}
+
+	// Vector conversions
+	/// <summary>
+	///     Converts world-scale coordinates to coordinates in the tile map.
+	/// </summary>
+    /// <returns>
+    ///     A tuple containing the tile map coordinates of the tiles in which the top left and
+    ///     bottom right corners of the hitbox lie.
+    /// </returns>
+	public (Point TopLeft, Point BottomRight) GetTileCoords(Rectangle hitbox) {
+		Point position = hitbox.Location;
+		position.X /= TileSize;
+		position.Y /= TileSize;
+		position.Y += 1 - hitbox.Height / TileSize;
+		return (position, position + new Point(1 + hitbox.Width / TileSize, 1 + hitbox.Height / TileSize));
+	}
+	/// <summary>
+	/// Converts tile map coordinates to a world-scale position.
+	/// </summary>
+	/// <param name="x">x-coordinate of the tile in the tile map.</param>
+	/// <param name="y">y-coordinate of the tile in the tile map.</param>
+	/// <param name="size">The size of the tile's texture.</param>
+	/// <returns>The position of the tile in world-scale.</returns>
+	private Vector2 GetTilePosition(int x, int y, Point size) {
+		return new Vector2(x * TileSize, (y + 1) * TileSize - size.Y);
+	}
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="x">The x-coordinate of the tile in the tilemap.</param>
+	/// <param name="y">The y-coordinate of the tile in the tilemap.</param>
+	/// <param name="texture">The texture of the tile.</param>
+	/// <returns>
+	///     A <see cref="Rectangle"/> representing the hitbox of the tile at coordinates
+	///     (<paramref name="x"/>, <paramref name="y"/>) in world scale.
+	/// </returns>
+	public Rectangle GetTileHitbox(int x, int y, Point textureSize) {
+		return new Rectangle(GetTilePosition(x, y, textureSize).ToPoint(), textureSize);
+	}
+
+	// Other
+	public void ClampToWorld(ref Rectangle hitbox, ref Vector2 position) {
+		hitbox.X = Math.Clamp((int)position.X, _movementBounds.Left, _movementBounds.Right - hitbox.Width);
+		hitbox.Y = Math.Clamp((int)position.Y, _movementBounds.Top, _movementBounds.Bottom - hitbox.Height);
+		position.X = Math.Clamp(position.X, _movementBounds.Left, _movementBounds.Right - hitbox.Width);
+		position.Y = Math.Clamp(position.Y, _movementBounds.Top, _movementBounds.Bottom - hitbox.Height);
+	}
 }
