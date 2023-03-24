@@ -4,6 +4,8 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System.Xml.Schema;
 
 namespace Shroomworld.FileHandling;
 public static class FileManager {
@@ -94,7 +96,7 @@ public static class FileManager {
 		using (StreamReader sr = new StreamReader(path)) {
 			while (!sr.EndOfStream) {
 				// Split the line using commas as separators.
-				line = sr.ReadLine().Split(s_separators[Levels.I]);
+				line = sr.ReadLine().Split(Levels.I);
 				file.Add(line);
 			}
 			sr.Close();
@@ -189,7 +191,7 @@ public static class FileManager {
     	return new PlayerType(
     		idData,
 			texture: LoadTexture(FilePaths.Elements.Player, idData.Name),
-			healthData: ParseHealthData(SplitAtLevel(plaintext[p++], Levels.II)),
+			healthData: ParseHealthData(plaintext[p++].Split(Levels.II)),
 			physicsData: ParsePhysicsData(plaintext[p++])
 		);
     }
@@ -205,7 +207,7 @@ public static class FileManager {
 
     // Parse components:
     private static int[] ParseLayers(string plaintext) {
-		return SplitAtLevel(plaintext, Levels.II).ToInt();
+		return plaintext.Split(Levels.II).ToInt();
 	}
 	private static PhysicsData ParsePhysicsData(string plaintext) {
 		return new PhysicsData(maxSpeed: plaintext.ToInt());
@@ -214,10 +216,10 @@ public static class FileManager {
 		if (string.IsNullOrEmpty(plaintext)) {
 			return Maybe.None;
 		}
-		string[] drops_str = SplitAtLevel(plaintext, Levels.II);
+		string[] drops_str = plaintext.Split(Levels.II);
 		Drop[] drops = new Drop[drops_str.Length];
 		for (int i = 0; i < drops.Length; i++) {
-			drops[i] = new Drop(SplitAtLevel(drops_str[i], Levels.III).ToInt());
+			drops[i] = new Drop(drops_str[i].Split(Levels.III).ToInt());
 		}
 		return drops;
 	}
@@ -225,7 +227,7 @@ public static class FileManager {
 		if (string.IsNullOrEmpty(plaintext)) {
 			return Array.Empty<int>();
 		}
-		return SplitAtLevel(plaintext, Levels.II).ToInt();
+		return plaintext.Split(Levels.II).ToInt();
     }
 	private static HealthData ParseHealthData(string[] plaintext) {
 		int p = 0;
@@ -244,6 +246,44 @@ public static class FileManager {
 	//	// ConvertAll to powerup
 	//	// local function to use as converter
 	//}
+
+	// Parse Menus
+	public static List<ButtonMenu> LoadButtonMenus() {
+		string[][] file = LoadCsvFile(FilePaths.MenuTextFile);
+		List<ButtonMenu> menus = new List<ButtonMenu>();
+		foreach (string[] menu in file) {
+			int p = 0;
+			string name = menu[p++];
+			string[] items = menu[p++].Split(Levels.II);
+			menus.Add(new ButtonMenu(name, items,
+				outcomes: ParseGameStates(menu[p++].Split(Levels.II)),
+				new ButtonMenuDisplayHandler(
+					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, name + FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II))),
+					location: ParseVector(menu[p++].Split(Levels.II)),
+					distanceBetweenEachButton: Convert.ToSingle(menu[p++]),
+					numberOfButtons: items.Length,
+					displayHandler: Shroomworld.DisplayHandler,
+					normalButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.DefaultButtonTextureName),
+					highlightedButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.HighlightedButtonTextureName),
+					pressedButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.PressedButtonTextureName),
+					normalTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
+					highlightedTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
+					pressedTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
+					backgroundColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt())
+				)
+				));
+		}
+		/* Menus.MainMenu = new ButtonMenu(new string[] { "Play" }, new GameStates[] { GameStates.Playing }, new ButtonMenuDisplayHandler(
+	new Sprite(s_displayHandler.BlankTexture), Vector2.Zero, 10f, 1, s_displayHandler, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture,
+	Color.Black, Color.White, Color.Black, Color.Green) */
+		return menus;
+	}
+	private static Shroomworld.GameStates[] ParseGameStates(string[] plaintext) {
+		return Array.ConvertAll(plaintext, gamestate => (Shroomworld.GameStates)(gamestate.ToInt()));
+	}
+	private static Vector2 ParseVector(string[] plaintext) {
+		return new Vector2(Convert.ToSingle(plaintext[0]), Convert.ToSingle(plaintext[1]));
+	}
 
 	// Save:
 	//public static void SavePlayer(Player player) {
@@ -269,7 +309,7 @@ public static class FileManager {
 		}
 		return csv.ToString();
 	}
-	private static string[] SplitAtLevel(string stringToSplit, int level) {
+	private static string[] Split(this string stringToSplit, int level) {
 		return stringToSplit.Split(s_separators[level]);
 	}
 	private static int ToInt(this string str) {

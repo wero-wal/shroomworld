@@ -20,6 +20,7 @@ public static class Input {
 
     // ----- Properties -----
     public static List<Inputs> CurrentInputs => _currentInputs;
+    public static Vector2 MousePosition => _mouseState.Position.ToVector2();
 
     // ----- Fields -----
     private static MouseState _mouseState;
@@ -52,9 +53,6 @@ public static class Input {
     public static bool HasBeenReleased(Inputs input) {
         return _currentInputs.Contains(input)
         && (!_previousInputs.Contains(input));
-    }
-    public static Vector2 GetMousePosition() {
-        return _mouseState.Position.ToVector2();
     }
 
     private static void ExtractInputsFromStates() {

@@ -17,6 +17,7 @@ public interface IDisplayHandler {
 	void DrawTile(int x, int y, Texture2D texture);
 	void End();
 	(Point TopLeft, Point BottomRight) GetTileCoords(Rectangle hitbox);
+	void Draw(Texture2D texture, Vector2 position);
 	void SetBackground(Color colour);
 	void SetBounds(int width, int height);
 	void SetTitle(string title);
