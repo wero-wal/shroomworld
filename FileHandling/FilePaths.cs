@@ -52,10 +52,10 @@ public static class FilePaths {
 
     // ----- Fields -----
     public const string FilePathFile = "file-paths.txt";
-    public const string TitleTextureName = "title";
-    public const string DefaultButtonTextureName = "default-button";
-    public const string HighlightedButtonTextureName = "highlighted-button";
-    public const string PressedButtonTextureName = "pressed-button";
+    public const string TitleTextureName = "icon";
+    public const string DefaultButtonTextureName = "default-menu-button";
+    public const string HighlightedButtonTextureName = "highlighted-menu-button";
+    public const string PressedButtonTextureName = "pressed-menu-button";
 
     // Elements for which there are types / templates.
     private static Elements[] s_typeElements = new Elements[] {

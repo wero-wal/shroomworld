@@ -258,19 +258,19 @@ public static class FileManager {
 			menus.Add(new ButtonMenu(name, items,
 				outcomes: ParseGameStates(menu[p++].Split(Levels.II)),
 				new ButtonMenuDisplayHandler(
-					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, name + FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II))),
+					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II))),
 					location: ParseVector(menu[p++].Split(Levels.II)),
 					distanceBetweenEachButton: Convert.ToSingle(menu[p++]),
 					numberOfButtons: items.Length,
 					displayHandler: Shroomworld.DisplayHandler,
-					normalButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.DefaultButtonTextureName),
-					highlightedButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.HighlightedButtonTextureName),
-					pressedButton: LoadTexture(FilePaths.Elements.Menu, name + FilePaths.PressedButtonTextureName),
-					normalTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
-					highlightedTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
-					pressedTextColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt()),
-					backgroundColour: new Color(menu[p++].ToInt(), menu[p++].ToInt(), menu[p++].ToInt())
-				)
+					normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
+					highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
+					pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),
+					normalTextColour: ParseColour(menu[p++].Split(Levels.II)),
+					highlightedTextColour: ParseColour(menu[p++].Split(Levels.II)),
+                    pressedTextColour: ParseColour(menu[p++].Split(Levels.II)),
+                    backgroundColour: ParseColour(menu[p++].Split(Levels.II))
+                )
 				));
 		}
 		/* Menus.MainMenu = new ButtonMenu(new string[] { "Play" }, new GameStates[] { GameStates.Playing }, new ButtonMenuDisplayHandler(
@@ -284,6 +284,9 @@ public static class FileManager {
 	private static Vector2 ParseVector(string[] plaintext) {
 		return new Vector2(Convert.ToSingle(plaintext[0]), Convert.ToSingle(plaintext[1]));
 	}
+	private static Color ParseColour(string[] plaintext) {
+		return new Color(plaintext[0].ToInt(), plaintext[1].ToInt(), plaintext[2].ToInt());
+    }
 
 	// Save:
 	//public static void SavePlayer(Player player) {
