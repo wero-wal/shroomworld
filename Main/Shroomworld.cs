@@ -134,7 +134,6 @@ public class Shroomworld : Game {
 
     protected override void Update(GameTime gameTime) {
         Input.Update();
-        World.DebugText = string.Empty;
         switch (_currentGameState) {
 
             case GameState.CreatingWorld:
@@ -263,9 +262,6 @@ public class Shroomworld : Game {
             default:
                 break;
         }
-        s_displayHandler.End();
-        s_displayHandler.BeginText();
-        s_displayHandler.DrawText(World.DebugText, new Vector2(10f, 10f), Color.Black);
         s_displayHandler.End();
         base.Draw(gameTime);
     }

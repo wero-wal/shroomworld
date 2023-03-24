@@ -15,8 +15,6 @@ public class World {
     public List<Friendly> Friendlies => _friendlies;
     public List<Enemy> Enemies => _enemies;
 
-    public static string DebugText = string.Empty;
-
 
     // ----- Fields -----
     private static IDisplayHandler _display;
@@ -117,15 +115,13 @@ public class World {
         (Point topLeft, Point bottomRight) corners = _display.GetTileCoords(hitbox);
         ClampToMap(ref corners.topLeft);
         ClampToMap(ref corners.bottomRight);
-DebugText += $"top left: {corners.topLeft}\nbottom right: {corners.bottomRight}\n";
-DebugText+=$"Player hitbox position: {_player.Sprite.Hitbox.Location}\n";
-DebugText+=$"Player position: {_player.Sprite.Position}\n";
+
         // Check whether the tiles that intersect with the hitbox are solid.
         TileType tile;
         for (int x = corners.topLeft.X; x <= corners.bottomRight.X; x++) {
             for (int y = corners.topLeft.Y; y <= corners.bottomRight.Y; y++) {
                 tile = _tileTypes[_map[x, y]];
-                if (tile.IsSolid && _display.GetTileHitbox(x, y, tile.Texture.Bounds.Size).Intersects(hitbox)) {
+                if (tile.IsSolid) {
                     return true;
                 }
             }

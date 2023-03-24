@@ -54,7 +54,7 @@ public class DisplayHandler : IDisplayHandler {
 
 	public void Update(Vector2 playerPosition) {
 		_centreOfScreen = _window.ClientBounds.Size.ToVector2() / 2;
-		_camera.Follow(playerPosition);
+		_camera.Follow(playerPosition * ScaleFactor);
 	}
 
 	// Drawing
@@ -121,8 +121,8 @@ public class DisplayHandler : IDisplayHandler {
 		Point position = hitbox.Location;
 		position.X /= TileSize;
 		position.Y /= TileSize;
-		position.Y += 1 - hitbox.Height;
-		return (position, position + new Point(hitbox.Width / TileSize, hitbox.Height / TileSize));
+		position.Y += 1 - hitbox.Height / TileSize;
+		return (position, position + new Point(1 + hitbox.Width / TileSize, 1 + hitbox.Height / TileSize));
 	}
 	/// <summary>
 	/// Converts tile map coordinates to a world-scale position.
