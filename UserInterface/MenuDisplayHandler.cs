@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,12 +11,12 @@ public class ButtonMenuDisplayHandler {
 	private readonly Sprite _title;
 	private readonly Vector2 _location; // Position of the top left corner of the first button in the menu.
 	private Rectangle _menuBounds;
-	private readonly float _distanceBetweenEachButton = 10;
+	private readonly float _distanceBetweenEachButton = 1;
 	private readonly Dictionary<MenuButton.States, Texture2D> _buttonTextures;
 	private readonly Dictionary<MenuButton.States, Color> _textColours;
 	private readonly Color _backgroundColour;
 	private readonly IDisplayHandler _displayHandler;
-
+	private readonly Point _buttonSize;
 
 	// ----- Constructors -----
 	public ButtonMenuDisplayHandler(Sprite title, Vector2 location, float distanceBetweenEachButton, int numberOfButtons,
@@ -39,9 +37,10 @@ public class ButtonMenuDisplayHandler {
 			{ MenuButton.States.Pressed, pressedTextColour }
 		};
 		_backgroundColour = backgroundColour;
-		int width = _buttonTextures[MenuButton.States.Default].Width;
-		int height = (int)((_buttonTextures[MenuButton.States.Default].Height + _distanceBetweenEachButton) * numberOfButtons);
-		_menuBounds = new Rectangle(_location.ToPoint(), new Point(width, height));
+		_buttonSize = displayHandler.GetSizeInTiles(_buttonTextures[MenuButton.States.Default]);
+		int width = _buttonSize.X;
+		int height = (int)((_buttonSize.Y + _distanceBetweenEachButton) * numberOfButtons);
+		_menuBounds = Sprite.GetHitbox(_location, new Point(width, height));
 	}
 	
 
@@ -52,10 +51,9 @@ public class ButtonMenuDisplayHandler {
 	/// </summary>
 	public IEnumerable<MenuButton> ConvertToButtons(IEnumerable<string> items) {
 		Vector2 position = _location;
-		float buttonHeight = _buttonTextures[MenuButton.States.Default].Height;
 		foreach (string item in items) {
 			yield return new MenuButton(item, position);
-			position.Y += buttonHeight + _distanceBetweenEachButton;
+			position.Y += _buttonSize.Y + _distanceBetweenEachButton;
 		}
 	}
 	public int GetIndexOfButtonContainingMouse(int defaultIndex) {
@@ -64,17 +62,17 @@ public class ButtonMenuDisplayHandler {
 			return defaultIndex;
 		}
 		// Calculate index
-		int index = (int)(Input.MousePosition.Y / (_buttonTextures[MenuButton.States.Default].Height + _distanceBetweenEachButton));
+		int index = (int)((_displayHandler.MousePosition.Y - _location.Y) / (_buttonSize.Y + _distanceBetweenEachButton));
 
 		// Check mouse is in the gap between two buttons.
-		float bottomOfButton = _location.Y + (_buttonTextures[MenuButton.States.Default].Height * index) + (_distanceBetweenEachButton * (index - 1));
-		if (Input.MousePosition.Y > bottomOfButton) {
+		float bottomOfButton = _location.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
+		if (_displayHandler.MousePosition.Y > bottomOfButton) {
 			return defaultIndex;
 		}
 		return index;
 	}
 	private bool MouseIsWithinMenuBounds() {
-		return _menuBounds.Contains(Input.MousePosition);
+		return _menuBounds.Contains(_displayHandler.MousePosition);
 	}
 	public void Draw(MenuButton[] buttons) {
 		_displayHandler.SetBackground(_backgroundColour);

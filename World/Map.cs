@@ -1,3 +1,6 @@
+using System;
+using Microsoft.Xna.Framework;
+
 namespace Shroomworld; 
 /// <summary>
 /// Used to generate and store a tilemap.
@@ -30,6 +33,4 @@ public class Map {
 			_biomes = biomes;
 		_seed = seed;
 	}
-
-	// ----- Methods -----
 }

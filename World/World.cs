@@ -17,7 +17,8 @@ public class World {
 
 
     // ----- Fields -----
-    private static IDisplayHandler _display;
+    public delegate Vector2 Clamper(Vector2 position, Point size);
+
     private static Dictionary<int, TileType> _tileTypes;
 
     private readonly Map _map;
@@ -38,7 +39,7 @@ public class World {
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
         SetKeyBinds();
-        _physics = new Physics.Physics(acceleration: 0.2f, gravity: 6f);
+        _physics = new Physics.Physics(acceleration: 0.2f, gravity: 0.1f);
     }
     /// <summary>
     /// Instantiate a saved / existing world.
@@ -51,28 +52,28 @@ public class World {
     }
 
     // ----- Methods -----
-    public static void SetUp(IDisplayHandler displayHandler, Dictionary<int, TileType> tileTypes) {
-        _display = displayHandler;
+    public static void SetUp(Dictionary<int, TileType> tileTypes) {
         _tileTypes = tileTypes;
     }
 
     public void Update() {
         _keyBinds.ProcessInputs(Input.CurrentInputs);
         ApplyPhysics();
+        _player.Update();
+        _player.Sprite.Position = Clamp(_player.Sprite.Position, _player.Sprite.Size);
     }
-    public void Draw() {
-        _display.SetBackground(Color.CornflowerBlue);
+    public void Draw(IDisplayHandler displayHandler) {
+        displayHandler.SetBackground(Color.CornflowerBlue);
 
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                _display.DrawTile(x, y, _tileTypes[_map[x, y]].Texture);
+                displayHandler.Draw(_tileTypes[_map[x, y]].Texture, x, y);
             }
         }
-
-        _display.DrawSprite(_player.Sprite);
+        displayHandler.Draw(_player.Sprite);
     }
 
     private void SetKeyBinds() {
@@ -90,20 +91,13 @@ public class World {
         _keyBinds.Add(Input.Inputs.N3, SwitchToHotbarSlot3);
         _keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
     }
-    private void PlayerJump() {
-        _player.Body.AddAcceleration(_physics.AccelerationUp);
-    }
-    private void PlayerMoveLeft() {
-        _player.Body.AddAcceleration(_physics.AccelerationLeft);
-    }
-    private void PlayerMoveRight() {
-        _player.Body.AddAcceleration(_physics.AccelerationRight);
-    }
-    private void PlayerMoveDown() {
-        _player.Body.AddAcceleration(_physics.AccelerationDown);
-    }
+    private void PlayerJump() => _player.Body.AddAcceleration(_physics.AccelerationUp);
+    private void PlayerMoveLeft() => _player.Body.AddAcceleration(_physics.AccelerationLeft);
+    private void PlayerMoveRight() => _player.Body.AddAcceleration(_physics.AccelerationRight);
+    private void PlayerMoveDown() => _player.Body.AddAcceleration(_physics.AccelerationDown);
     private void ApplyPhysics() {
-        _player.Body.ApplyPhysics(CheckForCollisions);
+        _player.Body.AddGravity(_physics.Gravity);
+        _player.Body.ApplyPhysics(CheckForCollisions, Clamp);
     }
     /// <summary>
     /// Checks whether the given <paramref name="hitbox"/> intersects with any solid tiles.
@@ -111,30 +105,22 @@ public class World {
     /// <param name="hitbox">The hitbox of the entity for which you are checking collisions.</param>
     /// <returns></returns>
     private bool CheckForCollisions(Rectangle hitbox) {
-        // Get the tilemap coordinates of the tiles at the top left and bottom right of the entity's hitbox.
-        (Point topLeft, Point bottomRight) corners = _display.GetTileCoords(hitbox);
-        ClampToMap(ref corners.topLeft);
-        ClampToMap(ref corners.bottomRight);
-
-        // Check whether the tiles that intersect with the hitbox are solid.
-        TileType tile;
-        for (int x = corners.topLeft.X; x <= corners.bottomRight.X; x++) {
-            for (int y = corners.topLeft.Y; y <= corners.bottomRight.Y; y++) {
-                tile = _tileTypes[_map[x, y]];
-                if (tile.IsSolid) {
+        for (int x = hitbox.Left; x <= hitbox.Right; x++) {
+            for (int y = hitbox.Top; y <= hitbox.Bottom; y++) {
+                if (_tileTypes[_map[x, y]].IsSolid) {
                     return true;
                 }
             }
         }
         return false;
-
-        /// <summary>
-        /// Clamps the given <see cref="Point"/> to the tile map.
-        /// </summary>
-        /// <param name="point">Tile map coordinates.</param>
-        void ClampToMap(ref Point point) {
-            point.X = Math.Clamp(point.X, 0, _map.Width - 1);
-            point.Y = Math.Clamp(point.Y, 0, _map.Height - 1);
-        }
+	}
+    private void Clamp(ref Vector2 position, Point size) {
+        position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
+        position.Y = Math.Clamp(position.Y, 0, _map.Height - 1 - size.Y);
+    }
+    private Vector2 Clamp(Vector2 position, Point size) {
+        position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
+        position.Y = Math.Clamp(position.Y, 0, _map.Height - 1 - size.Y);
+        return position;
     }
 }

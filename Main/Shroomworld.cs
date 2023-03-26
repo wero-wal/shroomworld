@@ -79,7 +79,7 @@ public class Shroomworld : Game {
         s_displayHandler.SetTitle("Shroomworld");
 
         // Set up menus.
-        _currentGameState = GameStates.Menu;
+        _currentGameState = GameStates.CreatingWorld;
         _activeMenus = new Stack<ButtonMenu>();
 
         Input.Initialise();
@@ -99,7 +99,7 @@ public class Shroomworld : Game {
             SetStateToError("Couldn't load game files.");
         }
         try {
-            List<ButtonMenu> menus = FileManager.LoadButtonMenus();
+            List<ButtonMenu> menus = FileManager.LoadButtonMenus(s_displayHandler);
             Menus.MainMenu = menus[0];
         }
         catch (System.Exception) {
@@ -124,7 +124,7 @@ public class Shroomworld : Game {
             return false;
         }
 
-        World.SetUp(s_displayHandler, tileTypes);
+        World.SetUp(tileTypes);
 
         /* TODO: Things to load:
            - World names / ids
@@ -144,19 +144,17 @@ public class Shroomworld : Game {
         Input.Update();
         switch (_currentGameState) {
 
-            case GameState.CreatingWorld:
+            case GameStates.CreatingWorld:
                 const int Width = 100;
                 const int Height = 50;
                 const int NumberOfBiomes = 10;
-                Player player = s_playerTypes[0].CreateNew(Vector2.Zero);
+                Player player = s_playerTypes[0].CreateNew(Vector2.Zero, s_displayHandler);
 
-                s_displayHandler.SetBounds(Width, Height);
                 _world = new World(new MapGenerator(Width, Height, NumberOfBiomes, 69_420).Generate(), player);
-                _currentGameState = GameState.Playing;
+                _currentGameState = GameStates.Playing;
                 break;
 
-            case GameState.Playing:
-
+            case GameStates.Playing:
                 _world.Update();
                 s_displayHandler.Update(_world.Player.Sprite.Position);
                 break;
@@ -245,25 +243,25 @@ public class Shroomworld : Game {
     protected override void Draw(GameTime gameTime) {
         switch (_currentGameState) {
 
-            case GameState.CreatingWorld:
+            case GameStates.CreatingWorld:
                 s_displayHandler.BeginText();
                 s_displayHandler.SetBackground(Color.Green);
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
                 break;
 
-            case GameState.Playing:
+            case GameStates.Playing:
                 s_displayHandler.Begin();
-                _world.Draw();
+                _world.Draw(s_displayHandler);
                 break;
 
-            case GameState.Menu:
+            case GameStates.Menu:
                 s_displayHandler.BeginText();
                 s_displayHandler.SetBackground(Color.White);
                 s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
                 _activeMenus.Peek().Draw();
                 break;
 
-            case GameState.Error:
+            case GameStates.Error:
 				      s_displayHandler.BeginText();
 				      s_displayHandler.SetBackground(Color.Red);
               s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);

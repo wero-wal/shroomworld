@@ -25,8 +25,8 @@ public class FriendlyType : IType {
 		_quest = quest;
 	}
 
-	public Friendly CreateNew() {
-		Sprite sprite = new Sprite(_texture);
+	public Friendly CreateNew(IDisplayHandler displayHandler) {
+		Sprite sprite = new Sprite(_texture, displayHandler);
 		return new Friendly(this, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
 	}
 }

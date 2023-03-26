@@ -30,7 +30,7 @@ public class EnemyType : IType {
 
 
 	// ----- Methods -----
-	public Enemy GetNewEnemy() {
-		return new Enemy(this, new Sprite(_texture), new EntityHealthData(_healthData));
+	public Enemy GetNewEnemy(IDisplayHandler displayHandler) {
+		return new Enemy(this, new Sprite(_texture, displayHandler), new EntityHealthData(_healthData));
 	}
 }

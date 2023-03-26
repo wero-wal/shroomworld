@@ -21,5 +21,10 @@ namespace Shroomworld {
             _healthData = healthData;
             _body = body;
         }
+
+        // ----- Methods -----
+        public virtual void Update() {
+            _sprite.Update();
+        }
     }
 }

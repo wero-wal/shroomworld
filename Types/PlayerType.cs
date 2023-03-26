@@ -26,7 +26,7 @@ public class PlayerType : IType {
     }
 
     // ----- Methods -----
-    public Player CreateNew(Vector2 position) {
-        return new Player(this, new Sprite(_texture, position), new EntityHealthData(_healthData));
+    public Player CreateNew(Vector2 position, IDisplayHandler displayHandler) {
+        return new Player(this, new Sprite(_texture, position, displayHandler), new EntityHealthData(_healthData));
     }
 }

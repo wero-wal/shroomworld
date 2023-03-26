@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Intrinsics;
 using Microsoft.Xna.Framework;
 
 namespace Shroomworld.Physics;
@@ -45,11 +46,16 @@ public class Body {
 	/// Change velocity based on acceleration and position based on velocity.
 	/// <para>Note: velocity is limited by the body's max speed.</para>
 	/// </summary>
-	public void ApplyPhysics(CollisionChecker checkForCollisions) {
-		//AddGravity();
+	public void ApplyPhysics(CollisionChecker checkForCollisions, World.Clamper clamp) {
 		ApplyAcceleration();
 		ResetAcceleration();
-		ApplyVelocity(checkForCollisions);
+		ApplyVelocity(checkForCollisions, clamp);
+	}
+	/// <summary>
+	/// Add gravity to the acceleration in the positive vertical direction.
+	/// </summary>
+	public void AddGravity(float gravity) {
+		_acceleration.Y += gravity;
 	}
 	private void ApplyAcceleration() {
 		Vector2 newVelocity = _velocity + _acceleration;
@@ -65,16 +71,10 @@ public class Body {
 			_velocity *= 0.95f;
 		}
 	}
-	private void ApplyVelocity(CollisionChecker checkForCollisions) {
-		if (!checkForCollisions(_sprite.SimulateChangePosition(_velocity))) {
-			_sprite.ChangePosition(_velocity);
+	private void ApplyVelocity(CollisionChecker checkForCollisions, World.Clamper clamp) {
+		if (!checkForCollisions(_sprite.GetHitbox(clamp(_sprite.Position + _velocity, _sprite.Size)))) {
+			_sprite.Position += _velocity;
 		}
-	}
-	/// <summary>
-	/// Add gravity to the acceleration in the positive vertical direction.
-	/// </summary>
-	private void AddGravity(float gravity) {
-		_acceleration.Y += gravity;
 	}
 	/// <summary>
 	/// Set acceleration to zero.

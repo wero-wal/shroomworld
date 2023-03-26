@@ -210,7 +210,7 @@ public static class FileManager {
 		return plaintext.Split(Levels.II).ToInt();
 	}
 	private static PhysicsData ParsePhysicsData(string plaintext) {
-		return new PhysicsData(maxSpeed: plaintext.ToInt());
+		return new PhysicsData(maxSpeed: Convert.ToSingle(plaintext));
 	}
 	private static Maybe<Drop[]> ParseDrops(string plaintext) {
 		if (string.IsNullOrEmpty(plaintext)) {
@@ -248,7 +248,7 @@ public static class FileManager {
 	//}
 
 	// Parse Menus
-	public static List<ButtonMenu> LoadButtonMenus() {
+	public static List<ButtonMenu> LoadButtonMenus(IDisplayHandler displayHandler) {
 		string[][] file = LoadCsvFile(FilePaths.MenuTextFile);
 		List<ButtonMenu> menus = new List<ButtonMenu>();
 		foreach (string[] menu in file) {
@@ -258,11 +258,11 @@ public static class FileManager {
 			menus.Add(new ButtonMenu(name, items,
 				outcomes: ParseGameStates(menu[p++].Split(Levels.II)),
 				new ButtonMenuDisplayHandler(
-					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II))),
+					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II)), displayHandler),
 					location: ParseVector(menu[p++].Split(Levels.II)),
 					distanceBetweenEachButton: Convert.ToSingle(menu[p++]),
 					numberOfButtons: items.Length,
-					displayHandler: Shroomworld.DisplayHandler,
+					displayHandler: displayHandler,
 					normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
 					highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
 					pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),

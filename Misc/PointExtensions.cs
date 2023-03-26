@@ -2,6 +2,11 @@ using Microsoft.Xna.Framework;
 
 namespace Shroomworld;
 public static class PointExtensions {
+
+	// ----- Properties -----
+	public static Point One = new Point(1, 1);
+
+	// ----- Methods -----
 	/// <summary>
 	/// Multiplies a <see cref="Point"/> by a scalar value.
 	/// </summary>

@@ -8,10 +8,10 @@
 		public float MaximumSpeed => _maximumSpeed;
 
 		// ----- Fields -----
-		private int _maximumSpeed;
+		private float _maximumSpeed;
 		
 		// ----- Constructors -----
-		public PhysicsData(int maxSpeed) {
+		public PhysicsData(float maxSpeed) {
 			_maximumSpeed = maxSpeed;
 		}
 	}
