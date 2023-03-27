@@ -9,6 +9,7 @@ public class Sprite {
     public Texture2D Texture => _texture;
     public Vector2 Position { get => _position; set => _position = value; }
     public Point Size => _size;
+    public Rectangle Hitbox => _hitbox;
 
     // ----- Fields -----
     private readonly Texture2D _texture;
@@ -30,13 +31,10 @@ public class Sprite {
 
     // ----- Methods -----
     public static Rectangle GetHitbox(Vector2 position, Point size) {
-		return new Rectangle(position.ToPoint(), new Point((int)Math.Ceiling(position.X + size.X) - (int)position.X, (int)Math.Ceiling(position.Y + size.Y) - (int)position.Y));
+		return new Rectangle(position.ToPoint(), (Vector2.Ceiling(position + size.ToVector2()) - Vector2.Floor(position)).ToPoint());
     }
     public void Update() {
         // Update the hitbox by flooring the position and ceiling the size.
-		_hitbox = new Rectangle(_position.ToPoint(), new Point((int)Math.Ceiling(_position.X + _size.X) - (int)_position.X, (int)Math.Ceiling(_position.Y + _size.Y) - (int)_position.Y));
+		_hitbox = GetHitbox(_position, _size);
 	}
-    public Rectangle GetHitbox(Vector2 position) {
-		return new Rectangle(position.ToPoint(), new Point((int)Math.Ceiling(position.X + _size.X) - (int)position.X, (int)Math.Ceiling(position.Y + _size.Y) - (int)position.Y));
-    }
 }

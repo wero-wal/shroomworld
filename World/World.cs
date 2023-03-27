@@ -96,23 +96,23 @@ public class World {
     private void PlayerMoveRight() => _player.Body.AddAcceleration(_physics.AccelerationRight);
     private void PlayerMoveDown() => _player.Body.AddAcceleration(_physics.AccelerationDown);
     private void ApplyPhysics() {
-        _player.Body.AddGravity(_physics.Gravity);
-        _player.Body.ApplyPhysics(CheckForCollisions, Clamp);
+        _player.Body.ApplyPhysics(_physics.Gravity, GetSolidIntersectingTiles);
     }
     /// <summary>
-    /// Checks whether the given <paramref name="hitbox"/> intersects with any solid tiles.
     /// </summary>
     /// <param name="hitbox">The hitbox of the entity for which you are checking collisions.</param>
-    /// <returns></returns>
-    private bool CheckForCollisions(Rectangle hitbox) {
-        for (int x = hitbox.Left; x <= hitbox.Right; x++) {
-            for (int y = hitbox.Top; y <= hitbox.Bottom; y++) {
+    /// <returns>
+    ///     A collection of the solid tiles with which the entity with the given <paramref name="point"/> and <paramref name="size"> intersects.
+    /// </returns>
+    private IEnumerable<Point> GetSolidIntersectingTiles(Vector2 position, Point size) {
+        Clamp(ref position, size);
+        for (int x = (int)position.X; x <= Math.Ceiling(position.X + size.X); x++) {
+            for (int y = (int)position.Y; y <= Math.Ceiling(position.Y + size.Y); y++) {
                 if (_tileTypes[_map[x, y]].IsSolid) {
-                    return true;
+                    yield return new Point(x, y);
                 }
             }
         }
-        return false;
 	}
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
