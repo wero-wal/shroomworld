@@ -114,6 +114,16 @@ public class World {
             }
         }
 	}
+    private void BreakTile() {
+        Point mouse = Shroomworld.DisplayHandler.MousePosition;
+        // Todo: Check range
+        // Todo: Check tool
+        _tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(ref _player.Inventory);
+        _map[mouse.X, mouse.Y] = TileType.AirId;
+    }
+    private void PlaceTile() {
+        Point mouse = Shroomworld.DisplayHandler.MousePosition;
+    }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
         position.Y = Math.Clamp(position.Y, 0, _map.Height - 1 - size.Y);

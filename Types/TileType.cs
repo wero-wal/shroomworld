@@ -38,10 +38,12 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public InventoryItem[] GetDrops() {
+    public void InsertDrops(ref Inventory inventory) {
         if (!_drops.TryGetValue(out Drop[] drops)) {
-            return Array.Empty<InventoryItem>();
+            return;
         }
-        return Array.ConvertAll(drops, drop => drop.DropItem());
+        foreach (Drop drop in drops) {
+            inventory.Add(drop.DropItem());
+        }
     }
 }
