@@ -7,25 +7,24 @@ public class Sprite {
 
     // ----- Properties -----
     public Texture2D Texture => _texture;
-    public Vector2 Position { get => _position; set => _position = value; }
     public Point Size => _size;
     public Rectangle Hitbox => _hitbox;
 
     // ----- Fields -----
+    public Vector2 Position;
     private readonly Texture2D _texture;
     private readonly Point _size;
     private Rectangle _hitbox;
-    private Vector2 _position;
 
     // ----- Constructors -----
     public Sprite(Texture2D texture, IDisplayHandler displayHandler) {
         _texture = texture;
-        _position = Vector2.Zero;
+        Position = Vector2.Zero;
         _size = displayHandler.GetSizeInTiles(texture);
     }
     public Sprite(Texture2D texture, Vector2 position, IDisplayHandler displayHandler) {
         _texture = texture;
-        _position = position;
+        Position = position;
         _size = displayHandler.GetSizeInTiles(texture);
     }
 
@@ -35,6 +34,6 @@ public class Sprite {
     }
     public void Update() {
         // Update the hitbox by flooring the position and ceiling the size.
-		_hitbox = GetHitbox(_position, _size);
+		_hitbox = GetHitbox(Position, _size);
 	}
 }
