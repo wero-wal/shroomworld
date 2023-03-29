@@ -51,7 +51,7 @@ public static class FilePaths {
     public static Elements[] TextureElements => s_textureElements;
 
 	public static string HotbarSlotTexture => s_hotbarSlotTexture;
-	public static string HighlightedHotbarSlotTexture => s_highlightedHotbarSlotTexture;
+	public static string SelectedHotbarSlotTexture => s_selectedHotbarSlotTexture;
 	public static string TitleTexture => s_titleTexture;
 	public static string ButtonTexture => s_buttonTexture;
 	public static string HighlightedButtonTexture => s_highlightedButtonTexture;
@@ -98,7 +98,7 @@ public static class FilePaths {
     
     // Gui texture file names
     private static string s_hotbarSlotTexture;
-    private static string s_highlightedHotbarSlotTexture;
+    private static string s_selectedHotbarSlotTexture;
 
     // Gui file name
     private static string s_guiData; // Path to file containing data about the in-game GUI.
@@ -155,7 +155,7 @@ public static class FilePaths {
         }
         // Gui texture file names
         s_hotbarSlotTexture = paths[p++];
-        s_highlightedHotbarSlotTexture = paths[p++];
+        s_selectedHotbarSlotTexture = paths[p++];
 
         // Menu texture file names
         s_titleTexture = paths[p++];
