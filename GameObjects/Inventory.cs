@@ -17,6 +17,7 @@ public class Inventory {
 	public int this[int x, int y] {
 		get => _items[x, y];
 	}
+	public InventoryItem SelectedItem => GetItemAt(_selected);
 	
 	// ----- Fields -----
 	public const int Width = 5;
@@ -25,7 +26,7 @@ public class Inventory {
 	private const int HotbarRow = 0;
 	
 	private readonly InventoryItem[,] _items;
-	private int _selected; // The index of the slot in the hotbar row which is currently selected (i.e. which the player is holding).
+	private (int x, int y) _selected = (0, 0); // The index of the slot in the hotbar row which is currently selected (i.e. which the player is holding).
 	private (int x, int y) _endPointer = (0, 0);
 
 	// ----- Constructors -----
