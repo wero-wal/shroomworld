@@ -34,6 +34,7 @@ public static class FilePaths {
     /// Path for the file containing text for all menu buttons and headings for all menus.
     /// </value>
     public static string MenuTextFile => s_menuText;
+    public static string GuiData => s_guiData;
     /// <value>
     /// Paths for the files containing data about the types of different <see cref="Elements"/>.
     /// </value>
@@ -55,6 +56,7 @@ public static class FilePaths {
 	public static string ButtonTexture => s_buttonTexture;
 	public static string HighlightedButtonTexture => s_highlightedButtonTexture;
 	public static string PressedButtonTexture => s_pressedButtonTexture;
+
 
 
 	// ----- Fields -----
