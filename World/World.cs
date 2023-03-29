@@ -64,6 +64,9 @@ public class World {
         s_itemTypes = itemTypes;
         s_biomeTypes = biomeTypes;
     }
+    public static BiomeType GetRandomBiome(Random random = null) {
+        return s_biomeTypes[(random ?? new Random()).Next(1, s_biomeTypes.Count + 1)];
+    }
 
     public void Update() {
         _keyBinds.ProcessInputs(Input.CurrentInputs);
@@ -71,7 +74,7 @@ public class World {
         _player.Update();
         _player.Sprite.Position = Clamp(_player.Sprite.Position, _player.Sprite.Size);
     }
-    public void Draw(IDisplayHandler displayHandler) {
+    public void Draw(IDisplayHandler displayHandler, GuiElements guiElements) {
         displayHandler.SetBackground(Color.CornflowerBlue);
 
         for (int x = 0; x < _map.Width; x++) {
@@ -83,6 +86,9 @@ public class World {
             }
         }
         displayHandler.Draw(_player.Sprite);
+        displayHandler.End();
+        displayHandler.BeginStatic();
+        displayHandler.DrawHotbar(_player.Inventory, s_itemTypes, guiElements);
     }
 
     private void SetKeyBinds() {
