@@ -10,7 +10,7 @@ public class DisplayHandler : IDisplayHandler {
 
 	// ----- Fields -----
 	public const int TileSize = 8; // Number of pixels per square tile side length.
-	private const int Scale = 10;
+	private const int Scale = 5;
 
 	private GraphicsDeviceManager _graphicsDeviceManager;
 	private SpriteBatch _spriteBatch;
@@ -46,8 +46,8 @@ public class DisplayHandler : IDisplayHandler {
 		_window.Title = title;
 	}
 
-	public void Update(Vector2 playerPosition) {
-		_camera.Follow(playerPosition * TileSize, _centreOfScreen);
+	public void Update(Vector2 centreOfPlayer) {
+		_camera.Follow(centreOfPlayer * TileSize, _centreOfScreen / Scale);
 	}
 
 	// Drawing

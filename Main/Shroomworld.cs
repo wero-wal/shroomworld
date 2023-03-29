@@ -156,7 +156,7 @@ public class Shroomworld : Game {
 
             case GameStates.Playing:
                 _world.Update();
-                s_displayHandler.Update(_world.Player.Sprite.Position);
+                s_displayHandler.Update(_world.Player.Sprite.Position + _world.Player.Sprite.Size.ToVector2() / 2);
                 break;
 
             case GameStates.Menu:
