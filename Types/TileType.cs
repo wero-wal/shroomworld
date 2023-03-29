@@ -38,7 +38,7 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public void InsertDrops(ref Inventory inventory) {
+    public void InsertDrops(Inventory inventory) {
         if (!_drops.TryGetValue(out Drop[] drops)) {
             return;
         }
