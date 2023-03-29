@@ -160,9 +160,16 @@ public static class FileManager {
 		}
 		return new ItemType(
 			idData,
-			placeable: plaintext[p++].ToBoolean(),
+			tileType: ParseTile(plaintext[p++]),
 			stackable: plaintext[p++].ToBoolean()
 		);
+
+		Maybe<int> ParseTile(string plaintext) {
+			if (string.IsNullOrEmpty(plaintext)) {
+				return Maybe.None;
+			}
+			return plaintext.ToInt();
+		}
 	}
     private static BiomeType ParseBiomeType(IdData idData, string[] plaintext) {
       	int p = 0;
