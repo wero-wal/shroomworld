@@ -17,16 +17,16 @@ public class Inventory {
 	public int this[int x, int y] {
 		get => _items[x, y];
 	}
-	public InventoryItem SelectedItem => GetItemAt(_selected);
+	public InventoryItem SelectedItem => _items[HotbarRow, _selected];
+	public int SelectedSlot => _selected;
 	
 	// ----- Fields -----
 	public const int Width = 5;
 	public const int Height = 4;
-	
-	private const int HotbarRow = 0;
+	public const int HotbarRow = 0;
 	
 	private readonly InventoryItem[,] _items;
-	private (int x, int y) _selected = (0, 0); // The index of the slot in the hotbar row which is currently selected (i.e. which the player is holding).
+	private int _selected = 0; // The index of the slot in the hotbar row which is currently selected (i.e. which the player is holding).
 	private (int x, int y) _endPointer = (0, 0);
 
 	// ----- Constructors -----
