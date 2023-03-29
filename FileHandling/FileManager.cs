@@ -5,7 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System.Xml.Schema;
 
 namespace Shroomworld.FileHandling;
 public static class FileManager {
@@ -151,19 +150,21 @@ public static class FileManager {
 	}
 	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
 		int p = 0;
+		Texture2D texture = LoadTexture(FilePaths.Elements.Item, idData.Name);
 		bool isTool = plaintext[p++].ToBoolean();
 		if (isTool) {
 			return new ItemType(
-				idData,
+				idData, texture,
 				toolData: new ToolData(type: plaintext[p++].ToInt(), level: plaintext[p++].ToInt())
 				);
 		}
 		return new ItemType(
-			idData,
+			idData, texture,
 			tileType: ParseTile(plaintext[p++]),
 			stackable: plaintext[p++].ToBoolean()
 		);
 
+		// Local functions:
 		Maybe<int> ParseTile(string plaintext) {
 			if (string.IsNullOrEmpty(plaintext)) {
 				return Maybe.None;
@@ -265,14 +266,14 @@ public static class FileManager {
 			menus.Add(new ButtonMenu(name, items,
 				outcomes: ParseGameStates(menu[p++].Split(Levels.II)),
 				new ButtonMenuDisplayHandler(
-					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II)), displayHandler),
+					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu[p++].Split(Levels.II)), displayHandler),
 					location: ParseVector(menu[p++].Split(Levels.II)),
 					distanceBetweenEachButton: Convert.ToSingle(menu[p++]),
 					numberOfButtons: items.Length,
 					displayHandler: displayHandler,
-					normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
-					highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
-					pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),
+					normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.ButtonTexture),
+					highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTexture),
+					pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTexture),
 					normalTextColour: ParseColour(menu[p++].Split(Levels.II)),
 					highlightedTextColour: ParseColour(menu[p++].Split(Levels.II)),
                     pressedTextColour: ParseColour(menu[p++].Split(Levels.II)),
@@ -284,6 +285,14 @@ public static class FileManager {
 	new Sprite(s_displayHandler.BlankTexture), Vector2.Zero, 10f, 1, s_displayHandler, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture,
 	Color.Black, Color.White, Color.Black, Color.Green) */
 		return menus;
+	}
+	public static GuiElements LoadGuiElements() {
+		string[][] file = LoadCsvFile(FilePaths.GuiData);
+		return new GuiElements(
+			hotbarSlot: LoadTexture(FilePaths.Elements.Gui, FilePaths.HotbarSlotTexture),
+			selectedHotbarSlot: LoadTexture(FilePaths.Elements.Gui, FilePaths.SelectedHotbarSlotTexture),
+			hotbarPosition: ParseVector(file[0][0].Split(Levels.II))
+		);
 	}
 	private static Shroomworld.GameStates[] ParseGameStates(string[] plaintext) {
 		return Array.ConvertAll(plaintext, gamestate => (Shroomworld.GameStates)(gamestate.ToInt()));
