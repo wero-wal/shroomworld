@@ -17,25 +17,14 @@ public class Shroomworld : Game {
     }
 
     // ----- Properties -----
-    public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
-    public static Dictionary<int, BiomeType> BiomeTypes => s_biomeTypes;
-    public static Dictionary<int, FriendlyType> NpcTypes => s_friendlyTypes;
-    public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
-
     public static ContentManager ContentManager => s_contentManager;
     public static DisplayHandler DisplayHandler => s_displayHandler;
 
 
     // ----- Fields -----
 
-    // Dictionaries:
-    private static Dictionary<int, ItemType> s_itemTypes;
-    private static Dictionary<int, BiomeType> s_biomeTypes;
-    private static Dictionary<int, FriendlyType> s_friendlyTypes;
     private static Dictionary<int, PlayerType> s_playerTypes;
 
-    private static readonly int s_defaultTileTypeCount; // Number of default tile types.
-    
     // Monogame:
     private static ContentManager s_contentManager;
     private static DisplayHandler s_displayHandler;
@@ -113,18 +102,16 @@ public class Shroomworld : Game {
     /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
     private bool TryLoadGameFiles() {
 		// Load Types
-		Dictionary<int, TileType> tileTypes;
-
-        if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out s_itemTypes)
-        && FileManager.LoadTypes<TileType>().TryGetValue(out tileTypes)
-        && FileManager.LoadTypes<BiomeType>().TryGetValue(out s_biomeTypes)/*
-        && FileManager.LoadTypes<EnemyType>().TryGetValue(out _enemyTypes)
-        && FileManager.LoadTypes<FriendlyType>().TryGetValue(out _friendlyTypes)*/
+        if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out var itemTypes)
+        && FileManager.LoadTypes<TileType>().TryGetValue(out var tileTypes)
+        && FileManager.LoadTypes<BiomeType>().TryGetValue(out var biomeTypes)/*
+        && FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)
+        && FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)*/
         && FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes))) {
             return false;
         }
 
-        World.SetUp(tileTypes);
+        World.SetUp(tileTypes, itemTypes, biomeTypes/*, enemyTypes, friendlyTypes*/);
 
         /* TODO: Things to load:
            - World names / ids

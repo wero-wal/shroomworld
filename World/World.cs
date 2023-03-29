@@ -19,7 +19,13 @@ public class World {
     // ----- Fields -----
     public delegate Vector2 Clamper(Vector2 position, Point size);
 
-    private static Dictionary<int, TileType> _tileTypes;
+    private static Dictionary<int, TileType> s_tileTypes;
+    private static Dictionary<int, ItemType> s_itemTypes;
+    private static Dictionary<int, BiomeType> s_biomeTypes;
+    private static Dictionary<int, EnemyType> s_enemyTypes;
+    private static Dictionary<int, FriendlyType> s_friendlyTypes;
+
+    private static readonly int s_defaultTileTypeCount; // Number of default tile types.
 
     private readonly Map _map;
     private readonly List<Friendly> _friendlies;
@@ -52,8 +58,11 @@ public class World {
     }
 
     // ----- Methods -----
-    public static void SetUp(Dictionary<int, TileType> tileTypes) {
-        _tileTypes = tileTypes;
+    public static void SetUp(Dictionary<int, TileType> tileTypes, Dictionary<int, ItemType> itemTypes,
+        Dictionary<int, BiomeType> biomeTypes/*, Dictionary<int, EnemyType> enemyTypes, Dictionary<int, FriendlyType> friendlyTypes*/) {
+        s_tileTypes = tileTypes;
+        s_itemTypes = itemTypes;
+        s_biomeTypes = biomeTypes;
     }
 
     public void Update() {
@@ -70,7 +79,7 @@ public class World {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                displayHandler.Draw(_tileTypes[_map[x, y]].Texture, x, y);
+                displayHandler.Draw(s_tileTypes[_map[x, y]].Texture, x, y);
             }
         }
         displayHandler.Draw(_player.Sprite);
@@ -83,6 +92,8 @@ public class World {
         _keyBinds.Add(Input.Inputs.D, PlayerMoveRight);
         _keyBinds.Add(Input.Inputs.Space, PlayerJump);
         _keyBinds.Add(Input.Inputs.S, PlayerMoveDown);
+        _keyBinds.Add(Input.Inputs.LeftMouseButton, PlaceTile);
+        _keyBinds.Add(Input.Inputs.RightMouseButton, BreakTile);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
         _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
         _keyBinds.Add(Input.Inputs.E, OpenInventory);
@@ -108,7 +119,7 @@ public class World {
         Clamp(ref position, size);
         for (int x = (int)position.X; x <= Math.Ceiling(position.X + size.X); x++) {
             for (int y = (int)position.Y; y <= Math.Ceiling(position.Y + size.Y); y++) {
-                if (_tileTypes[_map[x, y]].IsSolid) {
+                if (s_tileTypes[_map[x, y]].IsSolid) {
                     yield return new Point(x, y);
                 }
             }
@@ -118,11 +129,16 @@ public class World {
         Point mouse = Shroomworld.DisplayHandler.MousePosition;
         // Todo: Check range
         // Todo: Check tool
-        _tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(ref _player.Inventory);
+        s_tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(_player.Inventory);
         _map[mouse.X, mouse.Y] = TileType.AirId;
     }
     private void PlaceTile() {
         Point mouse = Shroomworld.DisplayHandler.MousePosition;
+        // Todo: Check range
+        if ((_map[mouse.X, mouse.Y] == TileType.AirId)
+            && (s_itemTypes[_player.Inventory.SelectedItem].Tile.TryGetValue(out int tileToPlace))) {
+            _map[mouse.X, mouse.Y] = tileToPlace;
+        }
     }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
