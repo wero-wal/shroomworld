@@ -10,17 +10,14 @@ public class Camera {
     // ----- Fields -----
     private Matrix _transform;
     private readonly float _scale;
-    private readonly Vector2 _centreOfScreen;
 
     // ----- Constructors -----
     /// <summary>
     /// 
     /// </summary>
     /// <param name="scale"></param>
-    /// <param name="centreOfScreen">Centre of the screen in world scale.</param>
-    public Camera(float scale, ref Vector2 centreOfScreen) {
+    public Camera(float scale) {
         _scale = scale;
-        _centreOfScreen = centreOfScreen;
     }
 
     // ----- Methods -----
@@ -28,9 +25,10 @@ public class Camera {
     /// 
     /// </summary>
     /// <param name="targetPosition">The position on which to centre the camera in world scale.</param>
-    public void Follow(Vector2 targetPosition) {
+    /// <param name="centreOfScreen">Centre of the screen.</param>
+    public void Follow(Vector2 targetPosition, Vector2 centreOfScreen) {
         Matrix position = Matrix.CreateTranslation(-targetPosition.X, -targetPosition.Y, 0);
-        Matrix offset = Matrix.CreateTranslation(_centreOfScreen.X, _centreOfScreen.Y, 0);
+        Matrix offset = Matrix.CreateTranslation(centreOfScreen.X, centreOfScreen.Y, 0);
         Matrix scale = Matrix.CreateScale(_scale);
         _transform = position * offset * scale;
     }

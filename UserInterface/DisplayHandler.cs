@@ -31,9 +31,9 @@ public class DisplayHandler : IDisplayHandler {
 		_graphicsDeviceManager.PreferredBackBufferHeight = _graphicsDeviceManager.GraphicsDevice.DisplayMode.Height;
 		_graphicsDeviceManager.ApplyChanges();
 		_window = game.Window;
-		_window.AllowUserResizing = true;
-		_camera = new Camera(Scale, ref _centreOfScreen);
-
+		_window.AllowUserResizing = false;
+		_camera = new Camera(Scale);
+		_centreOfScreen = _window.ClientBounds.Center.ToVector2();
 		BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
 	}
 
@@ -47,8 +47,7 @@ public class DisplayHandler : IDisplayHandler {
 	}
 
 	public void Update(Vector2 playerPosition) {
-		_centreOfScreen = _window.ClientBounds.Center.ToVector2();
-		_camera.Follow(playerPosition * TileSize);
+		_camera.Follow(playerPosition * TileSize, _centreOfScreen);
 	}
 
 	// Drawing
