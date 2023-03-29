@@ -22,13 +22,15 @@ public class Shroomworld : Game {
 
 
     // ----- Fields -----
-
     private static Dictionary<int, PlayerType> s_playerTypes;
+
 
     // Monogame:
     private static ContentManager s_contentManager;
     private static DisplayHandler s_displayHandler;
     private GraphicsDeviceManager _graphicsDeviceManager;
+
+    private GuiElements _guiElements;
 
     // State management:
     private GameStates _currentGameState;
@@ -84,43 +86,80 @@ public class Shroomworld : Game {
             SetStateToError("Couldn't load file paths.");
             return;
         }
-        if (!TryLoadGameFiles()) {
-            SetStateToError("Couldn't load game files.");
+        LoadGameFiles();
+        LoadMenus();
+        LoadGuiElements();
+
+        // --- Local functions ---
+        void LoadGuiElements() {
+            try {
+                _guiElements = FileManager.LoadGuiElements();
+            }
+            catch (Exception) {
+                SetStateToError("Couldn't load gui elements.");
+                return;
+            }
         }
-        try {
-            List<ButtonMenu> menus = FileManager.LoadButtonMenus(s_displayHandler);
-            Menus.MainMenu = menus[0];
+        void LoadGameFiles() {
+            // Type[] types = new Type[] {
+            //     typeof(ItemType),
+            //     typeof(TileType),
+            //     typeof(BiomeType),
+            //     // typeof(EnemyType),
+            //     // typeof(FriendlyType),
+            //     typeof(PlayerType)
+            // };
+            // List<Dictionary<int, IType>> dictionaries = new();
+
+            // Load Types
+            // foreach (Type type in types) {
+            //     if (!FileManager.LoadTypes<type.GetType()>().TryGetValue(out Dictionary<int, type> dictionary))
+            // }
+            if(!FileManager.LoadTypes<ItemType>().TryGetValue(out var itemTypes)) {
+                SetStateToError("Item type loading failed."); return;
+            }
+            if (FileManager.LoadTypes<TileType>().TryGetValue(out var tileTypes)) {
+                SetStateToError("Tile type loading failed."); return;
+            }
+            if (FileManager.LoadTypes<BiomeType>().TryGetValue(out var biomeTypes)) {
+                SetStateToError("Biome type loading failed."); return;
+            }
+            /*if (FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)) {
+                SetStateToError("Tile type loading failed."); return;
+            }
+            if (FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)) {
+                SetStateToError("Tile type loading failed."); return;
+            }*/
+            if (FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
+                SetStateToError("Tile type loading failed."); return;
+            }
+
+            World.SetUp(tileTypes, itemTypes, biomeTypes/*, enemyTypes, friendlyTypes*/);
+
+            /* TODO: Things to load:
+            - World names / ids
+            - User settings --> different method
+            - Game settings
+            - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).*/
         }
-        catch (System.Exception) {
-            SetStateToError("Menu loading failed.");
+        void LoadMenus() {
+            try {
+                List<ButtonMenu> menus = FileManager.LoadButtonMenus(s_displayHandler);
+                Menus.MainMenu = menus[0];
+                _activeMenus.Push(Menus.MainMenu);
+                return;
+            }
+            catch (System.IndexOutOfRangeException) {
+                SetStateToError("Not all menus were loaded.");
+            }
+            catch (System.Exception) {
+                SetStateToError("Menu loading failed.");
+            }
         }
-        _activeMenus.Push(Menus.MainMenu);
     }
     /// <summary>
-    /// Loads all generic game files.
+    /// Loads all universal game files.
     /// </summary>
-    /// <returns><see langword="true"/> if all files are successfully loaded, <see langword="false"/></returns>
-    private bool TryLoadGameFiles() {
-		// Load Types
-        if(!(FileManager.LoadTypes<ItemType>().TryGetValue(out var itemTypes)
-        && FileManager.LoadTypes<TileType>().TryGetValue(out var tileTypes)
-        && FileManager.LoadTypes<BiomeType>().TryGetValue(out var biomeTypes)/*
-        && FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)
-        && FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)*/
-        && FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes))) {
-            return false;
-        }
-
-        World.SetUp(tileTypes, itemTypes, biomeTypes/*, enemyTypes, friendlyTypes*/);
-
-        /* TODO: Things to load:
-           - World names / ids
-           - User settings --> different method
-           - Game settings
-           - Menu button text (so, functionality will always be the same [will be hard-coded], but the button text can change).*/
-        return true;
-    }
-
     // Instantiation
     /*private void CreateMenus() {
         Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
@@ -231,25 +270,25 @@ public class Shroomworld : Game {
         switch (_currentGameState) {
 
             case GameStates.CreatingWorld:
-                s_displayHandler.BeginText();
+                s_displayHandler.BeginStatic();
                 s_displayHandler.SetBackground(Color.Green);
                 s_displayHandler.DrawText("Creating world...", new Vector2(500, 500), Color.Black);
                 break;
 
             case GameStates.Playing:
-                s_displayHandler.Begin();
-                _world.Draw(s_displayHandler);
+                s_displayHandler.BeginWithCamera();
+                _world.Draw(s_displayHandler, _guiElements);
                 break;
 
             case GameStates.Menu:
-                s_displayHandler.BeginText();
+                s_displayHandler.BeginStatic();
                 s_displayHandler.SetBackground(Color.White);
                 s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
                 _activeMenus.Peek().Draw();
                 break;
 
             case GameStates.Error:
-				      s_displayHandler.BeginText();
+				      s_displayHandler.BeginStatic();
 				      s_displayHandler.SetBackground(Color.Red);
               s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);
               break;
