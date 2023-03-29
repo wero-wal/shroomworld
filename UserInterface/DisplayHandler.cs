@@ -5,7 +5,7 @@ namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
 	// ----- Properties -----
-	public Point MousePosition => (Input.MousePosition / Scale).ToPoint();
+	public Point MousePosition => (Input.MousePosition / (Scale * TileSize)).ToPoint();
 	public Texture2D BlankTexture { get; private set; }
 
 	// ----- Fields -----
