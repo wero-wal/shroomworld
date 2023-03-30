@@ -12,6 +12,7 @@ public class TileType : IType {
     public IdData IdData => _idData;
     public Texture2D Texture => _texture;
     public bool IsSolid => _isSolid;
+    public int[] BreakableBy => _breakableBy;
 
 
 	// ----- Fields -----
@@ -38,10 +39,12 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public InventoryItem[] GetDrops() {
+    public void InsertDrops(Inventory inventory) {
         if (!_drops.TryGetValue(out Drop[] drops)) {
-            return Array.Empty<InventoryItem>();
+            return;
         }
-        return Array.ConvertAll(drops, drop => drop.DropItem());
+        foreach (Drop drop in drops) {
+            inventory.Add(drop.DropItem());
+        }
     }
 }

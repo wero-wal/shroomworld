@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -5,7 +6,7 @@ namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
 	// ----- Properties -----
-	public Point MousePosition => (Input.MousePosition / Scale).ToPoint();
+	public Point MousePosition => (Input.MousePosition / (Scale * TileSize)).ToPoint();
 	public Texture2D BlankTexture { get; private set; }
 
 	// ----- Fields -----
@@ -51,11 +52,11 @@ public class DisplayHandler : IDisplayHandler {
 	}
 
 	// Drawing
-	public void Begin() {
+	public void BeginWithCamera() {
 		_spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
 	}
-	public void BeginText() {
-		_spriteBatch.Begin();
+	public void BeginStatic() {
+		_spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 	}
 	public void End() {
 		_spriteBatch.End();
@@ -71,6 +72,27 @@ public class DisplayHandler : IDisplayHandler {
 	}
 	public void DrawText(string text, Vector2 position, Color? colour = null) {
 		_spriteBatch.DrawString(Font, text, position, colour ?? _defaultTextColour);
+	}
+	public void DrawHotbar(Inventory inventory, Dictionary<int, ItemType> itemTypes, GuiElements gui) {
+		Vector2 position = gui.HotbarPosition;
+		for (int i = 0; i < inventory.SelectedSlot; i++) {
+			DrawNext(gui.HotbarSlot, inventory[Inventory.HotbarRow, i]);
+		}
+		DrawNext(gui.SelectedHotbarSlot, inventory[Inventory.HotbarRow, inventory.SelectedSlot]);
+		for (int i = inventory.SelectedSlot + 1; i < Inventory.Width; i++) {
+			DrawNext(gui.HotbarSlot, inventory[Inventory.HotbarRow, i]);
+		}
+
+		void DrawNext(Texture2D texture, int itemId) {
+			_spriteBatch.Draw(texture, position, _defaultColour);
+			_spriteBatch.Draw(itemTypes[itemId].Texture, position, _defaultColour);
+			position.X += texture.Width;
+		}
+	}
+	public Texture2D CreateTexture(Color? colour = null) {
+		Texture2D texture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
+		texture.SetData(new Color[] { colour ?? _defaultColour });
+		return texture;
 	}
 	public Point GetSizeInTiles(Texture2D texture) {
 		return new Point(texture.Width / TileSize, texture.Height / TileSize);

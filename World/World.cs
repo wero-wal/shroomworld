@@ -19,7 +19,13 @@ public class World {
     // ----- Fields -----
     public delegate Vector2 Clamper(Vector2 position, Point size);
 
-    private static Dictionary<int, TileType> _tileTypes;
+    private static Dictionary<int, TileType> s_tileTypes;
+    private static Dictionary<int, ItemType> s_itemTypes;
+    private static Dictionary<int, BiomeType> s_biomeTypes;
+    private static Dictionary<int, EnemyType> s_enemyTypes;
+    private static Dictionary<int, FriendlyType> s_friendlyTypes;
+
+    private static readonly int s_defaultTileTypeCount; // Number of default tile types.
 
     private readonly Map _map;
     private readonly List<Friendly> _friendlies;
@@ -52,8 +58,14 @@ public class World {
     }
 
     // ----- Methods -----
-    public static void SetUp(Dictionary<int, TileType> tileTypes) {
-        _tileTypes = tileTypes;
+    public static void SetUp(Dictionary<int, TileType> tileTypes, Dictionary<int, ItemType> itemTypes,
+        Dictionary<int, BiomeType> biomeTypes/*, Dictionary<int, EnemyType> enemyTypes, Dictionary<int, FriendlyType> friendlyTypes*/) {
+        s_tileTypes = tileTypes;
+        s_itemTypes = itemTypes;
+        s_biomeTypes = biomeTypes;
+    }
+    public static BiomeType GetRandomBiome(Random random = null) {
+        return s_biomeTypes[(random ?? new Random()).Next(1, s_biomeTypes.Count + 1)];
     }
 
     public void Update() {
@@ -62,7 +74,7 @@ public class World {
         _player.Update();
         _player.Sprite.Position = Clamp(_player.Sprite.Position, _player.Sprite.Size);
     }
-    public void Draw(IDisplayHandler displayHandler) {
+    public void Draw(IDisplayHandler displayHandler, GuiElements guiElements) {
         displayHandler.SetBackground(Color.CornflowerBlue);
 
         for (int x = 0; x < _map.Width; x++) {
@@ -70,10 +82,13 @@ public class World {
                 if (_map[x, y] == TileType.AirId) {
                     continue;
                 }
-                displayHandler.Draw(_tileTypes[_map[x, y]].Texture, x, y);
+                displayHandler.Draw(s_tileTypes[_map[x, y]].Texture, x, y);
             }
         }
         displayHandler.Draw(_player.Sprite);
+        displayHandler.End();
+        displayHandler.BeginStatic();
+        displayHandler.DrawHotbar(_player.Inventory, s_itemTypes, guiElements);
     }
 
     private void SetKeyBinds() {
@@ -83,6 +98,8 @@ public class World {
         _keyBinds.Add(Input.Inputs.D, PlayerMoveRight);
         _keyBinds.Add(Input.Inputs.Space, PlayerJump);
         _keyBinds.Add(Input.Inputs.S, PlayerMoveDown);
+        _keyBinds.Add(Input.Inputs.LeftMouseButton, PlaceTile);
+        _keyBinds.Add(Input.Inputs.RightMouseButton, BreakTile);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
         _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
         _keyBinds.Add(Input.Inputs.E, OpenInventory);
@@ -96,24 +113,51 @@ public class World {
     private void PlayerMoveRight() => _player.Body.AddAcceleration(_physics.AccelerationRight);
     private void PlayerMoveDown() => _player.Body.AddAcceleration(_physics.AccelerationDown);
     private void ApplyPhysics() {
-        _player.Body.AddGravity(_physics.Gravity);
-        _player.Body.ApplyPhysics(CheckForCollisions, Clamp);
+        _player.Body.ApplyPhysics(_physics.Gravity, GetSolidIntersectingTiles);
     }
     /// <summary>
-    /// Checks whether the given <paramref name="hitbox"/> intersects with any solid tiles.
     /// </summary>
     /// <param name="hitbox">The hitbox of the entity for which you are checking collisions.</param>
-    /// <returns></returns>
-    private bool CheckForCollisions(Rectangle hitbox) {
-        for (int x = hitbox.Left; x <= hitbox.Right; x++) {
-            for (int y = hitbox.Top; y <= hitbox.Bottom; y++) {
-                if (_tileTypes[_map[x, y]].IsSolid) {
-                    return true;
+    /// <returns>
+    ///     A collection of the solid tiles with which the entity with the given <paramref name="point"/> and <paramref name="size"> intersects.
+    /// </returns>
+    private IEnumerable<Point> GetSolidIntersectingTiles(Vector2 position, Point size) {
+        Clamp(ref position, size);
+        for (int x = (int)position.X; x <= Math.Ceiling(position.X + size.X); x++) {
+            for (int y = (int)position.Y; y <= Math.Ceiling(position.Y + size.Y); y++) {
+                if (s_tileTypes[_map[x, y]].IsSolid) {
+                    yield return new Point(x, y);
                 }
             }
         }
-        return false;
 	}
+    private void BreakTile() {
+        Point mouse = Shroomworld.DisplayHandler.MousePosition;
+
+        if (!TileIsInRange(mouse, _player)) { return; }
+
+        // Check if player is holding the appropriate tool.
+        if (!_itemTypes[_player.Inventory.SelectedItem.Id].ToolData.TryGetValue(out ToolData toolData)) { return; }
+        if (!_tileTypes[_map[mouse.X, mouse.Y]].BreakableBy.Contains(toolData.Type)) { return; }
+
+        // Place the tile.
+        s_tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(_player.Inventory);
+        _map[mouse.X, mouse.Y] = TileType.AirId;
+    }
+    private void PlaceTile() {
+        Point mouse = Shroomworld.DisplayHandler.MousePosition;
+
+        if (!TileIsInRange(mouse, _player)) { return; }
+
+        if ((_map[mouse.X, mouse.Y] == TileType.AirId)
+            && (s_itemTypes[_player.Inventory.SelectedItem].Tile.TryGetValue(out int tileToPlace))) {
+            _map[mouse.X, mouse.Y] = tileToPlace;
+        }
+    }
+    private bool TileIsInRange(Point tilePosition, Entity entity) {
+        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5);
+        return (distanceBetweenCentres <= entity.Type.PhysicsData.Range);
+    }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
         position.Y = Math.Clamp(position.Y, 0, _map.Height - 1 - size.Y);

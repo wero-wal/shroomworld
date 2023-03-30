@@ -34,6 +34,7 @@ public static class FilePaths {
     /// Path for the file containing text for all menu buttons and headings for all menus.
     /// </value>
     public static string MenuTextFile => s_menuText;
+    public static string GuiData => s_guiData;
     /// <value>
     /// Paths for the files containing data about the types of different <see cref="Elements"/>.
     /// </value>
@@ -49,13 +50,17 @@ public static class FilePaths {
     public static Dictionary<Type, Elements> ElementForType => s_elementForType;
     public static Elements[] TextureElements => s_textureElements;
 
+	public static string HotbarSlotTexture => s_hotbarSlotTexture;
+	public static string SelectedHotbarSlotTexture => s_selectedHotbarSlotTexture;
+	public static string TitleTexture => s_titleTexture;
+	public static string ButtonTexture => s_buttonTexture;
+	public static string HighlightedButtonTexture => s_highlightedButtonTexture;
+	public static string PressedButtonTexture => s_pressedButtonTexture;
 
-    // ----- Fields -----
-    public const string FilePathFile = "file-paths.txt";
-    public const string TitleTextureName = "icon";
-    public const string DefaultButtonTextureName = "default-menu-button";
-    public const string HighlightedButtonTextureName = "highlighted-menu-button";
-    public const string PressedButtonTextureName = "pressed-menu-button";
+
+
+	// ----- Fields -----
+	public const string FilePathFile = "file-paths.txt";
 
     // Elements for which there are types / templates.
     private static Elements[] s_typeElements = new Elements[] {
@@ -90,6 +95,21 @@ public static class FilePaths {
     private static string s_menuText;
     // Path for the directory containing all world save directories.
     private static string s_worldSavesDirectory;
+    
+    // Gui texture file names
+    private static string s_hotbarSlotTexture;
+    private static string s_selectedHotbarSlotTexture;
+
+    // Gui file name
+    private static string s_guiData; // Path to file containing data about the in-game GUI.
+
+    // Menu texture file names
+    private static string s_titleTexture;
+    private static string s_buttonTexture;
+    private static string s_highlightedButtonTexture;
+    private static string s_pressedButtonTexture;
+
+    // Dictionaries
     private static Dictionary<Elements, string> s_types;
     private static Dictionary<Elements, string> s_worldSaveFileNames;
     private static Dictionary<Elements, string> s_textureDirectories;
@@ -115,6 +135,7 @@ public static class FilePaths {
         // General settings
         s_generalSettings = paths[p++];
         s_menuText = paths[p++];
+        s_guiData = paths[p++];
 
         // Types
         s_types = new Dictionary<Elements, string>(s_typeElements.Length);
@@ -132,6 +153,15 @@ public static class FilePaths {
         for (int i = 0; i < s_textureElements.Length; i++) {
             s_textureDirectories.Add(s_textureElements[i], paths[p++]);
         }
+        // Gui texture file names
+        s_hotbarSlotTexture = paths[p++];
+        s_selectedHotbarSlotTexture = paths[p++];
+
+        // Menu texture file names
+        s_titleTexture = paths[p++];
+        s_buttonTexture = paths[p++];
+        s_highlightedButtonTexture = paths[p++];
+        s_pressedButtonTexture = paths[p++];
     }
     /// <summary>
     /// 

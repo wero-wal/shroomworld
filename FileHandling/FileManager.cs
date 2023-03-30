@@ -5,7 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System.Xml.Schema;
 
 namespace Shroomworld.FileHandling;
 public static class FileManager {
@@ -151,18 +150,27 @@ public static class FileManager {
 	}
 	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
 		int p = 0;
+		Texture2D texture = LoadTexture(FilePaths.Elements.Item, idData.Name);
 		bool isTool = plaintext[p++].ToBoolean();
 		if (isTool) {
 			return new ItemType(
-				idData,
+				idData, texture,
 				toolData: new ToolData(type: plaintext[p++].ToInt(), level: plaintext[p++].ToInt())
 				);
 		}
 		return new ItemType(
-			idData,
-			placeable: plaintext[p++].ToBoolean(),
+			idData, texture,
+			tileType: ParseTile(plaintext[p++]),
 			stackable: plaintext[p++].ToBoolean()
 		);
+
+		// Local functions:
+		Maybe<int> ParseTile(string plaintext) {
+			if (string.IsNullOrEmpty(plaintext)) {
+				return Maybe.None;
+			}
+			return plaintext.ToInt();
+		}
 	}
     private static BiomeType ParseBiomeType(IdData idData, string[] plaintext) {
       	int p = 0;
@@ -192,7 +200,7 @@ public static class FileManager {
     		idData,
 			texture: LoadTexture(FilePaths.Elements.Player, idData.Name),
 			healthData: ParseHealthData(plaintext[p++].Split(Levels.II)),
-			physicsData: ParsePhysicsData(plaintext[p++])
+			physicsData: ParsePhysicsData(plaintext[p++].Split(Levels.II))
 		);
     }
     //private static FriendlyType ParseFriendlyType(IdData idData, string[] plaintext) {
@@ -209,8 +217,12 @@ public static class FileManager {
     private static int[] ParseLayers(string plaintext) {
 		return plaintext.Split(Levels.II).ToInt();
 	}
-	private static PhysicsData ParsePhysicsData(string plaintext) {
-		return new PhysicsData(maxSpeed: Convert.ToSingle(plaintext));
+	private static PhysicsData ParsePhysicsData(string[] plaintext) {
+		int p = 0;
+		return new PhysicsData(
+			maxSpeed: Convert.ToSingle(plaintext[p++]),
+			range: Convert.ToSingle(plaintext[p++])
+		);
 	}
 	private static Maybe<Drop[]> ParseDrops(string plaintext) {
 		if (string.IsNullOrEmpty(plaintext)) {
@@ -254,27 +266,37 @@ public static class FileManager {
 		string[][] file = LoadCsvFile(FilePaths.MenuTextFile);
 
 		// Load menu display handler:
+		int p = 0;
 		menuDisplayHandler = new ButtonMenuDisplayHandler(
 			distanceBetweenEachButton: Convert.ToSingle(file[0][p++]),
 			displayHandler: displayHandler,
-			normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
-			highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
-			pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),
+			normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.ButtonTexture),
+			highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTexture),
+			pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTexture),
 			normalTextColour: ParseColour(file[0][p++].Split(Levels.II)),
 			highlightedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
 			pressedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
 			backgroundColour: ParseColour(file[0][p++].Split(Levels.II))
 		);
 		// Load menus:
+		menus = new();
 		for(int i = 1; i < file.Length; i++) {
 			string[] menu_str = file[i];
 			(string name, Sprite title, string[] items, Vector2 location) menu;
 			menu.name = menu_str[p++];
-			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu_str[p++].Split(Levels.II)), displayHandler);
+			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu_str[p++].Split(Levels.II)), displayHandler);
 			menu.items = menu_str[p++].Split(Levels.II);
 			menu.location = ParseVector(menu_str[p++].Split(Levels.II));
 			menus.Add(menu);
 		}
+	}
+	public static GuiElements LoadGuiElements() {
+		string[][] file = LoadCsvFile(FilePaths.GuiData);
+		return new GuiElements(
+			hotbarSlot: LoadTexture(FilePaths.Elements.Gui, FilePaths.HotbarSlotTexture),
+			selectedHotbarSlot: LoadTexture(FilePaths.Elements.Gui, FilePaths.SelectedHotbarSlotTexture),
+			hotbarPosition: ParseVector(file[0][0].Split(Levels.II))
+		);
 	}
 	private static Shroomworld.GameStates[] ParseGameStates(string[] plaintext) {
 		return Array.ConvertAll(plaintext, gamestate => (Shroomworld.GameStates)(gamestate.ToInt()));

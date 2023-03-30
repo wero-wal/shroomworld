@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Intrinsics;
 using Microsoft.Xna.Framework;
 
@@ -46,15 +48,16 @@ public class Body {
 	/// Change velocity based on acceleration and position based on velocity.
 	/// <para>Note: velocity is limited by the body's max speed.</para>
 	/// </summary>
-	public void ApplyPhysics(CollisionChecker checkForCollisions, World.Clamper clamp) {
+	public void ApplyPhysics(float gravity, Func<Vector2, Point, IEnumerable<Point>> getIntersectingSolidTiles) {
+		//AddGravity(gravity);
 		ApplyAcceleration();
 		ResetAcceleration();
-		ApplyVelocity(checkForCollisions, clamp);
+		ApplyVelocity(getIntersectingSolidTiles);
 	}
 	/// <summary>
 	/// Add gravity to the acceleration in the positive vertical direction.
 	/// </summary>
-	public void AddGravity(float gravity) {
+	private void AddGravity(float gravity) {
 		_acceleration.Y += gravity;
 	}
 	private void ApplyAcceleration() {
@@ -71,9 +74,43 @@ public class Body {
 			_velocity *= 0.95f;
 		}
 	}
-	private void ApplyVelocity(CollisionChecker checkForCollisions, World.Clamper clamp) {
-		if (!checkForCollisions(_sprite.GetHitbox(clamp(_sprite.Position + _velocity, _sprite.Size)))) {
-			_sprite.Position += _velocity;
+	private void ApplyVelocity(Func<Vector2, Point, IEnumerable<Point>> getIntersectingSolidTiles) {
+		_sprite.Position += _velocity;
+		_sprite.Update();
+		ResolveCollisions(getIntersectingSolidTiles(_sprite.Position, _sprite.Size));
+	}
+	private void ResolveCollisions(IEnumerable<Point> intersectingSolidTiles) {
+		foreach (Point tile in intersectingSolidTiles) {
+			if (_sprite.Hitbox.Contains(tile)) {
+
+				// Find intersection.
+				Vector2 intersection;
+				if (_velocity.X < 0) {
+					intersection.X = _sprite.Position.X - (tile.X + 1);
+				}
+				else {
+					intersection.X = _sprite.Position.X - tile.X;
+				}
+				if (_velocity.Y < 0) {
+					intersection.Y = _sprite.Position.Y - (tile.Y + 1);
+				}
+				else {
+					intersection.Y = _sprite.Position.Y - tile.Y;
+				}
+
+				// Resolve collision.
+				Vector2 v = Vector2.Normalize(_velocity);
+				float scaleFactor;
+				if (Math.Abs(intersection.X / intersection.Y) > 1) {
+					scaleFactor = v.X / intersection.X;
+				}
+				else {
+					scaleFactor = v.Y / intersection.Y;
+				}
+				v *= scaleFactor;
+				_sprite.Position += v;
+				_sprite.Update();
+			}
 		}
 	}
 	/// <summary>

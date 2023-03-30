@@ -4,20 +4,21 @@ namespace Shroomworld;
 public class Player : Entity {
     // ----- Enums -----
     // ----- Properties -----
+    public Inventory Inventory => _inventory;
 
     // ----- Fields -----
+    private readonly Inventory _inventory;
     //private readonly PowerUps _powerUps;
-    //private readonly InventoryItem[,] _inventory;
     //private readonly List<Quest> _quests;
     //private readonly Dictionary<string, int> _statistics;
 
 
     // ----- Constructors -----
-    public Player(PlayerType type, Sprite sprite, EntityHealthData healthData/*,
-    PowerUp[] powerUps, InventoryItem[,] inventory, List<Quest> activeQuests, StatisticsDictionary statistics*/)
+    public Player(PlayerType type, Sprite sprite, EntityHealthData healthData, Inventory inventory
+    /*,PowerUp[] powerUps, List<Quest> activeQuests, StatisticsDictionary statistics*/)
         : base(type, sprite, healthData, new Body(sprite, type.PhysicsData)) {
-        /*_powerUps = powerUps;
         _inventory = inventory;
+        /*_powerUps = powerUps;
         _quests = activeQuests ?? new List<Quest>();
         _statistics = statistics;*/
     }
