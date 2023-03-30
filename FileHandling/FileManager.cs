@@ -248,35 +248,33 @@ public static class FileManager {
 	//}
 
 	// Parse Menus
-	public static List<ButtonMenu> LoadButtonMenus(IDisplayHandler displayHandler) {
+	public static void LoadMenus(IDisplayHandler displayHandler, out ButtonMenuDisplayHandler menuDisplayHandler,
+	out List<(string name, Sprite title, string[] items, Vector2 location)> menus) {
+		
 		string[][] file = LoadCsvFile(FilePaths.MenuTextFile);
-		List<ButtonMenu> menus = new List<ButtonMenu>();
-		foreach (string[] menu in file) {
-			int p = 0;
-			string name = menu[p++];
-			string[] items = menu[p++].Split(Levels.II);
-			menus.Add(new ButtonMenu(name, items,
-				outcomes: ParseGameStates(menu[p++].Split(Levels.II)),
-				new ButtonMenuDisplayHandler(
-					title: new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu[p++].Split(Levels.II)), displayHandler),
-					location: ParseVector(menu[p++].Split(Levels.II)),
-					distanceBetweenEachButton: Convert.ToSingle(menu[p++]),
-					numberOfButtons: items.Length,
-					displayHandler: displayHandler,
-					normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
-					highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
-					pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),
-					normalTextColour: ParseColour(menu[p++].Split(Levels.II)),
-					highlightedTextColour: ParseColour(menu[p++].Split(Levels.II)),
-                    pressedTextColour: ParseColour(menu[p++].Split(Levels.II)),
-                    backgroundColour: ParseColour(menu[p++].Split(Levels.II))
-                )
-				));
+
+		// Load menu display handler:
+		menuDisplayHandler = new ButtonMenuDisplayHandler(
+			distanceBetweenEachButton: Convert.ToSingle(file[0][p++]),
+			displayHandler: displayHandler,
+			normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.DefaultButtonTextureName),
+			highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTextureName),
+			pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTextureName),
+			normalTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+			highlightedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+			pressedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+			backgroundColour: ParseColour(file[0][p++].Split(Levels.II))
+		);
+		// Load menus:
+		for(int i = 1; i < file.Length; i++) {
+			string[] menu_str = file[i];
+			(string name, Sprite title, string[] items, Vector2 location) menu;
+			menu.name = menu_str[p++];
+			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTextureName), ParseVector(menu_str[p++].Split(Levels.II)), displayHandler);
+			menu.items = menu_str[p++].Split(Levels.II);
+			menu.location = ParseVector(menu_str[p++].Split(Levels.II));
+			menus.Add(menu);
 		}
-		/* Menus.MainMenu = new ButtonMenu(new string[] { "Play" }, new GameStates[] { GameStates.Playing }, new ButtonMenuDisplayHandler(
-	new Sprite(s_displayHandler.BlankTexture), Vector2.Zero, 10f, 1, s_displayHandler, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture, s_displayHandler.BlankTexture,
-	Color.Black, Color.White, Color.Black, Color.Green) */
-		return menus;
 	}
 	private static Shroomworld.GameStates[] ParseGameStates(string[] plaintext) {
 		return Array.ConvertAll(plaintext, gamestate => (Shroomworld.GameStates)(gamestate.ToInt()));

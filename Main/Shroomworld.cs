@@ -99,13 +99,22 @@ public class Shroomworld : Game {
             SetStateToError("Couldn't load game files.");
         }
         try {
-            List<ButtonMenu> menus = FileManager.LoadButtonMenus(s_displayHandler);
-            Menus.MainMenu = menus[0];
+            FileManager.LoadMenus(s_displayHandler, out var menuDisplayHandler, out var menus);
+            ButtonMenu.SetDisplayHandler(menuDisplayHandler);
+            int m = 0;
+            Menus.MainMenu = CreateMenu(menus[m++],
+            new Action[] {
+                () => _currentGameState = GameStates.Playing
+            });
         }
         catch (System.Exception) {
             SetStateToError("Menu loading failed.");
         }
         _activeMenus.Push(Menus.MainMenu);
+
+        ButtonMenu CreateMenu((string name, Sprite title, string[] items, Vector2 location) menuData, Action[] actions) {
+            return new ButtonMenu(menu.name, menu.title, menu.items, menu.location, actions);
+        }
     }
     /// <summary>
     /// Loads all generic game files.
@@ -160,7 +169,7 @@ public class Shroomworld : Game {
                 break;
 
             case GameStates.Menu:
-                _currentGameState = _activeMenus.Peek().Update(GameStates.Menu);
+                _currentGameState = _activeMenus.Peek().Update();
                 // TODO: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
                 break;
 
