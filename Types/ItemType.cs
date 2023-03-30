@@ -23,6 +23,7 @@ public class ItemType : IType {
     /// </summary>
     public ItemType(IdData idData, Texture2D texture, bool stackable, Maybe<int> tileType) {
         _idData = idData;
+        _texture = texture;
         _stackable = stackable;
         _toolData = Maybe.None;
         _tile = tileType;
@@ -32,6 +33,7 @@ public class ItemType : IType {
     /// </summary>
     public ItemType(IdData idData, Texture2D texture, ToolData toolData) {
         _idData = idData;
+        _texture = texture;
         _toolData = toolData;
         _stackable = false;
     }

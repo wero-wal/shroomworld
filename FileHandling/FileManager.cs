@@ -144,8 +144,7 @@ public static class FileManager {
 			texture: LoadTexture(FilePaths.Elements.Tile, idData.Name),
 			drops: ParseDrops(plaintext[p++]),
 			isSolid: plaintext[p++].ToBoolean(),
-			breakableBy: ParseBreakableBy(plaintext[p++]),
-			friction: (float)Convert.ToDecimal(plaintext[p++])
+			breakableBy: ParseBreakableBy(plaintext[p++])
 		);
 	}
 	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
@@ -281,11 +280,12 @@ public static class FileManager {
 		// Load menus:
 		menus = new();
 		for(int i = 1; i < file.Length; i++) {
+			p = 0;
 			string[] menu_str = file[i];
 			(string name, Sprite title, string[] items, Vector2 location) menu;
 			menu.name = menu_str[p++];
-			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu_str[p++].Split(Levels.II)), displayHandler);
 			menu.items = menu_str[p++].Split(Levels.II);
+			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu_str[p++].Split(Levels.II)));
 			menu.location = ParseVector(menu_str[p++].Split(Levels.II));
 			menus.Add(menu);
 		}

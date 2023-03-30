@@ -18,10 +18,6 @@ public class InventoryItem {
     }
 
     // ----- Methods -----
-    public static implicit operator int (InventoryItem item) {
-        return item._id;
-    }
-
     public void IncreaseAmountBy(int amount) {
         if (amount < 0) {
             throw new ArgumentException("Can't increase amount by a negative amount.");

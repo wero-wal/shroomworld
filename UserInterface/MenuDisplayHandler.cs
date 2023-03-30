@@ -38,7 +38,7 @@ public class ButtonMenuDisplayHandler {
 
 		// Bounds, locations, and sizes:
 		_distanceBetweenEachButton = distanceBetweenEachButton;
-		_buttonSize = displayHandler.GetSizeInTiles(_buttonTextures[MenuButton.States.Default]);
+		_buttonSize = displayHandler.GetSizeInTiles(_buttonTextures[MenuButton.States.Default].Bounds.Size);
 	}
 	
 

@@ -7,7 +7,7 @@ public interface IDisplayHandler {
 	Texture2D BlankTexture { get; }
 	Point MousePosition { get; }
 
-	void Update(Vector2 playerPosition);
+	void Update(Vector2 playerPosition, int width, int height);
 	void BeginWithCamera();
 	void BeginStatic();
 	void End();
@@ -16,7 +16,8 @@ public interface IDisplayHandler {
 	void Draw(Sprite sprite);
 	void DrawText(string text, Vector2 position, Color? colour = null);
 	void DrawHotbar(Inventory inventory, Dictionary<int, ItemType> itemTypes, GuiElements gui);
-	void SetTitle(string title);
+	void DrawInventory(Inventory inventory, Dictionary<int, ItemType> itemTypes, GuiElements gui);
+    void SetTitle(string title);
 	void SetBackground(Color colour);
-	Point GetSizeInTiles(Texture2D texture);
+	Point GetSizeInTiles(Point size);
 }

@@ -20,7 +20,7 @@ namespace Shroomworld
 		public Drop(params int[] properties) {
 			_itemId = properties[0];
 			_min = properties[1];
-			_max = properties[2];
+			_max = properties[2] + 1;
 		}
 
 		// ----- Methods -----
