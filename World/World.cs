@@ -155,9 +155,9 @@ public class World {
             _map[mouse.X, mouse.Y] = tileToPlace;
         }
     }
-    private bool TileIsInRange(Point tilePosition, Player player) {
-        float distanceBetweenCentres = Vector2.Distance(player.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5f);
-        return (distanceBetweenCentres <= Shroomworld.PlayerTypes[player.Id].PhysicsData.Range);
+    private bool TileIsInRange(Point tilePosition, Entity entity) {
+        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5f);
+        return (distanceBetweenCentres <= entity.Body.PhysicsData.Range);
     }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
