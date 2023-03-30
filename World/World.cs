@@ -133,18 +133,30 @@ public class World {
 	}
     private void BreakTile() {
         Point mouse = Shroomworld.DisplayHandler.MousePosition;
-        // Todo: Check range
-        // Todo: Check tool
+
+        if (!TileIsInRange(mouse, _player)) { return; }
+
+        // Check if player is holding the appropriate tool.
+        if (!_itemTypes[_player.Inventory.SelectedItem.Id].ToolData.TryGetValue(out ToolData toolData)) { return; }
+        if (!_tileTypes[_map[mouse.X, mouse.Y]].BreakableBy.Contains(toolData.Type)) { return; }
+
+        // Place the tile.
         s_tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(_player.Inventory);
         _map[mouse.X, mouse.Y] = TileType.AirId;
     }
     private void PlaceTile() {
         Point mouse = Shroomworld.DisplayHandler.MousePosition;
-        // Todo: Check range
+
+        if (!TileIsInRange(mouse, _player)) { return; }
+
         if ((_map[mouse.X, mouse.Y] == TileType.AirId)
             && (s_itemTypes[_player.Inventory.SelectedItem].Tile.TryGetValue(out int tileToPlace))) {
             _map[mouse.X, mouse.Y] = tileToPlace;
         }
+    }
+    private bool TileIsInRange(Point tilePosition, Entity entity) {
+        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5);
+        return (distanceBetweenCentres <= entity.Type.PhysicsData.Range);
     }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
