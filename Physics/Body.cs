@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Intrinsics;
 using Microsoft.Xna.Framework;
 
 namespace Shroomworld.Physics;
@@ -16,6 +14,7 @@ public class Body {
 	// ----- Properties -----
 	public Vector2 Velocity => _velocity;
 	public Sprite Sprite => _sprite;
+	public PhysicsData PhysicsData => _physicsData;
 
 	
 	// ----- Fields -----
