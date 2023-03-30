@@ -200,7 +200,7 @@ public static class FileManager {
     		idData,
 			texture: LoadTexture(FilePaths.Elements.Player, idData.Name),
 			healthData: ParseHealthData(plaintext[p++].Split(Levels.II)),
-			physicsData: ParsePhysicsData(plaintext[p++])
+			physicsData: ParsePhysicsData(plaintext[p++].Split(Levels.II))
 		);
     }
     //private static FriendlyType ParseFriendlyType(IdData idData, string[] plaintext) {
@@ -217,8 +217,12 @@ public static class FileManager {
     private static int[] ParseLayers(string plaintext) {
 		return plaintext.Split(Levels.II).ToInt();
 	}
-	private static PhysicsData ParsePhysicsData(string plaintext) {
-		return new PhysicsData(maxSpeed: Convert.ToSingle(plaintext));
+	private static PhysicsData ParsePhysicsData(string[] plaintext) {
+		int p = 0;
+		return new PhysicsData(
+			maxSpeed: Convert.ToSingle(plaintext[p++]),
+			range: Convert.ToSingle(plaintext[p++])
+		);
 	}
 	private static Maybe<Drop[]> ParseDrops(string plaintext) {
 		if (string.IsNullOrEmpty(plaintext)) {
