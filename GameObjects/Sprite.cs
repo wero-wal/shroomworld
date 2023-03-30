@@ -37,6 +37,6 @@ public class Sprite {
 		_hitbox = GetHitbox(Position, _size);
 	}
     public Vector2 GetCentre() {
-        return _position + (_size.ToVector2() / 2);
+        return Position + (_size.ToVector2() / 2);
     }
 }

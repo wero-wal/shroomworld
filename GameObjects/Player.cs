@@ -14,9 +14,9 @@ public class Player : Entity {
 
 
     // ----- Constructors -----
-    public Player(PlayerType type, Sprite sprite, EntityHealthData healthData, Inventory inventory
+    public Player(int id, Sprite sprite, EntityHealthData healthData, Inventory inventory, Body body
     /*,PowerUp[] powerUps, List<Quest> activeQuests, StatisticsDictionary statistics*/)
-        : base(type, sprite, healthData, new Body(sprite, type.PhysicsData)) {
+        : base(id, sprite, healthData, body) {
         _inventory = inventory;
         /*_powerUps = powerUps;
         _quests = activeQuests ?? new List<Quest>();

@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
+
 namespace Shroomworld;
 public class EnemyType : IType {
 
@@ -31,6 +32,7 @@ public class EnemyType : IType {
 
 	// ----- Methods -----
 	public Enemy GetNewEnemy(IDisplayHandler displayHandler) {
-		return new Enemy(this, new Sprite(_texture, displayHandler), new EntityHealthData(_healthData));
+		Sprite sprite = new Sprite(_texture, displayHandler);
+		return new Enemy(_idData.Id, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
 	}
 }

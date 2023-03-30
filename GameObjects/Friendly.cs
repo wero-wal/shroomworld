@@ -7,7 +7,7 @@ public class Friendly : Entity {
     // ----- Properties -----
     // ----- Fields -----
     // ----- Constructors -----
-    public Friendly(IType type, Sprite sprite, EntityHealthData healthData, Body body) : base(type, sprite, healthData, body) {
+    public Friendly(int id, Sprite sprite, EntityHealthData healthData, Body body) : base(id, sprite, healthData, body) {
     }
 
     // ----- Methods -----

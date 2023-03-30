@@ -19,6 +19,7 @@ public class Shroomworld : Game {
     // ----- Properties -----
     public static ContentManager ContentManager => s_contentManager;
     public static DisplayHandler DisplayHandler => s_displayHandler;
+    public static Dictionary<int, PlayerType> PlayerTypes => s_playerTypes;
 
 
     // ----- Fields -----
@@ -177,7 +178,7 @@ public class Shroomworld : Game {
                 break;
 
             case GameStates.Menu:
-                _currentGameState = _activeMenus.Peek().Update();
+                _activeMenus.Peek().Update();
                 // TODO: if user chooses option to open a saved world, set _updateCurrentState to LoadWorld(id)
                 break;
 

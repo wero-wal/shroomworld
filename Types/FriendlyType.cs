@@ -27,6 +27,6 @@ public class FriendlyType : IType {
 
 	public Friendly CreateNew(IDisplayHandler displayHandler) {
 		Sprite sprite = new Sprite(_texture, displayHandler);
-		return new Friendly(this, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
+		return new Friendly(_idData.Id, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
 	}
 }

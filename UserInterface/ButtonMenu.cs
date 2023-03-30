@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace Shroomworld;
 public class ButtonMenu {
@@ -6,7 +8,7 @@ public class ButtonMenu {
     // ----- Fields -----
 	private const int DefaultIndex = -1;
 
-    private static readonly ButtonMenuDisplayHandler _menuDisplayHandler;
+    private static ButtonMenuDisplayHandler _menuDisplayHandler;
 
     private readonly string _name;
     private readonly Sprite _title;
@@ -40,7 +42,7 @@ public class ButtonMenu {
     /// Display all the buttons in the menu. They cannot be interacted with yet.
     /// </summary>
     public void Draw() {
-        _menuDisplayHandler.Draw(_buttons);
+        _menuDisplayHandler.Draw(_buttons, _title);
     }
 	/// <summary>
 	///     Allows the user to select a button by releasing the left mouse button on it.

@@ -63,7 +63,7 @@ public class ButtonMenuDisplayHandler {
 		int index = (int)((Input.MousePosition.Y - menuBounds.Location.Y) / (_buttonSize.Y + _distanceBetweenEachButton));
 
 		// Check mouse is in the gap between two buttons.
-		float bottomOfButton = location.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
+		float bottomOfButton = menuBounds.Location.Y + (_buttonSize.Y * index) + (_distanceBetweenEachButton * (index - 1));
 		if (_displayHandler.MousePosition.Y > bottomOfButton) {
 			return defaultIndex;
 		}
@@ -71,7 +71,7 @@ public class ButtonMenuDisplayHandler {
 	}
 	public void Draw(MenuButton[] buttons, Sprite title) {
 		_displayHandler.SetBackground(_backgroundColour);
-		_displayHandler.DrawSprite(title);
+		_displayHandler.Draw(title);
 		foreach (MenuButton button in buttons) {
 			DrawButton(button);
 		}

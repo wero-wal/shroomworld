@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
@@ -137,8 +138,8 @@ public class World {
         if (!TileIsInRange(mouse, _player)) { return; }
 
         // Check if player is holding the appropriate tool.
-        if (!_itemTypes[_player.Inventory.SelectedItem.Id].ToolData.TryGetValue(out ToolData toolData)) { return; }
-        if (!_tileTypes[_map[mouse.X, mouse.Y]].BreakableBy.Contains(toolData.Type)) { return; }
+        if (!s_itemTypes[_player.Inventory.SelectedItem.Id].ToolData.TryGetValue(out ToolData toolData)) { return; }
+        if (!s_tileTypes[_map[mouse.X, mouse.Y]].BreakableBy.Contains(toolData.Type)) { return; }
 
         // Place the tile.
         s_tileTypes[_map[mouse.X, mouse.Y]].InsertDrops(_player.Inventory);
@@ -154,9 +155,9 @@ public class World {
             _map[mouse.X, mouse.Y] = tileToPlace;
         }
     }
-    private bool TileIsInRange(Point tilePosition, Entity entity) {
-        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5);
-        return (distanceBetweenCentres <= entity.Type.PhysicsData.Range);
+    private bool TileIsInRange(Point tilePosition, Player player) {
+        float distanceBetweenCentres = Vector2.Distance(player.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5f);
+        return (distanceBetweenCentres <= Shroomworld.PlayerTypes[player.Id].PhysicsData.Range);
     }
     private void Clamp(ref Vector2 position, Point size) {
         position.X = Math.Clamp(position.X, 0, _map.Width - 1 - size.X);
