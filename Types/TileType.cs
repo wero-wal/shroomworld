@@ -12,6 +12,7 @@ public class TileType : IType {
     public IdData IdData => _idData;
     public Texture2D Texture => _texture;
     public bool IsSolid => _isSolid;
+    public int[] BreakableBy => _breakableBy;
 
 
 	// ----- Fields -----
