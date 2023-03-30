@@ -6,6 +6,7 @@ public class ItemType : IType {
 
     // ----- Properties -----
     public IdData IdData => _idData;
+    public Maybe<ToolData> ToolData => _toolData;
     public Maybe<int> Tile => _tile;
     public Texture2D Texture => _texture;
 
