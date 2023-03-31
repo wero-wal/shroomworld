@@ -52,7 +52,7 @@ public class Inventory {
 	/// 	caller is attempting to add items which required a new slot.
 	/// </exceptions>
 	public void Add(InventoryItem inventoryItem) {
-		if (!FindItemWithId(inventoryItem.Id, out (int x, int y) location)) {
+		if (!FindLocationOfItemWithId(inventoryItem.Id).TryGetValue(out (int x, int y) location)) {
 			if (IsFull()) {
 				throw new Exception("The inventory is full.");
 			}
@@ -74,7 +74,7 @@ public class Inventory {
 	/// <See cref="KeyNotFoundException"/>
 	/// </exceptions>
 	public void Remove(InventoryItem inventoryItem) {
-		if (!FindItemWithId(inventoryItem.Id, out (int x, int y) location)) {
+		if (!FindLocationOfItemWithId(inventoryItem.Id).TryGetValue(out (int x, int y) location)) {
 			throw new KeyNotFoundException();
 		}
 		// Remove the item from the inventory if there is none of it left.
@@ -89,6 +89,16 @@ public class Inventory {
 			_selected = slot;
         }
     }
+	public Maybe<InventoryItem> FindItemWithId(int id) {
+		for (int x = 0; x < Width; x++) {
+			for (int y = 0; y < Height; y++) {
+				if ((_items[x, y] is not null) && (_items[x, y].Id == id)) {
+					return _items[x, y];
+				}
+			}
+		}
+		return Maybe.None;
+	}
 
 	private void AddNewItem(InventoryItem inventoryItem) {
 		_items[_endPointer.x, _endPointer.y] = inventoryItem;
@@ -119,17 +129,15 @@ public class Inventory {
 	private InventoryItem GetItemAt((int x, int y) location) {
 		return _items[location.x, location.y];
 	}
-	private bool FindItemWithId(int id, out (int x, int y) location) {
-		location = (-1, -1);
+	private Maybe<(int x, int y)> FindLocationOfItemWithId(int id) {
 		for (int x = 0; x < Width; x++) {
 			for (int y = 0; y < Height; y++) {
 				if ((_items[x, y] is not null) && (_items[x, y].Id == id)) {
-					location = (x, y);
-					return true;
+					return (x, y);
 				}
 			}
 		}
-		return false;
+		return Maybe.None;
 	}
 	private bool IsFull() => _endPointer.y == Height;
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,20 +8,20 @@ namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
 	// ----- Properties -----
-	public Point MousePosition => (Input.MousePosition / (Scale * _tileSize)).ToPoint();
+	public Point MousePosition => (Vector2.Transform(Input.MousePosition, Matrix.Invert(_camera.Transform)) / _tileSize).ToPoint();
 	public Texture2D BlankTexture { get; private set; }
 
 	// ----- Fields -----
 	private const int Scale = 5;
 
-	public static SpriteFont Font;
-
 	private readonly Color _defaultColour = Color.White;
 	private readonly Color _defaultTextColour = Color.Black;
 	private readonly Matrix _transform;
+	private readonly Point _windowSize;
 	private int _tileSize = 8; // Number of pixels per square tile side length.
 	private GraphicsDeviceManager _graphicsDeviceManager;
 	private SpriteBatch _spriteBatch;
+	private SpriteFont _font;
 	private GameWindow _window;
 	private Camera _camera;
 	private Vector2 _centreOfScreen;
@@ -40,13 +41,16 @@ public class DisplayHandler : IDisplayHandler {
 		_centreOfScreen = _window.ClientBounds.Center.ToVector2();
 		BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, _tileSize, _tileSize);
 		_transform = Matrix.CreateScale(Scale)/* * Matrix.CreateTranslation(_centreOfScreen.X / Scale, _centreOfScreen.Y / Scale, 0)*/;
-	
+		_windowSize = _window.ClientBounds.Size;
 	}
 
 	// ----- Methods -----
 	// Initialising
 	public void SetTileSize(int tileSize) {
 		_tileSize = tileSize;
+	}
+	public void SetFont(SpriteFont font) {
+		_font = font;
 	}
 	public void SetBackground(Color colour)	{
 		_graphicsDeviceManager.GraphicsDevice.Clear(colour);
@@ -88,55 +92,68 @@ public class DisplayHandler : IDisplayHandler {
 		_spriteBatch.Draw(sprite.Texture, sprite.Position * _tileSize, _defaultColour);
 	}
 	public void DrawText(string text, Vector2 position, Color? colour = null) {
-		_spriteBatch.DrawString(Font, text, position, colour ?? _defaultTextColour);
+		_spriteBatch.DrawString(_font, text, position * _tileSize * Scale, colour ?? _defaultTextColour);
 	}
-	public void DrawHotbar(Inventory inventory, Dictionary<int, ItemType> itemTypes, GuiElements gui) {
+	public void DrawHotbar(Inventory inventory, GuiElements gui) {
 		Vector2 position = gui.HotbarPosition;
-		for (int i = 0; i < inventory.SelectedSlot; i++) {
-			DrawNext(gui.HotbarSlot, inventory[i, Inventory.HotbarRow]);
-		}
-		DrawNext(gui.SelectedHotbarSlot, inventory[inventory.SelectedSlot, Inventory.HotbarRow]);
-		for (int i = inventory.SelectedSlot + 1; i < Inventory.Width; i++) {
-			DrawNext(gui.HotbarSlot, inventory[i, Inventory.HotbarRow]);
-		}
-
-		void DrawNext(Texture2D texture, Maybe<InventoryItem> maybeItem) {
-			if (!maybeItem.TryGetValue(out var item)) {
-				return;
+		for (int i = 0; i < Inventory.Width; i++) {
+			DrawSlot(gui, position, i == inventory.SelectedSlot);
+			if (inventory[i, Inventory.HotbarRow].TryGetValue(out InventoryItem item)) {
+				DrawItem(item, position);
 			}
-			End();
-			BeginStatic();
-			_spriteBatch.Draw(texture, position * _tileSize, _defaultColour);
-			_spriteBatch.Draw(itemTypes[item.Id].Texture, position * _tileSize, _defaultColour);
-			End();
-			BeginText();
-			_spriteBatch.DrawString(Font, item.Amount.ToString(), position * _tileSize * Scale, Color.White);
 			position.X++;
 		}
 	}
-	public void DrawInventory(Inventory inventory, Dictionary<int, ItemType> itemTypes, GuiElements gui) {
+	public void DrawInventory(Inventory inventory, GuiElements gui) {
 		Vector2 position;
 		for (int y = 0; y < Inventory.Height; y++) {
 			for (int x = 0; x < Inventory.Width; x++) {
 				if (y != Inventory.HotbarRow) {
-					position = new Vector2(x * _tileSize, y * _tileSize);
-					End();
-					BeginStatic();
-					_spriteBatch.Draw(gui.HotbarSlot, position, _defaultColour);
-					if (!inventory[x, y].TryGetValue(out var item)) {
-						continue;
+					position = new Vector2(x, y);
+					DrawSlot(gui, position, false);
+					if (inventory[x, y].TryGetValue(out InventoryItem item)) {
+						DrawItem(item, position);
 					}
-					_spriteBatch.Draw(itemTypes[item.Id].Texture, position, _defaultColour);
-					End();
-					BeginText();
-					_spriteBatch.DrawString(Font, item.Amount.ToString(), position * Scale, Color.White);
 				}
 			}
 		}
 	}
-	public Texture2D CreateTexture(Color? colour = null) {
-		Texture2D texture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, _tileSize, _tileSize);
-		texture.SetData(new Color[] { colour ?? _defaultColour });
+	private void DrawSlot(GuiElements gui, Vector2 position, bool selected) {
+		End();
+		BeginStatic();
+		Draw(selected ? gui.SelectedHotbarSlot : gui.HotbarSlot, position);
+	}
+	private void DrawItem(InventoryItem item, Vector2 position) {
+		Draw(World.ItemTypes[item.Id].Texture, position);
+		End();
+		BeginText();
+		DrawText(item.Amount.ToString(), position, Color.White);
+	}
+	public void DrawQuests(List<Quest> quests, Texture2D questBox) {
+		int screenWidthInTiles = _window.ClientBounds.Width / (_tileSize * Scale);
+		Vector2 position = new Vector2(screenWidthInTiles - questBox.Width / _tileSize, 0);
+		string allQuests = string.Empty;
+		int questBoxHeight = 0;
+		foreach (Quest quest in quests) {
+			allQuests += quest.ToString() + Environment.NewLine;
+			questBoxHeight += quest.NumberOfRequirements + 1;
+		}
+		End();
+		BeginStatic();
+		Draw(questBox, position);
+		End();
+		BeginText();
+		DrawText(allQuests, position);
+	}
+	public Texture2D CreateTexture(int width = 1, int height = 1, Color? colour = null) {
+		width *= _tileSize;
+		height *= _tileSize;
+		Texture2D texture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, width, height);
+		Color[] data = new Color[width * height];
+		for (int pixel = 0; pixel < data.Length; pixel++) {
+			data[pixel] = colour ?? _defaultColour;
+		}
+		texture.SetData(data);
 		return texture;
 	}
 	public Point GetSizeInTiles(Point size) {

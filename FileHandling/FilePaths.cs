@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 
 namespace Shroomworld.FileHandling;
@@ -37,6 +38,7 @@ public static class FilePaths {
     /// </value>
     public static string MenuTextFile => s_menuText;
     public static string GuiData => s_guiData;
+    public static string Quests => s_quests;
     /// <value>
     /// Paths for the files containing data about the types of different <see cref="Elements"/>.
     /// </value>
@@ -96,6 +98,7 @@ public static class FilePaths {
     private static string s_generalSettings;
     private static string s_menuText;
     private static string s_gameData;
+    public static string s_quests;
     // Path for the directory containing all world save directories.
     private static string s_worldSavesDirectory;
     
@@ -140,6 +143,7 @@ public static class FilePaths {
         s_gameData = paths[p++];
         s_menuText = paths[p++];
         s_guiData = paths[p++];
+        s_quests = paths[p++];
 
         // Types
         s_types = new Dictionary<Elements, string>(s_typeElements.Length);

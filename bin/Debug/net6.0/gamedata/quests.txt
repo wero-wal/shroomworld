@@ -1,1 +1,0 @@
-Collect {i} and kill {e} for {fn}.

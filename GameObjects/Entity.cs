@@ -23,8 +23,10 @@ namespace Shroomworld {
         }
 
         // ----- Methods -----
-        public virtual void Update() {
+        public virtual void Update(UpdateArgs args) {
             _sprite.Update();
         }
+    }
+    public class UpdateArgs {
     }
 }

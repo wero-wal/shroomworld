@@ -47,6 +47,7 @@ public class Shroomworld : Game {
     private KeyBinds _friendlyInteractionKeyBinds;
     private static Settings s_settings;
     private GameData _gameData;
+    private List<Quest> _defaultQuests;
     
     private class Menus {
         public static ButtonMenu MainMenu;
@@ -84,11 +85,16 @@ public class Shroomworld : Game {
     
     // Loading
     protected override void LoadContent() {
-        DisplayHandler.Font = Content.Load<SpriteFont>("font");
+        
+        if (FileManager.LoadFont("font").TryGetValue(out SpriteFont font)) {
+            s_displayHandler.SetFont(font);
+        }
+        else {
+            SetStateToError("Font loading failed."); return;
+        }
 
         if (!FileManager.TryLoadFilePaths()) {
-            SetStateToError("Couldn't load file paths.");
-            return;
+            SetStateToError("Couldn't load file paths."); return;
         }
         LoadGameFiles();
         LoadMenus();
@@ -99,6 +105,9 @@ public class Shroomworld : Game {
         s_displayHandler.SetTileSize(s_settings.TileSize);
         if (!FileManager.LoadGameData().TryGetValue(out _gameData)) {
             SetStateToError("Game data loading failed");
+        }
+        if (!FileManager.LoadQuests().TryGetValue(out _defaultQuests)) {
+            SetStateToError("Quest loading failed."); return;
         }
 
         // --- Local functions ---
@@ -167,13 +176,16 @@ public class Shroomworld : Game {
                 const int Width = 100;
                 const int Height = 50;
                 const int NumberOfBiomes = 10;
-                Player player = s_playerTypes[0].CreateNew(Vector2.Zero);
+                Player player = s_playerTypes[0].CreateNew(quests: _defaultQuests);
+                const int QuestBoxWidth = 4;
+                const int QuestBoxHeight = 10;
 
                 _world = new World(
                     map: new MapGenerator(Width, Height, NumberOfBiomes/*, 69_420*/).Generate(),
                     player,
                     gravity: s_settings.Gravity,
-                    acceleration: s_settings.Acceleration
+                    acceleration: s_settings.Acceleration,
+                    s_displayHandler.CreateTexture(colour: Color.Brown, width: QuestBoxWidth, height: (QuestBoxHeight / 2))
                 );
                 _currentGameState = GameStates.Playing;
                 break;

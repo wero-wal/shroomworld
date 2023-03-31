@@ -10,7 +10,12 @@ public class ItemType : IType {
     public Maybe<int> Tile => _tile;
     public Texture2D Texture => _texture;
 
-    // ----- FIelds -----
+    // ----- Fields -----
+    public const int DefaultSwordId = 12;
+    public const int DefaultAxeId = 13;
+    public const int DefaultPickaxeId = 14;
+    public const int DefaultShovelId = 15;
+    
     private readonly IdData _idData;
     private readonly Texture2D _texture;
     private readonly Maybe<ToolData> _toolData;

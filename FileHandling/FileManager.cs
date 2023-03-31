@@ -88,7 +88,14 @@ public static class FileManager {
 	//		return Maybe.None;
 	//	}
 	//}
-	
+	public static Maybe<SpriteFont> LoadFont(string path) {
+		try {
+			return Shroomworld.ContentManager.Load<SpriteFont>(path);
+		}
+		catch {
+			return Maybe.None;
+		}
+	}
 	public static Maybe<Settings> LoadSettings() {
 		string[][] file = LoadCsvFile(FilePaths.GeneralSettingsFile);
 		int p = 0;
@@ -119,7 +126,33 @@ public static class FileManager {
 			return Maybe.None;
 		}
 	}
+	public static Maybe<List<Quest>> LoadQuests() {
+		string[][] file = LoadCsvFile(FilePaths.Quests);
+		List<Quest> quests = new List<Quest>();
+		try {
+			foreach (string[] line in file) {
+				int p = 0;
+				quests.Add(new Quest(
+					description: line[p++],
+					requiredItems: ParseItems(line[p++].Split(Levels.II)).ToArray()
+				));
+			}
+			return quests;
+		}
+		catch {
+			return Maybe.None;
+		}
 
+		IEnumerable<InventoryItem> ParseItems(string[] plaintext) {
+			foreach (string part in plaintext) {
+				string[] item = part.Split(Levels.III);
+				yield return new InventoryItem(
+					id: item[0].ToInt(),
+					amount: item[1].ToInt()
+				);
+			}
+		}
+	}
 	private static string[][] LoadCsvFile(string path) {
 		List<string[]> file = new List<string[]>();
 		string[] line;

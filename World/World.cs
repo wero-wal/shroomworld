@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld;
 
@@ -11,6 +12,7 @@ namespace Shroomworld;
 public class World {
 
     // ----- Properties -----
+    public static Dictionary<int, ItemType> ItemTypes => s_itemTypes;
     public Player Player => _player;
     public Map Map => _map;
     public List<Friendly> Friendlies => _friendlies;
@@ -32,22 +34,25 @@ public class World {
     private readonly List<Friendly> _friendlies;
     private readonly List<Enemy> _enemies;
     private readonly Player _player;
+    private readonly Texture2D _questBoxTexture;
     private KeyBinds _keyBinds;
     private Physics.Physics _physics;
     private bool _inventoryOpen = false;
+    private bool _questMenuOpen = false;
     private Maybe<int> _id = Maybe.None;
     
     // ----- Constructors -----
     /// <summary>
     /// Create a new world.
     /// </summary>
-    public World(Map map, Player player, float gravity, float acceleration) {
+    public World(Map map, Player player, float gravity, float acceleration, Texture2D questBoxTexture) {
         _map = map;
         _player = player;
-        _friendlies = new List<Friendly>(/*capacity*/);
-        _enemies = new List<Enemy>(/*capacity*/);
+        _friendlies = new List<Friendly>();
+        _enemies = new List<Enemy>();
         SetKeyBinds();
         _physics = new Physics.Physics(acceleration, gravity);
+        _questBoxTexture = questBoxTexture;
     }
     /// <summary>
     /// Instantiate a saved / existing world.
@@ -74,8 +79,7 @@ public class World {
     public void Update() {
         _keyBinds.ProcessInputs(Input.CurrentInputs);
         ApplyPhysics();
-        _player.Update();
-        _player.Sprite.Position = Clamp(_player.Sprite.Position, _player.Sprite.Size);
+        _player.Update(new PlayerUpdateArgs(Clamp));
     }
     public void Draw(IDisplayHandler displayHandler, GuiElements guiElements) {
         displayHandler.SetBackground(_map.Biomes[(int)_player.Sprite.Position.X].Background);
@@ -91,9 +95,12 @@ public class World {
         displayHandler.Draw(_player.Sprite);
         displayHandler.End();
         displayHandler.BeginStatic();
-        displayHandler.DrawHotbar(_player.Inventory, s_itemTypes, guiElements);
+        displayHandler.DrawHotbar(_player.Inventory, guiElements);
         if (_inventoryOpen) {
-            displayHandler.DrawInventory(_player.Inventory, s_itemTypes, guiElements);
+            displayHandler.DrawInventory(_player.Inventory, guiElements);
+        }
+        if (_questMenuOpen) {
+            displayHandler.DrawQuests(_player.Quests, _questBoxTexture);
         }
     }
 
@@ -113,8 +120,9 @@ public class World {
         _keyBinds.Add(Input.Inputs.N5, () => SwitchToHotbarSlot(4));
         _keyBinds.Add(Input.Inputs.E, () => _inventoryOpen = true);
         _keyBinds.Add(Input.Inputs.F, () => _inventoryOpen = false);
-        /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
-        _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);*/
+        _keyBinds.Add(Input.Inputs.Q, () => _questMenuOpen = true);
+        _keyBinds.Add(Input.Inputs.Z, () => _questMenuOpen = false);
+        /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);*/
     }
     private void PlayerJump() => _player.Body.AddAcceleration(_physics.AccelerationUp);
     private void PlayerMoveLeft() => _player.Body.AddAcceleration(_physics.AccelerationLeft);

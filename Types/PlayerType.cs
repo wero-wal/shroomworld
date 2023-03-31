@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shroomworld.Physics;
 
 namespace Shroomworld;
 public class PlayerType : IType {
+
     // ----- Properties ----- 
     public IdData IdData => _idData;
     public Texture2D Texture => _texture;
@@ -28,10 +28,22 @@ public class PlayerType : IType {
     }
 
     // ----- Methods -----
-    public Player CreateNew(Vector2 position) {
-        Sprite sprite = new Sprite(_texture, position);
-        return new Player(_idData.Id, sprite, new EntityHealthData(_healthData), new Inventory(new InventoryItem[]
-        { new InventoryItem(12, 1), new InventoryItem(13, 1), new InventoryItem(14, 1), new InventoryItem(15, 1) }),
-        new Physics.Body(sprite, _physicsData));
+    public Player CreateNew(Vector2? position = null, List<Quest> quests = null) {
+        Sprite sprite = new Sprite(_texture, position ?? Vector2.Zero);
+        return new Player(
+            id: _idData.Id,
+            sprite: sprite,
+            healthData: new EntityHealthData(_healthData),
+            inventory: new Inventory(GetDefaultItems()),
+            body: new Physics.Body(sprite, _physicsData),
+            activeQuests: quests
+        );
+    }
+    private InventoryItem[] GetDefaultItems() {
+        return new InventoryItem[] {
+            new InventoryItem(ItemType.DefaultPickaxeId, 1),
+            new InventoryItem(ItemType.DefaultAxeId, 1),
+            new InventoryItem(ItemType.DefaultShovelId, 1),
+            new InventoryItem(ItemType.DefaultSwordId, 1) };
     }
 }
