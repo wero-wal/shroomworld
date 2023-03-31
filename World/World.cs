@@ -34,6 +34,9 @@ public class World {
     private readonly Player _player;
     private KeyBinds _keyBinds;
     private Physics.Physics _physics;
+    private DateTime _time;
+    private readonly TimeSpan _inventoryToggleCooldown = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
+    private bool _inventoryOpen = false;
 
     
     // ----- Constructors -----
@@ -90,6 +93,9 @@ public class World {
         displayHandler.End();
         displayHandler.BeginStatic();
         displayHandler.DrawHotbar(_player.Inventory, s_itemTypes, guiElements);
+        if (_inventoryOpen) {
+            displayHandler.DrawInventory(_player.Inventory, s_itemTypes, guiElements);
+        }
     }
 
     private void SetKeyBinds() {
@@ -101,18 +107,26 @@ public class World {
         _keyBinds.Add(Input.Inputs.S, PlayerMoveDown);
         _keyBinds.Add(Input.Inputs.LeftMouseButton, PlaceTile);
         _keyBinds.Add(Input.Inputs.RightMouseButton, BreakTile);
+        _keyBinds.Add(Input.Inputs.N1, () => SwitchToHotbarSlot(0));
+        _keyBinds.Add(Input.Inputs.N2, () => SwitchToHotbarSlot(1));
+        _keyBinds.Add(Input.Inputs.N3, () => SwitchToHotbarSlot(2));
+        _keyBinds.Add(Input.Inputs.N4, () => SwitchToHotbarSlot(3));
+        _keyBinds.Add(Input.Inputs.E, ToggleInventory);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
-        _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);
-        _keyBinds.Add(Input.Inputs.E, OpenInventory);
-        _keyBinds.Add(Input.Inputs.N1, SwitchToHotbarSlot1);
-        _keyBinds.Add(Input.Inputs.N2, SwitchToHotbarSlot2);
-        _keyBinds.Add(Input.Inputs.N3, SwitchToHotbarSlot3);
-        _keyBinds.Add(Input.Inputs.N4, SwitchToHotbarSlot4);*/
+        _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);*/
     }
     private void PlayerJump() => _player.Body.AddAcceleration(_physics.AccelerationUp);
     private void PlayerMoveLeft() => _player.Body.AddAcceleration(_physics.AccelerationLeft);
     private void PlayerMoveRight() => _player.Body.AddAcceleration(_physics.AccelerationRight);
     private void PlayerMoveDown() => _player.Body.AddAcceleration(_physics.AccelerationDown);
+    private void SwitchToHotbarSlot(int slot) {
+        _player.Inventory.SelectSlot(slot);
+    }
+    private void ToggleInventory() {
+        if ((DateTime.Now - _time) >= _inventoryToggleCooldown) {
+            _inventoryOpen = !_inventoryOpen;
+        }
+    }
     private void ApplyPhysics() {
         _player.Body.ApplyPhysics(_physics.Gravity, GetSolidIntersectingTiles);
     }
@@ -151,12 +165,12 @@ public class World {
         if (!TileIsInRange(mouse, _player)) { return; }
 
         if ((_map[mouse.X, mouse.Y] == TileType.AirId)
-            && (s_itemTypes[_player.Inventory.SelectedItem].Tile.TryGetValue(out int tileToPlace))) {
+            && (s_itemTypes[_player.Inventory.SelectedItem.Id].Tile.TryGetValue(out int tileToPlace))) {
             _map[mouse.X, mouse.Y] = tileToPlace;
         }
     }
-    private bool TileIsInRange(Point tilePosition, Entity entity) {
-        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), tilePosition.ToVector2() + Vector2.One * 0.5f);
+    private bool TileIsInRange(Point position, Entity entity) {
+        float distanceBetweenCentres = Vector2.Distance(entity.Sprite.GetCentre(), position.ToVector2() + (Vector2.One * 0.5f));
         return (distanceBetweenCentres <= entity.Body.PhysicsData.Range);
     }
     private void Clamp(ref Vector2 position, Point size) {

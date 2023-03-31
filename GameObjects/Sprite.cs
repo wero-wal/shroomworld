@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Shroomworld;
@@ -11,24 +10,33 @@ public class Sprite {
     public Rectangle Hitbox => _hitbox;
 
     // ----- Fields -----
+    public delegate Point SizeConverter(Point textureSize);
+
+    private static SizeConverter _getSizeInTiles;
+
     public Vector2 Position;
+
     private readonly Texture2D _texture;
     private readonly Point _size;
+
     private Rectangle _hitbox;
 
     // ----- Constructors -----
-    public Sprite(Texture2D texture, IDisplayHandler displayHandler) {
+    public Sprite(Texture2D texture) {
         _texture = texture;
         Position = Vector2.Zero;
-        _size = displayHandler.GetSizeInTiles(texture);
+        _size = _getSizeInTiles(texture.Bounds.Size);
     }
-    public Sprite(Texture2D texture, Vector2 position, IDisplayHandler displayHandler) {
+    public Sprite(Texture2D texture, Vector2 position) {
         _texture = texture;
         Position = position;
-        _size = displayHandler.GetSizeInTiles(texture);
+        _size = _getSizeInTiles(texture.Bounds.Size);
     }
 
     // ----- Methods -----
+    public static void SetSizeConverter(SizeConverter getSizeInTiles) {
+        _getSizeInTiles = getSizeInTiles;
+    }
     public static Rectangle GetHitbox(Vector2 position, Point size) {
 		return new Rectangle(position.ToPoint(), (Vector2.Ceiling(position + size.ToVector2()) - Vector2.Floor(position)).ToPoint());
     }

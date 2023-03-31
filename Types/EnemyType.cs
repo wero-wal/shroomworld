@@ -31,8 +31,8 @@ public class EnemyType : IType {
 
 
 	// ----- Methods -----
-	public Enemy GetNewEnemy(IDisplayHandler displayHandler) {
-		Sprite sprite = new Sprite(_texture, displayHandler);
+	public Enemy GetNewEnemy() {
+		Sprite sprite = new Sprite(_texture);
 		return new Enemy(_idData.Id, sprite, new EntityHealthData(_healthData), new Physics.Body(sprite, _physicsData));
 	}
 }

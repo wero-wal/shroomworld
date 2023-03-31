@@ -28,9 +28,10 @@ public class PlayerType : IType {
     }
 
     // ----- Methods -----
-    public Player CreateNew(Vector2 position, IDisplayHandler displayHandler) {
-        Sprite sprite = new Sprite(_texture, position, displayHandler);
-        return new Player(_idData.Id, sprite, new EntityHealthData(_healthData), new Inventory(),
+    public Player CreateNew(Vector2 position) {
+        Sprite sprite = new Sprite(_texture, position);
+        return new Player(_idData.Id, sprite, new EntityHealthData(_healthData), new Inventory(new InventoryItem[]
+        { new InventoryItem(12, 1), new InventoryItem(13, 1), new InventoryItem(14, 1), new InventoryItem(15, 1) }),
         new Physics.Body(sprite, _physicsData));
     }
 }

@@ -69,6 +69,7 @@ public class Shroomworld : Game {
         // Set up display.
         s_displayHandler = new DisplayHandler(this, _graphicsDeviceManager);
         s_displayHandler.SetTitle("Shroomworld");
+        Sprite.SetSizeConverter(s_displayHandler.GetSizeInTiles);
 
         // Set up menus.
         _currentGameState = GameStates.CreatingWorld;
@@ -92,32 +93,23 @@ public class Shroomworld : Game {
         LoadGuiElements();
 
         // --- Local functions ---
-        void LoadGuiElements() {
-            try {
-                _guiElements = FileManager.LoadGuiElements();
-            }
-            catch (Exception) {
-                SetStateToError("Couldn't load gui elements.");
-                return;
-            }
-        }
         void LoadGameFiles() {
             if(!FileManager.LoadTypes<ItemType>().TryGetValue(out var itemTypes)) {
                 SetStateToError("Item type loading failed."); return;
             }
-            if (FileManager.LoadTypes<TileType>().TryGetValue(out var tileTypes)) {
+            if (!FileManager.LoadTypes<TileType>().TryGetValue(out var tileTypes)) {
                 SetStateToError("Tile type loading failed."); return;
             }
-            if (FileManager.LoadTypes<BiomeType>().TryGetValue(out var biomeTypes)) {
+            if (!FileManager.LoadTypes<BiomeType>().TryGetValue(out var biomeTypes)) {
                 SetStateToError("Biome type loading failed."); return;
             }
-            /*if (FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)) {
+            /*if (!FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)) {
                 SetStateToError("Tile type loading failed."); return;
             }
-            if (FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)) {
+            if (!FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)) {
                 SetStateToError("Tile type loading failed."); return;
             }*/
-            if (FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
+            if (!FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
                 SetStateToError("Tile type loading failed."); return;
             }
 
@@ -148,6 +140,15 @@ public class Shroomworld : Game {
                 return new ButtonMenu(menuData.name, menuData.title, menuData.items, menuData.location, actions);
             }
         }
+        void LoadGuiElements() {
+            try {
+                _guiElements = FileManager.LoadGuiElements();
+            }
+            catch (Exception) {
+                SetStateToError("Couldn't load gui elements.");
+                return;
+            }
+        }
     }
     /// <summary>
     /// Loads all universal game files.
@@ -166,15 +167,15 @@ public class Shroomworld : Game {
                 const int Width = 100;
                 const int Height = 50;
                 const int NumberOfBiomes = 10;
-                Player player = s_playerTypes[0].CreateNew(Vector2.Zero, s_displayHandler);
+                Player player = s_playerTypes[0].CreateNew(Vector2.Zero);
 
-                _world = new World(new MapGenerator(Width, Height, NumberOfBiomes, 69_420).Generate(), player);
+                _world = new World(new MapGenerator(Width, Height, NumberOfBiomes/*, 69_420*/).Generate(), player);
                 _currentGameState = GameStates.Playing;
                 break;
 
             case GameStates.Playing:
                 _world.Update();
-                s_displayHandler.Update(_world.Player.Sprite.Position + _world.Player.Sprite.Size.ToVector2() / 2);
+                s_displayHandler.Update(_world.Player.Sprite.GetCentre(), Width, Height);
                 break;
 
             case GameStates.Menu:

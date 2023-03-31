@@ -14,10 +14,10 @@ public class Inventory {
 	/// </value>
 	public int Volume => _items.Length;
 
-	public int this[int x, int y] {
+	public Maybe<InventoryItem> this[int x, int y] {
 		get => _items[x, y];
 	}
-	public InventoryItem SelectedItem => _items[HotbarRow, _selected];
+	public InventoryItem SelectedItem => _items[_selected, HotbarRow];
 	public int SelectedSlot => _selected;
 	
 	// ----- Fields -----
@@ -84,6 +84,12 @@ public class Inventory {
 		}
 		GetItemAt(location).DecreaseAmountBy(inventoryItem.Amount);
 	}
+	public void SelectSlot(int slot) {
+        if ((0 <= slot) && (slot < Width)) {
+			_selected = slot;
+        }
+    }
+
 	private void AddNewItem(InventoryItem inventoryItem) {
 		_items[_endPointer.x, _endPointer.y] = inventoryItem;
 		MoveEndPointerForward();
