@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Shroomworld;
 
@@ -11,6 +11,7 @@ public class BiomeDictionary {
 	public class CapacityReachedException : Exception { }
 
 	// ----- Properties -----
+	public int Count => _biomes.Length;
 	/// <summary>
 	/// 
 	/// </summary>
@@ -19,9 +20,9 @@ public class BiomeDictionary {
 	/// <exception cref="KeyNotFoundException">Thrown if not enough biomes have been set.</exception>
 	public BiomeType this[int x] {
 		get {
-			for (int i = 0; i < _size; i++) {
+			for (int i = 0; i < _count; i++) {
 				if (x < _biomeEndXCoords[i]) {
-					return _biomeTypes[i];
+					return _biomes[i];
 				}
 			}
 			throw new KeyNotFoundException();
@@ -30,34 +31,41 @@ public class BiomeDictionary {
 			if (!_biomeEndXCoords.Contains(x)) {
 				throw new KeyNotFoundException();
 			}
-			_biomeTypes[x] = value;
+			_biomes[x] = value;
 		}
 	}
 
 	// ----- Fields -----
 	private readonly int[] _biomeEndXCoords;
-	private readonly BiomeType[] _biomeTypes;
+	private readonly BiomeType[] _biomes;
 
-	private readonly int _size = 0;
+	private readonly int _count = 0;
 	
 	private int _endPointer = 0;
 
 	// ----- Constructors -----
-	public BiomeDictionary(int size, int width) {
-		_size = size;
-		_biomeEndXCoords = new int[size];
-		_biomeTypes = new BiomeType[size];
-		_biomeEndXCoords[^1] = width;
+	public BiomeDictionary(int count, int mapWidth) {
+		_count = count;
+		_biomeEndXCoords = new int[count];
+		_biomes = new BiomeType[count];
+		_biomeEndXCoords[^1] = mapWidth;
 	}
 
 	// ----- Methods -----
 	public void Add(int x, BiomeType biomeType) {
-		if (_endPointer == _size) {
+		if (_endPointer == _count) {
 			throw new CapacityReachedException();
 		}
 		if (_endPointer != 0) {
 			_biomeEndXCoords[_endPointer - 1] = x;
 		}
-		_biomeTypes[_endPointer++] = biomeType;
+		_biomes[_endPointer++] = biomeType;
+	}
+	public string ToString(string separator2, string separator3) {
+		string str = string.Empty;
+		for (int i = 0; i < _count; i++) {
+			str += _biomes[i].IdData.Id + separator3 + _biomeEndXCoords[i] + separator2;
+		}
+		return str.Remove(_count - 1);
 	}
 }

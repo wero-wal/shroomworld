@@ -48,7 +48,7 @@ public class Body {
 	/// <para>Note: velocity is limited by the body's max speed.</para>
 	/// </summary>
 	public void ApplyPhysics(float gravity, Func<Vector2, Point, IEnumerable<Point>> getIntersectingSolidTiles) {
-		//AddGravity(gravity);
+		AddGravity(gravity);
 		ApplyAcceleration();
 		ResetAcceleration();
 		ApplyVelocity(getIntersectingSolidTiles);

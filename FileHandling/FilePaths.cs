@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Shroomworld.FileHandling;
 
@@ -30,6 +31,7 @@ public static class FilePaths {
     /// Path for the file containing general (non-user-specific) game settings.
     /// </value>
     public static string GeneralSettingsFile => s_generalSettings;
+    public static string GameData => s_gameData;
     /// <value>
     /// Path for the file containing text for all menu buttons and headings for all menus.
     /// </value>
@@ -93,6 +95,7 @@ public static class FilePaths {
     private static string s_users;
     private static string s_generalSettings;
     private static string s_menuText;
+    private static string s_gameData;
     // Path for the directory containing all world save directories.
     private static string s_worldSavesDirectory;
     
@@ -134,6 +137,7 @@ public static class FilePaths {
 
         // General settings
         s_generalSettings = paths[p++];
+        s_gameData = paths[p++];
         s_menuText = paths[p++];
         s_guiData = paths[p++];
 
@@ -170,9 +174,9 @@ public static class FilePaths {
     /// <param name="file">Specify the file whose path you want.
     /// (options: <see cref="Elements.Map"/>, <see cref="Elements.Enemy"/>, <see cref="Elements.Friendly"/>, <see cref="Elements.Player"/>).</param>
     /// <returns>Path for the specified <paramref name="file"/> in the directory of a specific saved world.</returns>
-    public static Maybe<string> GetPathForWorldFile(int worldId, Elements file) {
+    public static string GetPathForWorldFile(int worldId, Elements file) {
         if (!s_worldSaveElements.Contains(file)) {
-            return Maybe.None;
+            throw new ArgumentException("This Element is not a world save file element.");
         }
         return $"{s_worldSavesDirectory}{worldId}\\{s_worldSaveFileNames[file]}";
     }

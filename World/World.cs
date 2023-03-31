@@ -15,7 +15,7 @@ public class World {
     public Map Map => _map;
     public List<Friendly> Friendlies => _friendlies;
     public List<Enemy> Enemies => _enemies;
-
+    public Maybe<int> Id => _id;
 
     // ----- Fields -----
     public delegate Vector2 Clamper(Vector2 position, Point size);
@@ -32,33 +32,34 @@ public class World {
     private readonly List<Friendly> _friendlies;
     private readonly List<Enemy> _enemies;
     private readonly Player _player;
+    private readonly TimeSpan _inventoryToggleCooldown = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
     private KeyBinds _keyBinds;
     private Physics.Physics _physics;
-    private DateTime _time;
-    private readonly TimeSpan _inventoryToggleCooldown = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
+    private DateTime _inventoryLastToggled;
     private bool _inventoryOpen = false;
-
+    private Maybe<int> _id = Maybe.None;
     
     // ----- Constructors -----
     /// <summary>
     /// Create a new world.
     /// </summary>
-    public World(Map map, Player player) {
+    public World(Map map, Player player, float gravity, float acceleration) {
         _map = map;
         _player = player;
         _friendlies = new List<Friendly>(/*capacity*/);
         _enemies = new List<Enemy>(/*capacity*/);
         SetKeyBinds();
-        _physics = new Physics.Physics(acceleration: 0.2f, gravity: 0.1f);
+        _physics = new Physics.Physics(acceleration, gravity);
     }
     /// <summary>
     /// Instantiate a saved / existing world.
     /// </summary>
-    public World(Map map/*, Player player, List<Friendly> friendlies, List<Enemy> enemies*/) {
+    public World(Map map, float gravity, float acceleration/*, Player player, List<Friendly> friendlies, List<Enemy> enemies*/) {
         _map = map;
         //_player = player;
         //_friendlies = friendlies;
         //_enemies = enemies;
+        _physics = new Physics.Physics(acceleration, gravity);
     }
 
     // ----- Methods -----
@@ -123,12 +124,12 @@ public class World {
         _player.Inventory.SelectSlot(slot);
     }
     private void ToggleInventory() {
-        if ((DateTime.Now - _time) >= _inventoryToggleCooldown) {
+        if ((DateTime.Now - _inventoryLastToggled) >= _inventoryToggleCooldown) {
             _inventoryOpen = !_inventoryOpen;
         }
     }
     private void ApplyPhysics() {
-        _player.Body.ApplyPhysics(_physics.Gravity, GetSolidIntersectingTiles);
+        _player.Body.ApplyPhysics(Shroomworld.Settings.Gravity, GetSolidIntersectingTiles);
     }
     /// <summary>
     /// </summary>

@@ -7,11 +7,10 @@ namespace Shroomworld;
 public class DisplayHandler : IDisplayHandler {
 
 	// ----- Properties -----
-	public Point MousePosition => (Input.MousePosition / (Scale * TileSize)).ToPoint();
+	public Point MousePosition => (Input.MousePosition / (Scale * _tileSize)).ToPoint();
 	public Texture2D BlankTexture { get; private set; }
 
 	// ----- Fields -----
-	public const int TileSize = 8; // Number of pixels per square tile side length.
 	private const int Scale = 5;
 
 	public static SpriteFont Font;
@@ -19,6 +18,7 @@ public class DisplayHandler : IDisplayHandler {
 	private readonly Color _defaultColour = Color.White;
 	private readonly Color _defaultTextColour = Color.Black;
 	private readonly Matrix _transform;
+	private int _tileSize = 8; // Number of pixels per square tile side length.
 	private GraphicsDeviceManager _graphicsDeviceManager;
 	private SpriteBatch _spriteBatch;
 	private GameWindow _window;
@@ -38,13 +38,16 @@ public class DisplayHandler : IDisplayHandler {
 		_window.AllowUserResizing = false;
 		_camera = new Camera(Scale);
 		_centreOfScreen = _window.ClientBounds.Center.ToVector2();
-		BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
+		BlankTexture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, _tileSize, _tileSize);
 		_transform = Matrix.CreateScale(Scale)/* * Matrix.CreateTranslation(_centreOfScreen.X / Scale, _centreOfScreen.Y / Scale, 0)*/;
 	
 	}
 
 	// ----- Methods -----
 	// Initialising
+	public void SetTileSize(int tileSize) {
+		_tileSize = tileSize;
+	}
 	public void SetBackground(Color colour)	{
 		_graphicsDeviceManager.GraphicsDevice.Clear(colour);
 	}
@@ -53,11 +56,11 @@ public class DisplayHandler : IDisplayHandler {
 	}
 
 	public void Update(Vector2 centreOfPlayer, int width, int height) {
-		_camera.Follow(ClampToEdges(centreOfPlayer * TileSize), _centreOfScreen / Scale);
+		_camera.Follow(ClampToEdges(centreOfPlayer * _tileSize), _centreOfScreen / Scale);
 
 		Vector2 ClampToEdges(Vector2 target) {
-			target.X = Math.Clamp(target.X, _centreOfScreen.X / Scale, (width - 1) * TileSize - _centreOfScreen.X / Scale);
-			target.Y = Math.Clamp(target.Y, _centreOfScreen.Y / Scale, (height - 1) * TileSize - _centreOfScreen.Y / Scale);
+			target.X = Math.Clamp(target.X, _centreOfScreen.X / Scale, (width - 1) * _tileSize - _centreOfScreen.X / Scale);
+			target.Y = Math.Clamp(target.Y, _centreOfScreen.Y / Scale, (height - 1) * _tileSize - _centreOfScreen.Y / Scale);
 			return target;
 		}
 	}
@@ -76,13 +79,13 @@ public class DisplayHandler : IDisplayHandler {
 		_spriteBatch.End();
 	}
 	public void Draw(Texture2D texture, Vector2 position) {
-		_spriteBatch.Draw(texture, position * TileSize, _defaultColour);
+		_spriteBatch.Draw(texture, position * _tileSize, _defaultColour);
 	}
 	public void Draw(Texture2D texture, int x, int y) {
-		_spriteBatch.Draw(texture, new Vector2(x, y - GetSizeInTiles(texture.Bounds.Size).Y + 1) * TileSize, _defaultColour);
+		_spriteBatch.Draw(texture, new Vector2(x, y - GetSizeInTiles(texture.Bounds.Size).Y + 1) * _tileSize, _defaultColour);
 	}
 	public void Draw(Sprite sprite) {
-		_spriteBatch.Draw(sprite.Texture, sprite.Position * TileSize, _defaultColour);
+		_spriteBatch.Draw(sprite.Texture, sprite.Position * _tileSize, _defaultColour);
 	}
 	public void DrawText(string text, Vector2 position, Color? colour = null) {
 		_spriteBatch.DrawString(Font, text, position, colour ?? _defaultTextColour);
@@ -103,11 +106,11 @@ public class DisplayHandler : IDisplayHandler {
 			}
 			End();
 			BeginStatic();
-			_spriteBatch.Draw(texture, position * TileSize, _defaultColour);
-			_spriteBatch.Draw(itemTypes[item.Id].Texture, position * TileSize, _defaultColour);
+			_spriteBatch.Draw(texture, position * _tileSize, _defaultColour);
+			_spriteBatch.Draw(itemTypes[item.Id].Texture, position * _tileSize, _defaultColour);
 			End();
 			BeginText();
-			_spriteBatch.DrawString(Font, item.Amount.ToString(), position * TileSize * Scale, Color.White);
+			_spriteBatch.DrawString(Font, item.Amount.ToString(), position * _tileSize * Scale, Color.White);
 			position.X++;
 		}
 	}
@@ -115,7 +118,7 @@ public class DisplayHandler : IDisplayHandler {
 		Vector2 position;
 		for (int y = 0; y < Inventory.Height; y++) {
 			for (int x = 0; x < Inventory.Width; x++) {
-				position = new Vector2(y * TileSize, x * TileSize);
+				position = new Vector2(y * _tileSize, x * _tileSize);
 				End();
 				BeginStatic();
 				_spriteBatch.Draw(gui.HotbarSlot, position, _defaultColour);
@@ -130,11 +133,11 @@ public class DisplayHandler : IDisplayHandler {
 		}
 	}
 	public Texture2D CreateTexture(Color? colour = null) {
-		Texture2D texture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, TileSize, TileSize);
+		Texture2D texture = new Texture2D(_graphicsDeviceManager.GraphicsDevice, _tileSize, _tileSize);
 		texture.SetData(new Color[] { colour ?? _defaultColour });
 		return texture;
 	}
 	public Point GetSizeInTiles(Point size) {
-		return new Point(size.X / TileSize, size.Y / TileSize);
+		return new Point(size.X / _tileSize, size.Y / _tileSize);
 	}
 }

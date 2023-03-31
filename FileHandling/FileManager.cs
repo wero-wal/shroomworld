@@ -89,6 +89,37 @@ public static class FileManager {
 	//	}
 	//}
 	
+	public static Maybe<Settings> LoadSettings() {
+		string[][] file = LoadCsvFile(FilePaths.GeneralSettingsFile);
+		int p = 0;
+		try {
+			return new Settings(
+				gravity: file[0][p++].ToFloat(),
+				acceleration: file[0][p++].ToFloat(),
+				regenSpeedPercent: file[0][p++].ToInt(),
+				tileSize: file[0][p++].ToInt()
+			);
+		}
+		catch (Exception) {
+			return Maybe.None;
+		}
+	}
+	public static Maybe<GameData> LoadGameData() {
+		var file = LoadCsvFile(FilePaths.GameData);
+		if (file.Length == 0) {
+			return new GameData(Array.Empty<int>());
+		}
+		int p = 0;
+		try {
+			return new GameData(
+				worldIds: file[0][p++].Split(Levels.II).ToInt()
+			);
+		}
+		catch (Exception) {
+			return Maybe.None;
+		}
+	}
+
 	private static string[][] LoadCsvFile(string path) {
 		List<string[]> file = new List<string[]>();
 		string[] line;
@@ -259,38 +290,45 @@ public static class FileManager {
 	//}
 
 	// Parse Menus
-	public static void LoadMenus(IDisplayHandler displayHandler, out ButtonMenuDisplayHandler menuDisplayHandler,
+	public static bool TryLoadMenus(IDisplayHandler displayHandler, out ButtonMenuDisplayHandler menuDisplayHandler,
 	out List<(string name, Sprite title, string[] items, Vector2 location)> menus) {
 		
 		string[][] file = LoadCsvFile(FilePaths.MenuTextFile);
-
-		// Load menu display handler:
-		int p = 0;
-		menuDisplayHandler = new ButtonMenuDisplayHandler(
-			distanceBetweenEachButton: Convert.ToSingle(file[0][p++]),
-			displayHandler: displayHandler,
-			normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.ButtonTexture),
-			highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTexture),
-			pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTexture),
-			normalTextColour: ParseColour(file[0][p++].Split(Levels.II)),
-			highlightedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
-			pressedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
-			backgroundColour: ParseColour(file[0][p++].Split(Levels.II))
-		);
-		// Load menus:
-		menus = new();
-		for(int i = 1; i < file.Length; i++) {
-			p = 0;
-			string[] menu_str = file[i];
-			(string name, Sprite title, string[] items, Vector2 location) menu;
-			menu.name = menu_str[p++];
-			menu.items = menu_str[p++].Split(Levels.II);
-			menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu_str[p++].Split(Levels.II)));
-			menu.location = ParseVector(menu_str[p++].Split(Levels.II));
-			menus.Add(menu);
+		menuDisplayHandler = null;
+		menus = null;
+		try {
+			// Load menu display handler:
+			int p = 0;
+			menuDisplayHandler = new ButtonMenuDisplayHandler(
+				distanceBetweenEachButton: Convert.ToSingle(file[0][p++]),
+				displayHandler: displayHandler,
+				normalButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.ButtonTexture),
+				highlightedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.HighlightedButtonTexture),
+				pressedButton: LoadTexture(FilePaths.Elements.Menu, FilePaths.PressedButtonTexture),
+				normalTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+				highlightedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+				pressedTextColour: ParseColour(file[0][p++].Split(Levels.II)),
+				backgroundColour: ParseColour(file[0][p++].Split(Levels.II))
+			);
+			// Load menus:
+			menus = new();
+			for(int i = 1; i < file.Length; i++) {
+				p = 0;
+				string[] menu_str = file[i];
+				(string name, Sprite title, string[] items, Vector2 location) menu;
+				menu.name = menu_str[p++];
+				menu.items = menu_str[p++].Split(Levels.II);
+				menu.title = new Sprite(LoadTexture(FilePaths.Elements.Menu, FilePaths.TitleTexture), ParseVector(menu_str[p++].Split(Levels.II)));
+				menu.location = ParseVector(menu_str[p++].Split(Levels.II));
+				menus.Add(menu);
+			}
+			return true;
+		}
+		catch (System.Exception) {
+			return false;
 		}
 	}
-	public static GuiElements LoadGuiElements() {
+	public static Maybe<GuiElements> LoadGuiElements() {
 		string[][] file = LoadCsvFile(FilePaths.GuiData);
 		return new GuiElements(
 			hotbarSlot: LoadTexture(FilePaths.Elements.Gui, FilePaths.HotbarSlotTexture),
@@ -311,9 +349,49 @@ public static class FileManager {
 	// Save:
 	//public static void SavePlayer(Player player) {
 	//}
-	//public static void SaveWorld() {
-	//	Dictionary<int, Npc> npcs, int[,] tileMap, int width, int height, int difficulty
-	//}
+	public static int SaveWorld(World world, GameData gameData) {
+		string file = string.Empty;
+
+		// Metadata.
+		AddToFile(world.Map.Width);
+		AddToFile(world.Map.Height);
+
+		// Biomes.
+		for (int i = 0; i < world.Map.Biomes.Count; i++) {
+			AddToFile(world.Map.Biomes.ToString(s_separators_str[Levels.II], s_separators_str[Levels.III]), addSeparator: (i != (world.Map.Biomes.Count - 1)));
+		}
+		// Tile map.
+		for (int y = 0; y < world.Map.Height; y++) {
+			for (int x = 0; x < world.Map.Width; x++) {
+				AddToFile(world.Map[x, y], addSeparator: x != (world.Map.Width - 1));
+			}
+			file += (y == (world.Map.Height - 1)) ? string.Empty : Environment.NewLine;
+		}
+		// Get id.
+		if (!world.Id.TryGetValue(out int id)) {
+			id = gameData.NextWorldId();
+		}
+		// Save file.
+		try {
+			using (StreamWriter streamWriter = new StreamWriter(FilePaths.GetPathForWorldFile(id, FilePaths.Elements.Map))) {
+				streamWriter.Write(file);
+			}
+			return id;
+		}
+		catch {
+			return -1;
+		}
+
+		// --- Local Functions ---
+		void AddToFile(object text, int level = Levels.I, bool addSeparator = true) {
+			if (addSeparator) {
+				file += text.ToString() + s_separators[level];
+			}
+			else {
+				file += text;
+			}
+		}
+	}
 
 	// Helper methods:
 	/// <summary>
@@ -343,5 +421,8 @@ public static class FileManager {
 	}
 	private static int[] ToInt(this string[] strArray) {
 		return Array.ConvertAll(strArray, item => Convert.ToInt32(item));
+	}
+	private static float ToFloat(this string str) {
+		return Convert.ToSingle(str);
 	}
 }

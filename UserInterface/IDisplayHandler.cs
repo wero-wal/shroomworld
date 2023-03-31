@@ -7,6 +7,7 @@ public interface IDisplayHandler {
 	Texture2D BlankTexture { get; }
 	Point MousePosition { get; }
 
+	void SetTileSize(int tileSize);
 	void Update(Vector2 playerPosition, int width, int height);
 	void BeginWithCamera();
 	void BeginStatic();
