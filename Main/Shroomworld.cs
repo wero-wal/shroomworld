@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -85,29 +87,41 @@ public class Shroomworld : Game {
     
     // Loading
     protected override void LoadContent() {
-        
+        const string LoadingErrorMessageSuffix = " loading failed.";
+        const string FontErrorMessage = "Font" + LoadingErrorMessageSuffix;
+        const string FilePathsErrorMessage = "File paths" + LoadingErrorMessageSuffix;
+        const string SettingsErrorMessage = "Settings" + LoadingErrorMessageSuffix;
+        const string GameDataErrorMessage = "Game data" + LoadingErrorMessageSuffix;
+        const string QuestErrorMessage = "Quest." + LoadingErrorMessageSuffix;
+        const string ItemErrorMessage = "Item" + LoadingErrorMessageSuffix;
+        const string TileErrorMessage = "Tile" + LoadingErrorMessageSuffix;
+        const string BiomeErrorMessage = "Biome" + LoadingErrorMessageSuffix;
+        const string PlayerErrorMessage = "Player" + LoadingErrorMessageSuffix;
+        const string MenuErrorMessage = "Menu" + LoadingErrorMessageSuffix;
+        const string GuiErrorMessage = "Gui" + LoadingErrorMessageSuffix;
+
         if (FileManager.LoadFont("font").TryGetValue(out SpriteFont font)) {
             s_displayHandler.SetFont(font);
         }
         else {
-            SetStateToError("Font loading failed."); return;
+            SetStateToError(FontErrorMessage); return;
         }
 
         if (!FileManager.TryLoadFilePaths()) {
-            SetStateToError("Couldn't load file paths."); return;
+            SetStateToError(FilePathsErrorMessage); return;
         }
         LoadGameFiles();
         LoadMenus();
         LoadGuiElements();
         if (!FileManager.LoadSettings().TryGetValue(out s_settings)) {
-            SetStateToError("Settings loading failed");
+            SetStateToError(SettingsErrorMessage);
         }
         s_displayHandler.SetTileSize(s_settings.TileSize);
         if (!FileManager.LoadGameData().TryGetValue(out _gameData)) {
-            SetStateToError("Game data loading failed");
+            SetStateToError(GameDataErrorMessage);
         }
         if (!FileManager.LoadQuests().TryGetValue(out _defaultQuests)) {
-            SetStateToError("Quest loading failed."); return;
+            SetStateToError(QuestErrorMessage); return;
         }
 
         // --- Local functions ---
@@ -116,29 +130,29 @@ public class Shroomworld : Game {
             Dictionary<int, ItemType> itemTypes;
             Dictionary<int, BiomeType> biomeTypes;
             if(!FileManager.LoadTypes<ItemType>().TryGetValue(out itemTypes)) {
-                SetStateToError("Item type loading failed."); return;
+                SetStateToError(ItemErrorMessage); return;
             }
             else if (!FileManager.LoadTypes<TileType>().TryGetValue(out tileTypes)) {
-                SetStateToError("Tile type loading failed."); return;
+                SetStateToError(TileErrorMessage); return;
             }
             else if (!FileManager.LoadTypes<BiomeType>().TryGetValue(out biomeTypes)) {
-                SetStateToError("Biome type loading failed."); return;
+                SetStateToError(BiomeErrorMessage); return;
             }
             /*else if (!FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)) {
-                SetStateToError("Tile type loading failed."); return;
+                SetStateToError(); return;
             }
             else if (!FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)) {
-                SetStateToError("Tile type loading failed."); return;
+                SetStateToError(); return;
             }*/
             else if (!FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
-                SetStateToError("Tile type loading failed."); return;
+                SetStateToError(PlayerErrorMessage); return;
             }
 
             World.SetUp(tileTypes, itemTypes, biomeTypes/*, enemyTypes, friendlyTypes*/);
         }
         void LoadMenus() {
             if (!FileManager.TryLoadMenus(s_displayHandler, out var menuDisplayHandler, out var menus)) {
-                SetStateToError("Menu loading failed.");
+                SetStateToError(MenuErrorMessage);
                 return;
             }
             ButtonMenu.SetDisplayHandler(menuDisplayHandler);
@@ -155,17 +169,10 @@ public class Shroomworld : Game {
         }
         void LoadGuiElements() {
             if (!FileManager.LoadGuiElements().TryGetValue(out _guiElements)) {
-                SetStateToError("Couldn't load gui elements.");
+                SetStateToError(GuiErrorMessage);
             }
         }
     }
-    /// <summary>
-    /// Loads all universal game files.
-    /// </summary>
-    // Instantiation
-    /*private void CreateMenus() {
-        Menus.MainMenu = new Menu<>(new string[]{"1. New", "2. Quit"}, bgColour, textColour, null, null, new Vector2(100, 100), new Vector2(200, 200), null, MonogameDisplayHandler.DisplayBox, GetCursorLocation, GetInput)
-    }*/
     private ButtonMenu GetCurrentMenu => _activeMenus.Peek();
 
     protected override void Update(GameTime gameTime) {
@@ -292,16 +299,14 @@ public class Shroomworld : Game {
 
             case GameStates.Menu:
                 s_displayHandler.BeginStatic();
-                s_displayHandler.SetBackground(Color.White);
-                s_displayHandler.DrawText("Shroomworld", Vector2.Zero, Color.Black);
                 _activeMenus.Peek().Draw();
                 break;
 
             case GameStates.Error:
-				      s_displayHandler.BeginStatic();
-				      s_displayHandler.SetBackground(Color.Red);
-              s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);
-              break;
+                s_displayHandler.BeginStatic();
+                s_displayHandler.SetBackground(Color.Red);
+                s_displayHandler.DrawText(_errorMessage, Vector2.Zero, Color.White);
+                break;
 
             default:
                 break;
