@@ -32,10 +32,8 @@ public class World {
     private readonly List<Friendly> _friendlies;
     private readonly List<Enemy> _enemies;
     private readonly Player _player;
-    private readonly TimeSpan _inventoryToggleCooldown = new TimeSpan(hours: 0, minutes: 0, seconds: 2);
     private KeyBinds _keyBinds;
     private Physics.Physics _physics;
-    private DateTime _inventoryLastToggled;
     private bool _inventoryOpen = false;
     private Maybe<int> _id = Maybe.None;
     
@@ -112,7 +110,9 @@ public class World {
         _keyBinds.Add(Input.Inputs.N2, () => SwitchToHotbarSlot(1));
         _keyBinds.Add(Input.Inputs.N3, () => SwitchToHotbarSlot(2));
         _keyBinds.Add(Input.Inputs.N4, () => SwitchToHotbarSlot(3));
-        _keyBinds.Add(Input.Inputs.E, ToggleInventory);
+        _keyBinds.Add(Input.Inputs.N5, () => SwitchToHotbarSlot(4));
+        _keyBinds.Add(Input.Inputs.E, () => _inventoryOpen = true);
+        _keyBinds.Add(Input.Inputs.F, () => _inventoryOpen = false);
         /*_keyBinds.Add(Input.Inputs.Escape, OpenPauseMenu);
         _keyBinds.Add(Input.Inputs.Q, OpenQuestMenu);*/
     }
@@ -122,11 +122,6 @@ public class World {
     private void PlayerMoveDown() => _player.Body.AddAcceleration(_physics.AccelerationDown);
     private void SwitchToHotbarSlot(int slot) {
         _player.Inventory.SelectSlot(slot);
-    }
-    private void ToggleInventory() {
-        if ((DateTime.Now - _inventoryLastToggled) >= _inventoryToggleCooldown) {
-            _inventoryOpen = !_inventoryOpen;
-        }
     }
     private void ApplyPhysics() {
         _player.Body.ApplyPhysics(Shroomworld.Settings.Gravity, GetSolidIntersectingTiles);
