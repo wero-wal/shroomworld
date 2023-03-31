@@ -1,12 +1,11 @@
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Shroomworld {
     public class BiomeType : IType {
 
         // ----- Properties -----
 		public IdData IdData => _idData;
-		public Texture Background => _background;
+		public Color Background => _background;
 		public int[] Layers => _layers;
 		public int TreeType => _treeType;
 		public int[] FlowerTypes => _flowerTypes;
@@ -17,7 +16,7 @@ namespace Shroomworld {
 
 		// -----Fields -----
 		private readonly IdData _idData;
-        private readonly Texture _background;
+        private readonly Color _background;
         private readonly int[] _layers;
         private readonly int _treeType;
         private readonly int[] _flowerTypes;
@@ -27,7 +26,7 @@ namespace Shroomworld {
 
 
         // ----- Constructors -----
-        public BiomeType(IdData idData, Texture background, int[] layers, int treeType, int[] flowerTypes,
+        public BiomeType(IdData idData, Color background, int[] layers, int treeType, int[] flowerTypes,
             int treeAmount, int chestAmount /*, int flowerAmount, int friendlyAmount, int enemyAmount*/) {
             _idData = idData;
             _background = background;

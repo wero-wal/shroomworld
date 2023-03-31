@@ -176,7 +176,7 @@ public static class FileManager {
       	int p = 0;
     	return new BiomeType(
     		idData: idData,
-    		background: LoadTexture(FilePaths.Elements.Biome, idData.Name),
+    		background: ParseColour(plaintext[p++].Split(Levels.II)),
     		layers: ParseLayers(plaintext[p++]),
     		treeType: plaintext[p++].ToInt(),
     		flowerTypes: ParseLayers(plaintext[p++]),

@@ -76,7 +76,7 @@ public class World {
         _player.Sprite.Position = Clamp(_player.Sprite.Position, _player.Sprite.Size);
     }
     public void Draw(IDisplayHandler displayHandler, GuiElements guiElements) {
-        displayHandler.SetBackground(Color.CornflowerBlue);
+        displayHandler.SetBackground(_map.Biomes[(int)_player.Sprite.Position.X].Background);
 
         for (int x = 0; x < _map.Width; x++) {
             for (int y = 0; y < _map.Height; y++) {
