@@ -118,17 +118,19 @@ public class DisplayHandler : IDisplayHandler {
 		Vector2 position;
 		for (int y = 0; y < Inventory.Height; y++) {
 			for (int x = 0; x < Inventory.Width; x++) {
-				position = new Vector2(y * _tileSize, x * _tileSize);
-				End();
-				BeginStatic();
-				_spriteBatch.Draw(gui.HotbarSlot, position, _defaultColour);
-				if (!inventory[x, y].TryGetValue(out var item)) {
-					continue;
+				if (y != Inventory.HotbarRow) {
+					position = new Vector2(x * _tileSize, y * _tileSize);
+					End();
+					BeginStatic();
+					_spriteBatch.Draw(gui.HotbarSlot, position, _defaultColour);
+					if (!inventory[x, y].TryGetValue(out var item)) {
+						continue;
+					}
+					_spriteBatch.Draw(itemTypes[item.Id].Texture, position, _defaultColour);
+					End();
+					BeginText();
+					_spriteBatch.DrawString(Font, item.Amount.ToString(), position * Scale, Color.White);
 				}
-				_spriteBatch.Draw(itemTypes[item.Id].Texture, position, _defaultColour);
-				End();
-				BeginText();
-				_spriteBatch.DrawString(Font, item.Amount.ToString(), position * Scale, Color.White);
 			}
 		}
 	}
