@@ -21,14 +21,14 @@ public class TileType : IType {
     private const int _chestId = 23;
 
     private readonly IdData _idData;
-    private readonly Maybe<Drop[]> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
+    private readonly Maybe<IDroppable[]> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
     private readonly bool _isSolid; // if is solid, entities can't pass through
     private readonly int[] _breakableBy; // IDs of the tools which can break this tile
     private readonly Texture2D _texture;
 
 
     // ----- Constructors -----
-    public TileType(IdData idData, Texture2D texture, Maybe<Drop[]> drops, bool isSolid, int[] breakableBy) {
+    public TileType(IdData idData, Texture2D texture, Maybe<IDroppable[]> drops, bool isSolid, int[] breakableBy) {
         _idData = idData;
         _texture = texture;
         _drops = drops;
@@ -37,12 +37,12 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public void InsertDrops(Inventory inventory) {
-        if (!_drops.TryGetValue(out Drop[] drops)) {
-            return;
+    public InventoryItem[] GetDrops(Inventory inventory) {
+        if (!_drops.TryGetValue(out IDroppable[] drops)) {
+            return Array.Empty<InventoryItem>();
         }
-        foreach (Drop drop in drops) {
-            inventory.Add(drop.DropItem());
+        foreach (IDroppable drop in drops) {
+            inventory.Add(drop.Drop());
         }
     }
 }

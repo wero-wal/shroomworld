@@ -287,14 +287,14 @@ public static class FileManager {
 			range: Convert.ToSingle(plaintext[p++])
 		);
 	}
-	private static Maybe<Drop[]> ParseDrops(string plaintext) {
+	private static Maybe<RandomDrop[]> ParseDrops(string plaintext) {
 		if (string.IsNullOrEmpty(plaintext)) {
 			return Maybe.None;
 		}
 		string[] drops_str = plaintext.Split(Levels.II);
-		Drop[] drops = new Drop[drops_str.Length];
+		RandomDrop[] drops = new RandomDrop[drops_str.Length];
 		for (int i = 0; i < drops.Length; i++) {
-			drops[i] = new Drop(drops_str[i].Split(Levels.III).ToInt());
+			drops[i] = new RandomDrop(drops_str[i].Split(Levels.III).ToInt());
 		}
 		return drops;
 	}
