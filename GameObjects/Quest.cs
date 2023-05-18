@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 
 namespace Shroomworld;
-
 public class Quest {
 
     // ----- Properties -----
-    public string Description => _description;
-    public int NumberOfRequirements => _requiredItems.Length;
 
     // ----- Fields -----
-    private readonly string _description;
-    private readonly InventoryItem[] _requiredItems;
+    private readonly QuestType _type;
     private readonly int[] _progress;
 
     // ----- Constructors -----
-    public Quest(string description, InventoryItem[] requiredItems) {
-        _description = description;
-        _requiredItems = requiredItems;
-        _progress = new int[requiredItems.Length];
+    public Quest(QuestType type, int[] progress) {
+        _type = type;
+        _progress = progress;
     }
 
     // ----- Methods -----

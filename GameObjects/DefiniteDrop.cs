@@ -1,28 +1,18 @@
-using System;
-
-namespace Shroomworld.Drops;
-
-public class DefiniteDrop : IDroppable {
-
+namespace Shroomworld;
+public class DefiniteDrop {
 	// ----- Properties -----
 	// ----- Fields -----
-	private readonly int _id;
+	private readonly ItemType _type;
 	private readonly int _amount;
 
 	// ----- Constructors -----
-	private DefiniteDrop(int id, int amount) {
-		_id = id;
+	private DefiniteDrop(ItemType type, int amount) {
+		_type = type;
 		_amount = amount;
 	}
 	
 	// ----- Methods -----
-	public static DefiniteDrop Parse(string[] plaintext) {
-		return new DefiniteDrop(
-			id: Convert.ToInt32(plaintext[0]),
-			amount: Convert.ToInt32(plaintext[1])
-		);
-	}
 	public InventoryItem Drop() {
-		return new InventoryItem (_id, _amount);
+		return new InventoryItem (_type, _amount);
 	}
 }
