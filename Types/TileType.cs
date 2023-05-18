@@ -1,14 +1,11 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
+using Shroomworld.Drops;
 
 namespace Shroomworld; 
 public class TileType : IType {
 
     // ----- Properties -----
-	public static int AirId => _airId;
-	public static int WaterId => _waterId;
-	public static int ChestId => _chestId;
-
     public IdData IdData => _idData;
     public Texture2D Texture => _texture;
     public bool IsSolid => _isSolid;
@@ -16,9 +13,9 @@ public class TileType : IType {
 
 
 	// ----- Fields -----
-	private const int _airId = 0;
-    private const int _waterId = 11;
-    private const int _chestId = 23;
+	public const int AirId = 0;
+    public const int WaterId = 11;
+    public const int ChestId = 23;
 
     private readonly IdData _idData;
     private readonly Maybe<IDroppable[]> _drops; // the IDs and mins and maxs of the items the tile can drop when broken
@@ -37,12 +34,14 @@ public class TileType : IType {
     }
 
     // ----- Methods -----
-    public InventoryItem[] GetDrops(Inventory inventory) {
+    public InventoryItem[] GetDrops() {
         if (!_drops.TryGetValue(out IDroppable[] drops)) {
             return Array.Empty<InventoryItem>();
         }
-        foreach (IDroppable drop in drops) {
-            inventory.Add(drop.Drop());
+        InventoryItem[] items = new InventoryItem[drops.Length];
+        for (int i = 0; i < drops.Length; i++) {
+            items[i] = drops[i].Drop();
         }
+        return items;
     }
 }
