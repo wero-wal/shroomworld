@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Threading;
 
-namespace Shroomworld.FileHandling;
+namespace Shroomworld;
 
 // Naming note: In this class, Dir = Directory
 public static class FilePaths {
