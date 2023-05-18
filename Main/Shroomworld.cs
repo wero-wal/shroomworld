@@ -100,27 +100,27 @@ public class Shroomworld : Game {
         const string MenuErrorMessage = "Menu" + LoadingErrorMessageSuffix;
         const string GuiErrorMessage = "Gui" + LoadingErrorMessageSuffix;
 
-        if (FileManager.LoadFont("font").TryGetValue(out SpriteFont font)) {
+        if (FileLoader.LoadFont("font").TryGetValue(out SpriteFont font)) {
             s_displayHandler.SetFont(font);
         }
         else {
             SetStateToError(FontErrorMessage); return;
         }
 
-        if (!FileManager.TryLoadFilePaths()) {
+        if (!FileLoader.TryLoadFilePaths()) {
             SetStateToError(FilePathsErrorMessage); return;
         }
         LoadGameFiles();
         LoadMenus();
         LoadGuiElements();
-        if (!FileManager.LoadSettings().TryGetValue(out s_settings)) {
+        if (!FileLoader.LoadSettings().TryGetValue(out s_settings)) {
             SetStateToError(SettingsErrorMessage);
         }
         s_displayHandler.SetTileSize(s_settings.TileSize);
-        if (!FileManager.LoadGameData().TryGetValue(out _gameData)) {
+        if (!FileLoader.LoadGameData().TryGetValue(out _gameData)) {
             SetStateToError(GameDataErrorMessage);
         }
-        if (!FileManager.LoadQuests().TryGetValue(out _defaultQuests)) {
+        if (!FileLoader.LoadQuests().TryGetValue(out _defaultQuests)) {
             SetStateToError(QuestErrorMessage); return;
         }
 
@@ -129,13 +129,13 @@ public class Shroomworld : Game {
             Dictionary<int, TileType> tileTypes;
             Dictionary<int, ItemType> itemTypes;
             Dictionary<int, BiomeType> biomeTypes;
-            if(!FileManager.LoadTypes<ItemType>().TryGetValue(out itemTypes)) {
+            if(!FileLoader.LoadTypes<ItemType>().TryGetValue(out itemTypes)) {
                 SetStateToError(ItemErrorMessage); return;
             }
-            else if (!FileManager.LoadTypes<TileType>().TryGetValue(out tileTypes)) {
+            else if (!FileLoader.LoadTypes<TileType>().TryGetValue(out tileTypes)) {
                 SetStateToError(TileErrorMessage); return;
             }
-            else if (!FileManager.LoadTypes<BiomeType>().TryGetValue(out biomeTypes)) {
+            else if (!FileLoader.LoadTypes<BiomeType>().TryGetValue(out biomeTypes)) {
                 SetStateToError(BiomeErrorMessage); return;
             }
             /*else if (!FileManager.LoadTypes<EnemyType>().TryGetValue(out var enemyTypes)) {
@@ -144,14 +144,14 @@ public class Shroomworld : Game {
             else if (!FileManager.LoadTypes<FriendlyType>().TryGetValue(out var friendlyTypes)) {
                 SetStateToError(); return;
             }*/
-            else if (!FileManager.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
+            else if (!FileLoader.LoadTypes<PlayerType>().TryGetValue(out s_playerTypes)) {
                 SetStateToError(PlayerErrorMessage); return;
             }
 
             World.SetUp(tileTypes, itemTypes, biomeTypes/*, enemyTypes, friendlyTypes*/);
         }
         void LoadMenus() {
-            if (!FileManager.TryLoadMenus(s_displayHandler, out var menuDisplayHandler, out var menus)) {
+            if (!FileLoader.TryLoadMenus(s_displayHandler, out var menuDisplayHandler, out var menus)) {
                 SetStateToError(MenuErrorMessage);
                 return;
             }
@@ -168,7 +168,7 @@ public class Shroomworld : Game {
             }
         }
         void LoadGuiElements() {
-            if (!FileManager.LoadGuiElements().TryGetValue(out _guiElements)) {
+            if (!FileLoader.LoadGuiElements().TryGetValue(out _guiElements)) {
                 SetStateToError(GuiErrorMessage);
             }
         }
