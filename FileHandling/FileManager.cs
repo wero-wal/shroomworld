@@ -5,137 +5,97 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
-namespace Shroomworld.FileHandling;
-public static class FileManager {
+namespace Shroomworld;
+public class FileLoader {
 
 	//----- Enums -----
-	/// <summary>
-	/// Used as an enum to keep track of which level of list (or separation) we are in within a file.
-	/// </summary>
-	public struct Levels {
-		public const int I = 0;
-		public const int II = 1;
-		public const int III = 2;
-	}
-
 	// ----- Properties -----
 	// ----- Fields -----
-	private readonly static char[] s_separators = { ',', ';', ':' };
-	private readonly static string[] s_separators_str = { ",", ";", ":" };
-	private static Dictionary<Type, Func<IdData, string[], IType>> s_parsers = new Dictionary<Type, Func<IdData, string[], IType>> {
-		{ typeof(ItemType), ParseItemType },
-		{ typeof(TileType), ParseTileType },
-		{ typeof(BiomeType), ParseBiomeType },/*
-		{ typeof(EnemyType), ParseEnemyType },
-		{ typeof(FriendlyType), ParseFriendlyType },*/
-		{ typeof(PlayerType), ParsePlayerType }
-	};
+	private readonly Separators _separators;
+	private readonly ContentManager _contentManager;
+
+	// ----- Constructors -----
+	public FileLoader(ContentManager contentManager, Separators separators) {
+		_contentManager = contentManager;
+		_separators = separators;
+	}
 
 	// ----- Methods -----
 
 	// Load:
-	public static bool TryLoadFilePaths() {
-		try {
-			string[] filePaths = LoadCsvFile(FilePaths.FilePathFile)[0];
-			FilePaths.SetFilePaths(filePaths);
-			return true;
+	private Error GenerateFileNotFoundError(string path) {
+		return new Error ($"File \"{path}\" not found.", Error.Types.FileLoading);
+	}
+	public Either<List<string>, Error> LoadFile(string path) {
+		if (!File.Exists(path)) {
+			return GenerateFileNotFoundError(path);
 		}
-		catch (System.Exception) {
-			return false;
+		List<string> file = new();
+		using (StreamReader streamReader = new StreamReader(path)) {
+			while (!streamReader.EndOfStream) {
+				file.Add(streamReader.ReadLine());
+			}
+		}
+		return file;
+	}
+	public Either<List<string[][][]>, Error> LoadSplitFile(string path) {
+		// Check if file exists.
+		if (!File.Exists(path)) {
+			return GenerateFileNotFoundError(path);
+		}
+		// Load file.
+		List<string[][][]> file = new();
+		using (StreamReader streamReader = new StreamReader(path)) {
+			while (!streamReader.EndOfStream) {
+				file.Add(_separators.Split(streamReader.ReadLine()));
+			}
+		}
+		return file;
+	}
+	Dictionary<Type, Func<string, Texture2D>> _textureLoaders = new() {
+		{ typeof(ItemType), (string name) => LoadTexture(FilePaths.Elements.Item, name) },
+		{ typeof(TileType), (string name) => LoadTexture(FilePaths.Elements.Tile, name) },
+		{ typeof(BiomeType), (string name) => LoadTexture(FilePaths.Elements.Biome, name) },
+		{ typeof(EnemyType), (string name) => LoadTexture(FilePaths.Elements.Enemy, name) },
+		{ typeof(FriendlyType), (string name) => LoadTexture(FilePaths.Elements.Friendly, name) },
+		{ typeof(PlayerType), (string name) => LoadTexture(FilePaths.Elements.Player, name) },
+		{ typeof(GuiElements), (string name) => LoadTexture(FilePaths.Elements.Gui, name) },
+		{ typeof(MenuButton), (string name) => LoadTexture(FilePaths.Elements.Menu, name) },
+		{ typeof(ButtonMenu), (string name) => LoadTexture(FilePaths.Elements.Menu, name) },
+	};
+	public Func<string, Texture2D> GetTextureLoader(Type type) {
+		try {
+			return _textureLoaders[type];
+		}
+		catch (KeyNotFoundException) {
+			return (string path) => _contentManager.Load<Texture2D>(path);
 		}
 	}
-	// Note: exceptions will be handled in LoadTypes and other such high-level, public methods.
-	public static Maybe<Dictionary<int, TType>> LoadTypes<TType>() where TType : IType {
-		string path = FilePaths.TypeFiles[FilePaths.ElementForType[typeof(TType)]];
+	public Either<List<string>, Error> LoadFilePaths() {
+		return LoadFile(FilePaths.FilePathFile);
+	}
+	public Either<SpriteFont, Error> LoadFont(string path) {
+		const string FontLoadingFailed = "Font loading failed.";
 		try {
-			return ParseTypes<TType>(LoadCsvFile(path));
+			return _contentManager.Load<SpriteFont>(path);
+		}
+		catch (FileNotFoundException) {
+			return new Error(FontLoadingFailed + $" Path: \"{path}\".", Error.Types.FileLoading);
 		}
 		catch (Exception) {
-			return Maybe.None;
+			return new Error(FontLoadingFailed, Error.Types.FileLoading);
 		}
 	}
-	//public static Maybe<Player> LoadPlayer(int id)
-	//{
-	//	// todo: sort loadplayer out
-	//	string[][] file;
-	
-	//	if (!LoadCsvFile(FilePaths.AllUsers, out file))
-	//	{
-	//		return Maybe.None;
-	//	}
-	//	int p = 0;
-	//	Texture2D texture;
-	//	try
-	//	{
-	//		string[] line = file[0];
-	//		PlayerType type = Shroomworld.PlayerTypes[line[p++].ToInt()];
-	//		texture = LoadTexture(FilePaths.Elements.Player, idData.Name);
-	//		return new Player(
-	//			type: type,
-	//			sprite: new Sprite(texture),
-	//			powerUps: new PowerUp(ParsePowerUps(line[p++])),
-	//			healthData: new HealthData(ParseEntityHealthData(line[p++]), type.HealthData),
-	//			shieldData: new HealthData(ParseHealthData(line[p++])),
-	//			attack: new AttackAndBoostInfo(_powerUps.Damage),
-	//			inventory: ParseInventory(line[p++]), // doesn't even need to be stored as 2-dimensional if we store inventory height / width in settings
-	//			quests: ParseQuests(line[p++]),
-	//			statistics: ParseStatistics(line[p++]));
-	//		return true;
-	//	}
-	//	catch (Exception)
-	//	{
-	//		return Maybe.None;
-	//	}
-	//}
-	public static Maybe<SpriteFont> LoadFont(string path) {
-		try {
-			return Shroomworld.ContentManager.Load<SpriteFont>(path);
+	public Either<List<Quest>, Error> LoadQuests() {
+		if (!LoadFile(FilePaths.Quests).TryGetValue(out var file, out var error)) {
+			return error;
 		}
-		catch {
-			return Maybe.None;
-		}
-	}
-	public static Maybe<Settings> LoadSettings() {
-		string[][] file = LoadCsvFile(FilePaths.GeneralSettingsFile);
-		int p = 0;
-		try {
-			return new Settings(
-				gravity: file[0][p++].ToFloat(),
-				acceleration: file[0][p++].ToFloat(),
-				regenSpeedPercent: file[0][p++].ToInt(),
-				tileSize: file[0][p++].ToInt()
-			);
-		}
-		catch (Exception) {
-			return Maybe.None;
-		}
-	}
-	public static Maybe<GameData> LoadGameData() {
-		var file = LoadCsvFile(FilePaths.GameData);
-		if (file.Length == 0) {
-			return new GameData(Array.Empty<int>());
-		}
-		int p = 0;
-		try {
-			return new GameData(
-				worldIds: file[0][p++].Split(Levels.II).ToInt()
-			);
-		}
-		catch (Exception) {
-			return Maybe.None;
-		}
-	}
-	public static Maybe<List<Quest>> LoadQuests() {
-		string[][] file = LoadCsvFile(FilePaths.Quests);
 		List<Quest> quests = new List<Quest>();
 		try {
-			foreach (string[] line in file) {
-				int p = 0;
-				quests.Add(new Quest(
-					description: line[p++],
-					requiredItems: ParseItems(line[p++].Split(Levels.II)).ToArray()
-				));
+			foreach (string[][] line in file[0]) {
+				quests.Add(Quest.Parse(line, (int id) => ));
 			}
 			return quests;
 		}
@@ -199,17 +159,6 @@ public static class FileManager {
 			typeDictionary.Add(idData.Id, type);
 		}
 		return typeDictionary;
-	}
-	private static TileType ParseTileType(IdData idData, string[] plaintext)
-	{
-		int p = 0;
-		return new TileType(
-			idData: idData,
-			texture: LoadTexture(FilePaths.Elements.Tile, idData.Name),
-			drops: ParseDrops(plaintext[p++]),
-			isSolid: plaintext[p++].ToBoolean(),
-			breakableBy: ParseBreakableBy(plaintext[p++])
-		);
 	}
 	private static ItemType ParseItemType(IdData idData, string[] plaintext) {
 		int p = 0;
@@ -418,7 +367,7 @@ public static class FileManager {
 		// --- Local Functions ---
 		void AddToFile(object text, int level = Levels.I, bool addSeparator = true) {
 			if (addSeparator) {
-				file += text.ToString() + s_separators[level];
+				file += text.ToString() + _separators[level];
 			}
 			else {
 				file += text;
@@ -442,20 +391,5 @@ public static class FileManager {
 			csv.Append(s_separators_str[level]).Append(items[i].ToString());
 		}
 		return csv.ToString();
-	}
-	private static string[] Split(this string stringToSplit, int level) {
-		return stringToSplit.Split(s_separators[level]);
-	}
-	private static int ToInt(this string str) {
-		return Convert.ToInt32(str);
-	}
-	private static bool ToBoolean(this string str) {
-		return Convert.ToBoolean(Convert.ToInt32(str));
-	}
-	private static int[] ToInt(this string[] strArray) {
-		return Array.ConvertAll(strArray, item => Convert.ToInt32(item));
-	}
-	private static float ToFloat(this string str) {
-		return Convert.ToSingle(str);
 	}
 }
